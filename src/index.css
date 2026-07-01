@@ -21,7 +21,7 @@ body {
   --surface: #ffffff;
   --nav-bg: #ffffff;
   --nav-gradient: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
-  --canvas-gradient: radial-gradient(ellipse at 60% 40%, #f5f3ff 0%, #fafafa 70%);
+  --canvas-gradient: radial-gradient(ellipse at 60% 40%, #ede9fe 0%, #fafafa 70%);
   --card-gradient: linear-gradient(135deg, #ffffff 0%, #faf9ff 100%);
   --text: #0f0a1e;
   --text-secondary: #4b5563;

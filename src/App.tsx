@@ -317,11 +317,11 @@ export default function App() {
               width: 32,
               height: 32,
               borderRadius: 8,
-              background: "linear-gradient(135deg, var(--primary), #a78bfa)",
+              background: "linear-gradient(135deg, #5b21b6, #c4a7e7)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 2px 8px rgba(244,63,94,0.3)",
+              boxShadow: "0 2px 12px rgba(91,33,182,0.35)",
             }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -522,11 +522,10 @@ export default function App() {
             style={{
               display: "flex",
               gap: 0,
-              background: "var(--surface)",
-              border: "1.5px solid var(--border)",
+              background: "var(--border-subtle)",
+              border: "1px solid transparent",
               borderRadius: 9,
               overflow: "hidden",
-              boxShadow: "0 1px 2px var(--shadow-primary)",
             }}
           >
             {(["tree", "list"] as ViewMode[]).map((v) => (
@@ -538,7 +537,7 @@ export default function App() {
                   border: "none",
                   background:
                     view === v
-                      ? "linear-gradient(135deg, var(--primary) 0%, #a78bfa 100%)"
+                      ? "linear-gradient(135deg, #5b21b6 0%, #c4a7e7 100%)"
                       : "transparent",
                   color: view === v ? "#fff" : "var(--text-muted)",
                   fontWeight: 600,
