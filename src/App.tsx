@@ -518,32 +518,26 @@ export default function App() {
             </button>
           )}
 
-          <div
-            style={{
-              display: "flex",
-              gap: 0,
-              background: "var(--border-subtle)",
-              border: "1px solid transparent",
-              borderRadius: 9,
-              overflow: "hidden",
-            }}
-          >
+          <div style={{ display: "flex", gap: 6 }}>
             {(["tree", "list"] as ViewMode[]).map((v) => (
               <button
                 key={v}
                 onClick={() => setView(v)}
                 style={{
-                  padding: "8px 18px",
-                  border: "none",
-                  background:
-                    view === v
-                      ? "linear-gradient(135deg, #5b21b6 0%, #c4a7e7 100%)"
-                      : "transparent",
-                  color: view === v ? "#fff" : "var(--text-muted)",
-                  fontWeight: 600,
+                  padding: "7px 16px",
+                  borderRadius: 20,
+                  border: view === v ? "1px solid #7c3aed55" : "1px solid transparent",
+                  background: view === v
+                    ? "linear-gradient(135deg, #7c3aed, #c4a7e7)"
+                    : "transparent",
+                  WebkitBackgroundClip: view === v ? "text" : undefined,
+                  WebkitTextFillColor: view === v ? "transparent" : undefined,
+                  backgroundClip: view === v ? "text" : undefined,
+                  color: view === v ? undefined : "var(--text-muted)",
+                  fontWeight: 700,
                   fontSize: 13,
                   cursor: "pointer",
-                  transition: "all 0.15s",
+                  transition: "opacity 0.15s",
                   letterSpacing: "0.01em",
                 }}
               >

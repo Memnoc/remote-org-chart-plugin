@@ -95,7 +95,7 @@ export default function StatsBar({ forest, filteredForest, filteredCount, active
                 WebkitBackgroundClip: active ? undefined : 'text',
                 WebkitTextFillColor: active ? '#fff' : 'transparent',
                 backgroundClip: active ? undefined : 'text',
-                border: `1.5px solid ${active ? c : `${c}55`}`,
+                border: `1px solid ${active ? c : `${c}45`}`,
                 borderRadius: 20,
                 padding: '3px 10px',
                 letterSpacing: '0.01em',
