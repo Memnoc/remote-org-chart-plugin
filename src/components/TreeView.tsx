@@ -12,7 +12,7 @@ function treeDepth(node: OrgNode): number {
   return 1 + Math.max(...node.children.map(treeDepth))
 }
 
-function SingleTree({ root }: { root: OrgNode }) {
+function SingleTree({ root, initialDepth }: { root: OrgNode; initialDepth?: number }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [translate, setTranslate] = useState({ x: 0, y: 80 })
 
@@ -71,6 +71,7 @@ function SingleTree({ root }: { root: OrgNode }) {
         zoom={0.8}
         enableLegacyTransitions
         collapsible
+        initialDepth={initialDepth}
       />
     </div>
   )
@@ -129,6 +130,14 @@ function LoneNodeCard({ node }: { node: OrgNode }) {
 }
 
 export default function TreeView({ forest }: Props) {
+  const [expandMode, setExpandMode] = useState<'all' | 'collapsed' | 'default'>('default')
+  const [treeKey, setTreeKey] = useState(0)
+
+  function applyMode(mode: 'all' | 'collapsed') {
+    setExpandMode(mode)
+    setTreeKey((k) => k + 1)
+  }
+
   if (forest.length === 0) {
     return <div style={{ padding: 40, color: 'var(--text-muted)' }}>No org data available.</div>
   }
@@ -136,10 +145,35 @@ export default function TreeView({ forest }: Props) {
   const mainTrees = forest.filter((r) => (r.children?.length ?? 0) > 0)
   const loneNodes = forest.filter((r) => !r.children?.length)
 
+  const initialDepth = expandMode === 'all' ? undefined : expandMode === 'collapsed' ? 0 : undefined
+
   return (
     <div>
+      {mainTrees.length > 0 && (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 12, justifyContent: 'flex-end' }}>
+          {(['all', 'collapsed'] as const).map((mode) => (
+            <button
+              key={mode}
+              onClick={() => applyMode(mode)}
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                padding: '4px 12px',
+                borderRadius: 7,
+                border: '1.5px solid var(--border)',
+                background: expandMode === mode ? 'var(--primary)' : 'var(--surface)',
+                color: expandMode === mode ? '#fff' : 'var(--text-muted)',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              {mode === 'all' ? 'Expand all' : 'Collapse all'}
+            </button>
+          ))}
+        </div>
+      )}
       {mainTrees.map((root, i) => (
-        <SingleTree key={root.attributes.id ?? i} root={root} />
+        <SingleTree key={`${root.attributes.id ?? i}-${treeKey}`} root={root} initialDepth={initialDepth} />
       ))}
       {loneNodes.length > 0 && (
         <div style={{ marginTop: 8 }}>
