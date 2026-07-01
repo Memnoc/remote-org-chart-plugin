@@ -4,6 +4,7 @@ import { deptColor } from './NodeCard.tsx'
 
 interface Props {
   forest: OrgNode[]
+  filteredForest: OrgNode[]
   filteredCount: number
   activeDepts: Set<string>
   onToggleDept: (dept: string) => void
@@ -14,12 +15,23 @@ function flatten(node: OrgNode, out: OrgNode[]) {
   node.children?.forEach((c) => flatten(c, out))
 }
 
-export default function StatsBar({ forest, filteredCount, activeDepts, onToggleDept }: Props) {
+export default function StatsBar({ forest, filteredForest, filteredCount, activeDepts, onToggleDept }: Props) {
   const all = React.useMemo(() => {
     const nodes: OrgNode[] = []
     forest.forEach((r) => flatten(r, nodes))
     return nodes
   }, [forest])
+
+  const filteredDeptCounts = React.useMemo(() => {
+    const nodes: OrgNode[] = []
+    filteredForest.forEach((r) => flatten(r, nodes))
+    const map = new Map<string, number>()
+    for (const n of nodes) {
+      const d = (!n.attributes.department || n.attributes.department === '—') ? 'Unassigned' : n.attributes.department
+      map.set(d, (map.get(d) ?? 0) + 1)
+    }
+    return map
+  }, [filteredForest])
 
   const total = all.length
 
@@ -67,6 +79,8 @@ export default function StatsBar({ forest, filteredCount, activeDepts, onToggleD
           const c = deptColor(dept)
           const active = activeDepts.has(dept)
           const dimmed = hasActiveFilter && !active
+          const filteredDeptCount = filteredDeptCounts.get(dept) ?? 0
+          const showRatio = hasActiveFilter && filteredDeptCount !== count
           return (
             <button
               key={dept}
@@ -89,7 +103,9 @@ export default function StatsBar({ forest, filteredCount, activeDepts, onToggleD
               }}
             >
               {dept}
-              <span style={{ fontWeight: 700, opacity: active ? 0.85 : 0.8 }}>{count}</span>
+              <span style={{ fontWeight: 700, opacity: active ? 0.85 : 0.8 }}>
+                {showRatio ? `${filteredDeptCount}/${count}` : count}
+              </span>
             </button>
           )
         })}

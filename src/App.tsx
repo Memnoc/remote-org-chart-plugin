@@ -550,6 +550,7 @@ export default function App() {
         {state.status === "ok" && (
           <StatsBar
             forest={state.data.forest}
+            filteredForest={filteredForest}
             filteredCount={filteredForest.reduce(
               (n, r) => n + countNodes(r),
               0,
