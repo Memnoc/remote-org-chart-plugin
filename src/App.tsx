@@ -184,6 +184,35 @@ function MoonIcon() {
   );
 }
 
+function flattenForest(forest: OrgNode[], parentName = ""): string[][] {
+  const rows: string[][] = [];
+  for (const node of forest) {
+    const esc = (v: string) => `"${v.replace(/"/g, '""')}"`
+    rows.push([
+      esc(node.name),
+      esc(node.attributes.title ?? ""),
+      esc(node.attributes.department ?? ""),
+      esc(parentName),
+      node.attributes.isExternal ? "Yes" : "No",
+    ]);
+    rows.push(...flattenForest(node.children ?? [], node.name));
+  }
+  return rows;
+}
+
+function exportCSV(forest: OrgNode[]) {
+  const header = ["Name", "Title", "Department", "Manager", "External"];
+  const rows = [header, ...flattenForest(forest)];
+  const csv = rows.map((r) => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "org-chart.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function readParams() {
   const p = new URLSearchParams(window.location.search);
   return {
@@ -460,6 +489,27 @@ export default function App() {
               }}
             />
           </div>
+
+          {state.status === "ok" && (
+            <button
+              onClick={() => exportCSV(state.data.forest)}
+              title="Export to CSV"
+              style={{
+                padding: "8px 14px",
+                borderRadius: 9,
+                border: "1.5px solid var(--border)",
+                background: "var(--surface)",
+                color: "var(--text-muted)",
+                fontWeight: 600,
+                fontSize: 13,
+                cursor: "pointer",
+                boxShadow: "0 1px 2px var(--shadow-primary)",
+                flexShrink: 0,
+              }}
+            >
+              Export CSV
+            </button>
+          )}
 
           <div
             style={{
