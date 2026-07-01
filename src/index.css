@@ -17,7 +17,7 @@ body {
   --primary-mid: #ddd6fe;
   --border: #e8e4f8;
   --border-subtle: #f1f0f9;
-  --bg: radial-gradient(ellipse at 75% 20%, #fff9f0 0%, #ffffff 60%), radial-gradient(ellipse at 25% 80%, #fff9f0 0%, #ffffff 60%);
+  --bg: radial-gradient(ellipse at 80% 15%, #fff9f0 0%, #ffffff 40%), radial-gradient(ellipse at 25% 80%, #fff9f0 0%, #ffffff 60%);
   --surface: #ffffff;
   --nav-bg: #ffffff;
   --nav-gradient: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
