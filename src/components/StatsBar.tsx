@@ -90,20 +90,23 @@ export default function StatsBar({ forest, filteredForest, filteredCount, active
                 alignItems: 'center',
                 gap: 4,
                 fontSize: 11,
-                fontWeight: 600,
-                color: active ? '#fff' : c,
-                background: active ? c : `${c}15`,
-                border: `1px solid ${active ? c : `${c}30`}`,
+                fontWeight: 700,
+                background: active ? `linear-gradient(135deg, ${c}, ${c}bb)` : `linear-gradient(135deg, ${c}, ${c}99)`,
+                WebkitBackgroundClip: active ? undefined : 'text',
+                WebkitTextFillColor: active ? '#fff' : 'transparent',
+                backgroundClip: active ? undefined : 'text',
+                border: `1.5px solid ${active ? c : `${c}55`}`,
                 borderRadius: 20,
-                padding: '3px 9px',
+                padding: '3px 10px',
                 letterSpacing: '0.01em',
                 cursor: 'pointer',
-                opacity: dimmed ? 0.4 : 1,
-                transition: 'all 0.15s',
+                opacity: dimmed ? 0.35 : 1,
+                transition: 'opacity 0.15s',
               }}
             >
               {dept}
-              <span style={{ fontWeight: 700, opacity: active ? 0.85 : 0.8 }}>
+              {' '}
+              <span>
                 {showRatio ? `${filteredDeptCount}/${count}` : count}
               </span>
             </button>
