@@ -41,6 +41,12 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
 })
 
+app.post('/api/org/refresh', (_req, res) => {
+  cache = null
+  cacheTime = 0
+  res.json({ ok: true })
+})
+
 app.get('/api/org', async (_req, res) => {
   // Serve cache if fresh
   if (cache && Date.now() - cacheTime < CACHE_TTL_MS) {

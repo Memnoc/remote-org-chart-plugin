@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { OrgResponse } from '../../shared/types.js'
 
 type State =
@@ -6,10 +6,12 @@ type State =
   | { status: 'error'; message: string }
   | { status: 'ok'; data: OrgResponse }
 
-export function useOrg(): State {
+export function useOrg(): State & { refresh: () => void } {
   const [state, setState] = useState<State>({ status: 'loading' })
+  const [tick, setTick] = useState(0)
 
   useEffect(() => {
+    setState({ status: 'loading' })
     fetch('/api/org')
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
@@ -17,7 +19,12 @@ export function useOrg(): State {
       })
       .then((data) => setState({ status: 'ok', data }))
       .catch((err: Error) => setState({ status: 'error', message: err.message }))
+  }, [tick])
+
+  const refresh = useCallback(async () => {
+    await fetch('/api/org/refresh', { method: 'POST' })
+    setTick((t) => t + 1)
   }, [])
 
-  return state
+  return { ...state, refresh }
 }

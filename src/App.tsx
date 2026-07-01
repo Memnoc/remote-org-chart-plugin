@@ -149,6 +149,27 @@ function SunIcon() {
   );
 }
 
+function RefreshIcon({ spinning }: { spinning: boolean }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      style={{ transition: "transform 0.4s", transform: spinning ? "rotate(360deg)" : "none" }}
+    >
+      <path
+        d="M1 7a6 6 0 0 1 10.39-4M13 7a6 6 0 0 1-10.39 4"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <polyline points="11,3 11.39,3 13,1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      <polyline points="3,11 2.61,11 1,13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 function MoonIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -164,13 +185,20 @@ function MoonIcon() {
 }
 
 export default function App() {
-  const state = useOrg();
+  const { refresh, ...state } = useOrg();
   const [view, setView] = useState<ViewMode>("tree");
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(
     () => window.matchMedia("(prefers-color-scheme: dark)").matches,
   );
   const [activeDepts, setActiveDepts] = useState<Set<string>>(new Set());
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await refresh();
+    setRefreshing(false);
+  }
 
   useEffect(() => {
     document.documentElement.setAttribute(
@@ -287,6 +315,29 @@ export default function App() {
               <span style={{ fontSize: 12, color: "var(--text-subtle)" }}>
                 {new Date(state.data.fetchedAt).toLocaleTimeString()}
               </span>
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                title="Refresh data"
+                style={{
+                  width: 24,
+                  height: 24,
+                  border: "1.5px solid var(--border)",
+                  borderRadius: 6,
+                  background: "var(--surface)",
+                  color: "var(--text-muted)",
+                  cursor: refreshing ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: refreshing ? 0.5 : 1,
+                  transition: "all 0.15s",
+                  flexShrink: 0,
+                  padding: 0,
+                }}
+              >
+                <RefreshIcon spinning={refreshing} />
+              </button>
             </div>
           )}
 
