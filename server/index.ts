@@ -17,7 +17,7 @@ let cacheTime = 0
 const CACHE_TTL_MS = 5 * 60 * 1000 // 5 min
 
 function loadSnapshot(): OrgResponse {
-  const raw = readFileSync(path.join(__dirname, 'snapshot.json'), 'utf-8')
+  const raw = readFileSync(path.join(__dirname, '..', '..', 'server', 'snapshot.json'), 'utf-8')
   const employments = JSON.parse(raw) as RemoteEmployment[]
   const people = employments.map(mapEmployment).filter((p) => p.name !== '—' || p.title !== '—' || p.department !== '—')
   return {
@@ -66,7 +66,7 @@ app.get('/api/org', async (_req, res) => {
 })
 
 // Serve built SPA in production
-const distPath = path.join(__dirname, '..', 'dist')
+const distPath = path.join(__dirname, '..', '..', 'dist')
 app.use(express.static(distPath))
 app.get('*', (_req, res) => {
   res.sendFile(path.join(distPath, 'index.html'))
