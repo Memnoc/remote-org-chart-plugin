@@ -1,0 +1,47 @@
+import { describe, it, expect } from 'vitest'
+import { mapEmployment } from '../server/lib/mapper.js'
+import type { RemoteEmployment } from '../shared/types.js'
+
+const base: RemoteEmployment = {
+  id: 'emp-001',
+  full_name: 'Alice',
+  job_title: 'CEO',
+  department: 'Executive',
+  department_id: 'dept-001',
+  manager: null,
+  manager_email: null,
+  manager_employment_id: null,
+  status: 'active',
+}
+
+describe('mapEmployment', () => {
+  it('maps full employment', () => {
+    const p = mapEmployment(base)
+    expect(p.id).toBe('emp-001')
+    expect(p.name).toBe('Alice')
+    expect(p.title).toBe('CEO')
+    expect(p.department).toBe('Executive')
+    expect(p.managerId).toBeNull()
+    expect(p.externalManagerEmail).toBeNull()
+  })
+
+  it('replaces null fields with placeholder', () => {
+    const p = mapEmployment({ ...base, full_name: null, job_title: null, department: null })
+    expect(p.name).toBe('—')
+    expect(p.title).toBe('—')
+    expect(p.department).toBe('—')
+  })
+
+  it('sets managerId when manager_employment_id present', () => {
+    const p = mapEmployment({ ...base, manager_employment_id: 'emp-002', manager_email: 'b@x.com' })
+    expect(p.managerId).toBe('emp-002')
+    expect(p.externalManagerEmail).toBeNull()
+  })
+
+  it('sets externalManagerEmail when email set but no id', () => {
+    const p = mapEmployment({ ...base, manager_email: 'ext@board.com', manager: 'Board Member' })
+    expect(p.managerId).toBeNull()
+    expect(p.externalManagerEmail).toBe('ext@board.com')
+    expect(p.externalManagerName).toBe('Board Member')
+  })
+})

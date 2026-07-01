@@ -1,0 +1,123 @@
+[
+  {
+    "id": "emp-001",
+    "full_name": "Alice CEO",
+    "job_title": "Chief Executive Officer",
+    "department": "Executive",
+    "department_id": "dept-001",
+    "manager": null,
+    "manager_email": null,
+    "manager_employment_id": null,
+    "status": "active"
+  },
+  {
+    "id": "emp-002",
+    "full_name": "Bob VP Engineering",
+    "job_title": "VP Engineering",
+    "department": "Engineering",
+    "department_id": "dept-002",
+    "manager": "Alice CEO",
+    "manager_email": "alice@acme.com",
+    "manager_employment_id": "emp-001",
+    "status": "active"
+  },
+  {
+    "id": "emp-003",
+    "full_name": "Carol VP Sales",
+    "job_title": "VP Sales",
+    "department": "Sales",
+    "department_id": "dept-003",
+    "manager": "Alice CEO",
+    "manager_email": "alice@acme.com",
+    "manager_employment_id": "emp-001",
+    "status": "active"
+  },
+  {
+    "id": "emp-004",
+    "full_name": "Dave Engineer",
+    "job_title": "Senior Software Engineer",
+    "department": "Engineering",
+    "department_id": "dept-002",
+    "manager": "Bob VP Engineering",
+    "manager_email": "bob@acme.com",
+    "manager_employment_id": "emp-002",
+    "status": "active"
+  },
+  {
+    "id": "emp-005",
+    "full_name": "Eve Engineer",
+    "job_title": "Software Engineer",
+    "department": "Engineering",
+    "department_id": "dept-002",
+    "manager": "Bob VP Engineering",
+    "manager_email": "bob@acme.com",
+    "manager_employment_id": "emp-002",
+    "status": "active"
+  },
+  {
+    "id": "emp-006",
+    "full_name": "Frank Salesperson",
+    "job_title": "Account Executive",
+    "department": "Sales",
+    "department_id": "dept-003",
+    "manager": "Carol VP Sales",
+    "manager_email": "carol@acme.com",
+    "manager_employment_id": "emp-003",
+    "status": "active"
+  },
+  {
+    "id": "emp-007",
+    "full_name": "Grace Contractor",
+    "job_title": "UX Designer",
+    "department": null,
+    "department_id": null,
+    "manager": "board-advisor@external.com",
+    "manager_email": "board-advisor@external.com",
+    "manager_employment_id": null,
+    "status": "active"
+  },
+  {
+    "id": "emp-008",
+    "full_name": null,
+    "job_title": null,
+    "department": null,
+    "department_id": null,
+    "manager": null,
+    "manager_email": null,
+    "manager_employment_id": null,
+    "status": "active"
+  },
+  {
+    "id": "emp-009",
+    "full_name": "Hank Cycle-A",
+    "job_title": "Manager",
+    "department": "Ops",
+    "department_id": "dept-004",
+    "manager": "Iris Cycle-B",
+    "manager_email": "iris@acme.com",
+    "manager_employment_id": "emp-010",
+    "status": "active"
+  },
+  {
+    "id": "emp-010",
+    "full_name": "Iris Cycle-B",
+    "job_title": "Manager",
+    "department": "Ops",
+    "department_id": "dept-004",
+    "manager": "Hank Cycle-A",
+    "manager_email": "hank@acme.com",
+    "manager_employment_id": "emp-009",
+    "status": "active"
+  },
+  {
+    "id": "emp-011",
+    "full_name": "Jane Orphan",
+    "job_title": "Analyst",
+    "department": "Finance",
+    "department_id": "dept-005",
+    "manager": "Unknown Manager",
+    "manager_email": "missing@acme.com",
+    "manager_employment_id": "emp-999",
+    "status": "active"
+  }
+]

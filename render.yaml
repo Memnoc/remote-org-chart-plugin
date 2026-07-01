@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: remote-org-chart
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: REMOTE_API_TOKEN
+        sync: false   # set manually in Render dashboard
+      - key: PORT
+        value: "3001"
