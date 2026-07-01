@@ -1,6 +1,6 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.rd3t-link { stroke: #f9b8c4 !important; stroke-width: 1.5 !important; }
+.rd3t-link { stroke: #6b7280 !important; stroke-width: 1.5 !important; }
 [data-theme="dark"] .rd3t-link { stroke: #56526e !important; stroke-width: 1.5 !important; }
 
 body {
