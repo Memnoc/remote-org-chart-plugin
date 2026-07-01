@@ -294,6 +294,9 @@ export default function App() {
       {/* Top bar */}
       <div
         style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
           background: "var(--nav-gradient)",
           borderBottom: "1px solid var(--border)",
           padding: "0 32px",
