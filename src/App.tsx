@@ -317,7 +317,7 @@ export default function App() {
               width: 32,
               height: 32,
               borderRadius: 8,
-              background: "linear-gradient(135deg, var(--primary), #fb923c)",
+              background: "linear-gradient(135deg, var(--primary), #a78bfa)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -392,10 +392,10 @@ export default function App() {
                 disabled={refreshing}
                 title="Refresh data"
                 style={{
-                  width: 24,
-                  height: 24,
+                  width: 32,
+                  height: 32,
                   border: "1.5px solid var(--border)",
-                  borderRadius: 6,
+                  borderRadius: 8,
                   background: "var(--surface)",
                   color: "var(--text-muted)",
                   cursor: refreshing ? "not-allowed" : "pointer",
@@ -538,7 +538,7 @@ export default function App() {
                   border: "none",
                   background:
                     view === v
-                      ? "linear-gradient(135deg, var(--primary) 0%, #f97316 100%)"
+                      ? "linear-gradient(135deg, var(--primary) 0%, #a78bfa 100%)"
                       : "transparent",
                   color: view === v ? "#fff" : "var(--text-muted)",
                   fontWeight: 600,
