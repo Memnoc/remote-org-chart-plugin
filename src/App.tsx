@@ -193,6 +193,23 @@ export default function App() {
   );
   const [activeDepts, setActiveDepts] = useState<Set<string>>(new Set());
   const [refreshing, setRefreshing] = useState(false);
+  const searchRef = React.useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement).tagName;
+      if (e.key === "/" && tag !== "INPUT" && tag !== "TEXTAREA") {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+      if (e.key === "Escape") {
+        setSearch("");
+        searchRef.current?.blur();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   async function handleRefresh() {
     setRefreshing(true);
@@ -406,8 +423,9 @@ export default function App() {
               />
             </svg>
             <input
+              ref={searchRef}
               type="search"
-              placeholder="Search name, title, department…"
+              placeholder="Search name, title, department… (press /)"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
