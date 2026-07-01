@@ -272,7 +272,7 @@ export default function App() {
         {state.status === 'ok' && (
           view === 'tree'
             ? <TreeView forest={filteredForest} />
-            : <ListView forest={filteredForest} />
+            : <ListView forest={filteredForest} search={search} />
         )}
       </div>
     </div>
