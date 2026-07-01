@@ -184,14 +184,24 @@ function MoonIcon() {
   );
 }
 
+function readParams() {
+  const p = new URLSearchParams(window.location.search);
+  return {
+    view: (p.get("view") as ViewMode) ?? "tree",
+    search: p.get("q") ?? "",
+    depts: p.get("depts") ? new Set(p.get("depts")!.split(",")) : new Set<string>(),
+  };
+}
+
 export default function App() {
   const { refresh, ...state } = useOrg();
-  const [view, setView] = useState<ViewMode>("tree");
-  const [search, setSearch] = useState("");
+  const init = readParams();
+  const [view, setView] = useState<ViewMode>(init.view);
+  const [search, setSearch] = useState(init.search);
   const [dark, setDark] = useState(
     () => window.matchMedia("(prefers-color-scheme: dark)").matches,
   );
-  const [activeDepts, setActiveDepts] = useState<Set<string>>(new Set());
+  const [activeDepts, setActiveDepts] = useState<Set<string>>(init.depts);
   const [refreshing, setRefreshing] = useState(false);
   const searchRef = React.useRef<HTMLInputElement>(null);
 
@@ -210,6 +220,15 @@ export default function App() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  useEffect(() => {
+    const p = new URLSearchParams();
+    if (view !== "tree") p.set("view", view);
+    if (search) p.set("q", search);
+    if (activeDepts.size > 0) p.set("depts", [...activeDepts].join(","));
+    const qs = p.toString();
+    window.history.replaceState(null, "", qs ? `?${qs}` : window.location.pathname);
+  }, [view, search, activeDepts]);
 
   async function handleRefresh() {
     setRefreshing(true);
