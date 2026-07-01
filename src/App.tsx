@@ -11,6 +11,21 @@ function countNodes(node: OrgNode): number {
   return 1 + (node.children ?? []).reduce((n, c) => n + countNodes(c), 0)
 }
 
+function filterByDept(forest: OrgNode[], depts: Set<string>): OrgNode[] {
+  function nodeMatches(node: OrgNode): boolean {
+    const d = (!node.attributes.department || node.attributes.department === '—')
+      ? 'Unassigned'
+      : node.attributes.department
+    return depts.has(d)
+  }
+  function keep(node: OrgNode): OrgNode | null {
+    const childMatches = (node.children ?? []).flatMap((c) => { const r = keep(c); return r ? [r] : [] })
+    if (nodeMatches(node) || childMatches.length > 0) return { ...node, children: childMatches.length ? childMatches : node.children }
+    return null
+  }
+  return forest.flatMap((r) => { const res = keep(r); return res ? [res] : [] })
+}
+
 function filterForest(forest: OrgNode[], query: string): OrgNode[] {
   if (!query) return forest
   const q = query.toLowerCase()
@@ -75,15 +90,26 @@ export default function App() {
   const [view, setView] = useState<ViewMode>('tree')
   const [search, setSearch] = useState('')
   const [dark, setDark] = useState(() => window.matchMedia('(prefers-color-scheme: dark)').matches)
+  const [activeDepts, setActiveDepts] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
   }, [dark])
 
-  const filteredForest = useMemo(
-    () => (state.status === 'ok' ? filterForest(state.data.forest, search) : []),
-    [state, search],
-  )
+  function toggleDept(dept: string) {
+    setActiveDepts((prev) => {
+      const next = new Set(prev)
+      next.has(dept) ? next.delete(dept) : next.add(dept)
+      return next
+    })
+  }
+
+  const filteredForest = useMemo(() => {
+    if (state.status !== 'ok') return []
+    const afterSearch = filterForest(state.data.forest, search)
+    if (activeDepts.size === 0) return afterSearch
+    return filterByDept(afterSearch, activeDepts)
+  }, [state, search, activeDepts])
 
   const isLive = state.status === 'ok' && state.data.source === 'live'
 
@@ -225,7 +251,12 @@ export default function App() {
         </div>
 
         {state.status === 'ok' && (
-          <StatsBar forest={state.data.forest} filteredCount={filteredForest.reduce((n, r) => n + countNodes(r), 0)} />
+          <StatsBar
+            forest={state.data.forest}
+            filteredCount={filteredForest.reduce((n, r) => n + countNodes(r), 0)}
+            activeDepts={activeDepts}
+            onToggleDept={toggleDept}
+          />
         )}
 
         {state.status === 'loading' && (

@@ -5,6 +5,8 @@ import { deptColor } from './NodeCard.tsx'
 interface Props {
   forest: OrgNode[]
   filteredCount: number
+  activeDepts: Set<string>
+  onToggleDept: (dept: string) => void
 }
 
 function flatten(node: OrgNode, out: OrgNode[]) {
@@ -12,7 +14,7 @@ function flatten(node: OrgNode, out: OrgNode[]) {
   node.children?.forEach((c) => flatten(c, out))
 }
 
-export default function StatsBar({ forest, filteredCount }: Props) {
+export default function StatsBar({ forest, filteredCount, activeDepts, onToggleDept }: Props) {
   const all = React.useMemo(() => {
     const nodes: OrgNode[] = []
     forest.forEach((r) => flatten(r, nodes))
@@ -33,6 +35,7 @@ export default function StatsBar({ forest, filteredCount }: Props) {
   }, [all])
 
   const showFiltered = filteredCount !== total
+  const hasActiveFilter = activeDepts.size > 0
 
   return (
     <div style={{
@@ -59,28 +62,55 @@ export default function StatsBar({ forest, filteredCount }: Props) {
 
       <div style={{ width: 1, height: 20, background: 'var(--border)', flexShrink: 0 }} />
 
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
         {deptCounts.map(([dept, count]) => {
           const c = deptColor(dept)
+          const active = activeDepts.has(dept)
+          const dimmed = hasActiveFilter && !active
           return (
-            <span key={dept} style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              fontSize: 11,
-              fontWeight: 600,
-              color: c,
-              background: `${c}15`,
-              border: `1px solid ${c}30`,
-              borderRadius: 20,
-              padding: '3px 9px',
-              letterSpacing: '0.01em',
-            }}>
+            <button
+              key={dept}
+              onClick={() => onToggleDept(dept)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: 11,
+                fontWeight: 600,
+                color: active ? '#fff' : c,
+                background: active ? c : `${c}15`,
+                border: `1px solid ${active ? c : `${c}30`}`,
+                borderRadius: 20,
+                padding: '3px 9px',
+                letterSpacing: '0.01em',
+                cursor: 'pointer',
+                opacity: dimmed ? 0.4 : 1,
+                transition: 'all 0.15s',
+              }}
+            >
               {dept}
-              <span style={{ fontWeight: 700, opacity: 0.8 }}>{count}</span>
-            </span>
+              <span style={{ fontWeight: 700, opacity: active ? 0.85 : 0.8 }}>{count}</span>
+            </button>
           )
         })}
+        {hasActiveFilter && (
+          <button
+            onClick={() => activeDepts.forEach((d) => onToggleDept(d))}
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--text-muted)',
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              borderRadius: 20,
+              padding: '3px 9px',
+              cursor: 'pointer',
+              letterSpacing: '0.01em',
+            }}
+          >
+            Clear
+          </button>
+        )}
       </div>
     </div>
   )
