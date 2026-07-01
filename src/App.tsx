@@ -3,6 +3,8 @@ import { useOrg } from "./hooks/useOrg.ts";
 import TreeView from "./components/TreeView.tsx";
 import ListView from "./components/ListView.tsx";
 import StatsBar from "./components/StatsBar.tsx";
+import DetailPanel from "./components/DetailPanel.tsx";
+import type { PersonDetail } from "./components/DetailPanel.tsx";
 import type { OrgNode } from "../shared/types.js";
 
 type ViewMode = "tree" | "list";
@@ -232,6 +234,7 @@ export default function App() {
   );
   const [activeDepts, setActiveDepts] = useState<Set<string>>(init.depts);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedPerson, setSelectedPerson] = useState<PersonDetail | null>(null);
   const searchRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -291,6 +294,7 @@ export default function App() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
+      <DetailPanel person={selectedPerson} onClose={() => setSelectedPerson(null)} />
       {/* Top bar */}
       <div
         style={{
@@ -591,7 +595,7 @@ export default function App() {
         )}
         {state.status === "ok" &&
           (view === "tree" ? (
-            <TreeView forest={filteredForest} />
+            <TreeView forest={filteredForest} onSelect={setSelectedPerson} />
           ) : (
             <ListView forest={filteredForest} search={search} />
           ))}

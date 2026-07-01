@@ -2,9 +2,11 @@ import React, { useRef, useEffect, useState, useCallback } from 'react'
 import Tree from 'react-d3-tree'
 import type { OrgNode } from '../../shared/types.js'
 import NodeCard, { deptColor } from './NodeCard.tsx'
+import type { PersonDetail } from './DetailPanel.tsx'
 
 interface Props {
   forest: OrgNode[]
+  onSelect?: (person: PersonDetail) => void
 }
 
 function treeDepth(node: OrgNode): number {
@@ -12,7 +14,7 @@ function treeDepth(node: OrgNode): number {
   return 1 + Math.max(...node.children.map(treeDepth))
 }
 
-function SingleTree({ root, initialDepth }: { root: OrgNode; initialDepth?: number }) {
+function SingleTree({ root, initialDepth, onSelect }: { root: OrgNode; initialDepth?: number; onSelect?: (p: PersonDetail) => void }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [translate, setTranslate] = useState({ x: 0, y: 80 })
 
@@ -27,19 +29,31 @@ function SingleTree({ root, initialDepth }: { root: OrgNode; initialDepth?: numb
   const height = Math.max(220, depth * 180 + 60)
 
   const renderNode = useCallback(
-    ({ nodeDatum, toggleNode }: { nodeDatum: Record<string, unknown>; toggleNode: () => void }) => (
-      <foreignObject
-        width={230}
-        height={110}
-        x={-115}
-        y={-55}
-        onClick={toggleNode}
-        style={{ cursor: 'pointer', overflow: 'visible' }}
-      >
-        <NodeCard nodeData={nodeDatum as Parameters<typeof NodeCard>[0]['nodeData']} />
-      </foreignObject>
-    ),
-    [],
+    ({ nodeDatum, toggleNode }: { nodeDatum: Record<string, unknown>; toggleNode: () => void }) => {
+      const nd = nodeDatum as Parameters<typeof NodeCard>[0]['nodeData']
+      return (
+        <foreignObject
+          width={230}
+          height={110}
+          x={-115}
+          y={-55}
+          style={{ overflow: 'visible' }}
+        >
+          <NodeCard
+            nodeData={nd}
+            onToggle={toggleNode}
+            onSelect={() => onSelect?.({
+              name: nd.name,
+              title: nd.attributes?.title,
+              department: nd.attributes?.department,
+              isExternal: nd.attributes?.isExternal,
+              badge: nd.attributes?.badge,
+            })}
+          />
+        </foreignObject>
+      )
+    },
+    [onSelect],
   )
 
   return (
@@ -129,7 +143,7 @@ function LoneNodeCard({ node }: { node: OrgNode }) {
   )
 }
 
-export default function TreeView({ forest }: Props) {
+export default function TreeView({ forest, onSelect }: Props) {
   const [expandMode, setExpandMode] = useState<'all' | 'collapsed' | 'default'>('default')
   const [treeKey, setTreeKey] = useState(0)
 
@@ -173,7 +187,7 @@ export default function TreeView({ forest }: Props) {
         </div>
       )}
       {mainTrees.map((root, i) => (
-        <SingleTree key={`${root.attributes.id ?? i}-${treeKey}`} root={root} initialDepth={initialDepth} />
+        <SingleTree key={`${root.attributes.id ?? i}-${treeKey}`} root={root} initialDepth={initialDepth} onSelect={onSelect} />
       ))}
       {loneNodes.length > 0 && (
         <div style={{ marginTop: 8 }}>

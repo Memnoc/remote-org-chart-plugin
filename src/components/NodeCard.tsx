@@ -12,6 +12,8 @@ interface Props {
     children?: unknown[]
     __rd3t?: { collapsed: boolean }
   }
+  onSelect?: () => void
+  onToggle?: () => void
 }
 
 const DEPT_COLORS: Record<string, string> = {
@@ -48,7 +50,7 @@ function initials(name: string): string {
     .toUpperCase()
 }
 
-export default function NodeCard({ nodeData }: Props) {
+export default function NodeCard({ nodeData, onSelect, onToggle }: Props) {
   const { name, attributes = {}, children, __rd3t } = nodeData
   const { title, department, isExternal } = attributes
   const displayName = name === '—' ? 'Unknown Employee' : name
@@ -58,17 +60,20 @@ export default function NodeCard({ nodeData }: Props) {
   const color = deptColor(department)
 
   return (
-    <div style={{
-      background: 'var(--card-gradient)',
-      border: '1px solid var(--border)',
-      borderRadius: 12,
-      padding: '12px 14px 12px 12px',
-      width: 210,
-      boxShadow: 'var(--shadow-card)',
-      textAlign: 'left',
-      position: 'relative',
-      borderLeft: `4px solid ${color}`,
-    }}>
+    <div
+      onClick={onSelect}
+      style={{
+        background: 'var(--card-gradient)',
+        border: '1px solid var(--border)',
+        borderRadius: 12,
+        padding: '12px 14px 12px 12px',
+        width: 210,
+        boxShadow: 'var(--shadow-card)',
+        textAlign: 'left',
+        position: 'relative',
+        borderLeft: `4px solid ${color}`,
+        cursor: onSelect ? 'pointer' : 'default',
+      }}>
 
       {/* Avatar + name row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 9, paddingRight: hasChildren ? 22 : 0 }}>
@@ -131,7 +136,7 @@ export default function NodeCard({ nodeData }: Props) {
 
       {/* Expand/collapse chevron */}
       {hasChildren && (
-        <div style={{
+        <div onClick={(e) => { e.stopPropagation(); onToggle?.() }} style={{
           position: 'absolute',
           top: 10,
           right: 10,
