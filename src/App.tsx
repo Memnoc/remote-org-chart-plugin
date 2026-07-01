@@ -2,9 +2,14 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { useOrg } from './hooks/useOrg.ts'
 import TreeView from './components/TreeView.tsx'
 import ListView from './components/ListView.tsx'
+import StatsBar from './components/StatsBar.tsx'
 import type { OrgNode } from '../shared/types.js'
 
 type ViewMode = 'tree' | 'list'
+
+function countNodes(node: OrgNode): number {
+  return 1 + (node.children ?? []).reduce((n, c) => n + countNodes(c), 0)
+}
 
 function filterForest(forest: OrgNode[], query: string): OrgNode[] {
   if (!query) return forest
@@ -218,6 +223,10 @@ export default function App() {
             ))}
           </div>
         </div>
+
+        {state.status === 'ok' && (
+          <StatsBar forest={state.data.forest} filteredCount={filteredForest.reduce((n, r) => n + countNodes(r), 0)} />
+        )}
 
         {state.status === 'loading' && (
           <div style={{ padding: 80, textAlign: 'center', color: 'var(--text-subtle)', fontSize: 14 }}>
