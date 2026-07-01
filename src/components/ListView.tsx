@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import type { OrgNode } from '../../shared/types.js'
+
+const PAGE_SIZE = 20
 
 interface Props {
   forest: OrgNode[]
@@ -55,21 +57,83 @@ function NodeRow({ node, depth, search }: { node: OrgNode; depth: number; search
   )
 }
 
+interface FlatRow { node: OrgNode; depth: number }
+
+function flattenForest(forest: OrgNode[]): FlatRow[] {
+  const rows: FlatRow[] = []
+  function walk(node: OrgNode, depth: number) {
+    rows.push({ node, depth })
+    node.children?.forEach((c) => walk(c, depth + 1))
+  }
+  forest.forEach((r) => walk(r, 0))
+  return rows
+}
+
 export default function ListView({ forest, search = '' }: Props) {
+  const [page, setPage] = useState(0)
+
+  useEffect(() => { setPage(0) }, [forest, search])
+
   if (forest.length === 0) {
     return <div style={{ padding: 40, color: 'var(--text-muted)' }}>No org data available.</div>
   }
+
+  const rows = flattenForest(forest)
+  const totalPages = Math.ceil(rows.length / PAGE_SIZE)
+  const pageRows = rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+
   return (
-    <div style={{
-      background: 'var(--surface)',
-      borderRadius: 12,
-      border: '1px solid var(--border)',
-      overflow: 'hidden',
-      boxShadow: '0 1px 4px var(--shadow-primary)',
-    }}>
-      {forest.map((root, i) => (
-        <NodeRow key={root.attributes.id ?? i} node={root} depth={0} search={search} />
-      ))}
+    <div>
+      <div style={{
+        background: 'var(--surface)',
+        borderRadius: 12,
+        border: '1px solid var(--border)',
+        overflow: 'hidden',
+        boxShadow: '0 1px 4px var(--shadow-primary)',
+      }}>
+        {pageRows.map(({ node, depth }, i) => (
+          <NodeRow key={node.attributes.id ?? `${page}-${i}`} node={node} depth={depth} search={search} />
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          gap: 12, marginTop: 16,
+        }}>
+          <button
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+            style={pageBtn(page === 0)}
+          >
+            Previous
+          </button>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
+            Page {page + 1} of {totalPages}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+            disabled={page === totalPages - 1}
+            style={pageBtn(page === totalPages - 1)}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   )
+}
+
+function pageBtn(disabled: boolean): React.CSSProperties {
+  return {
+    padding: '6px 16px',
+    borderRadius: 8,
+    border: '1.5px solid var(--border)',
+    background: 'var(--surface)',
+    color: disabled ? 'var(--text-subtle)' : 'var(--text-muted)',
+    fontWeight: 600,
+    fontSize: 12,
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    opacity: disabled ? 0.5 : 1,
+  }
 }
