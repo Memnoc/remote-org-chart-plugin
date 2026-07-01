@@ -524,21 +524,17 @@ export default function App() {
                 key={v}
                 onClick={() => setView(v)}
                 style={{
-                  padding: "7px 16px",
-                  borderRadius: 20,
-                  border: view === v ? "1px solid #7c3aed55" : "1px solid transparent",
-                  background: view === v
-                    ? "linear-gradient(135deg, #7c3aed, #c4a7e7)"
-                    : "transparent",
-                  WebkitBackgroundClip: view === v ? "text" : undefined,
-                  WebkitTextFillColor: view === v ? "transparent" : undefined,
-                  backgroundClip: view === v ? "text" : undefined,
-                  color: view === v ? undefined : "var(--text-muted)",
-                  fontWeight: 700,
+                  padding: "8px 14px",
+                  borderRadius: 9,
+                  border: view === v ? "1.5px solid var(--primary)" : "1.5px solid var(--border)",
+                  background: "var(--surface)",
+                  color: view === v ? "var(--primary)" : "var(--text-muted)",
+                  fontWeight: 600,
                   fontSize: 13,
                   cursor: "pointer",
-                  transition: "opacity 0.15s",
+                  transition: "all 0.15s",
                   letterSpacing: "0.01em",
+                  boxShadow: "0 1px 2px var(--shadow-primary)",
                 }}
               >
                 {v.charAt(0).toUpperCase() + v.slice(1)}
