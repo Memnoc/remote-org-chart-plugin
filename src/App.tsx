@@ -112,7 +112,7 @@ export default function App() {
             </svg>
           </div>
           <span style={{ fontWeight: 800, fontSize: 17, color: 'var(--text)', letterSpacing: '-0.02em' }}>
-            Org Chart
+            Remote Org Chart Plugin
           </span>
         </div>
 
