@@ -5,6 +5,7 @@ import ListView from "./components/ListView.tsx";
 import DetailPanel from "./components/DetailPanel.tsx";
 import type { PersonDetail } from "./components/DetailPanel.tsx";
 import { deptColor } from "./components/NodeCard.tsx";
+import StatsPanel, { computeStats } from "./components/StatsPanel.tsx";
 import type { OrgNode } from "../shared/types.js";
 
 type ViewMode = "tree" | "list";
@@ -145,6 +146,7 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState<PersonDetail | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [statsOpen, setStatsOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const filterBtnRef = useRef<HTMLButtonElement>(null);
   const filterPanelRef = useRef<HTMLDivElement>(null);
@@ -245,12 +247,18 @@ export default function App() {
     return filterByDept(afterSearch, activeDepts);
   }, [state, search, activeDepts]);
 
+  const orgStats = useMemo(
+    () => state.status === "ok" ? computeStats(allNodes, state.data.forest) : null,
+    [allNodes, state],
+  );
+
   const isLive = state.status === "ok" && state.data.source === "live";
   const totalPeople = allNodes.length;
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden", background: "var(--bg)" }}>
       <DetailPanel person={selectedPerson} onClose={() => setSelectedPerson(null)} />
+      {orgStats && <StatsPanel stats={orgStats} open={statsOpen} onClose={() => setStatsOpen(false)} />}
 
       {/* Header */}
       <div style={{
@@ -493,6 +501,19 @@ export default function App() {
           ))}
         </div>
 
+        {state.status === "ok" && (
+          <button
+            onClick={() => setStatsOpen((o) => !o)}
+            style={{
+              padding: "7px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer",
+              border: `1.5px solid ${statsOpen ? "#f59e0b" : "var(--border)"}`,
+              background: statsOpen ? "rgba(245,158,11,0.06)" : "var(--surface)",
+              color: statsOpen ? "#f59e0b" : "var(--text-muted)",
+            }}
+          >
+            Stats
+          </button>
+        )}
         {state.status === "ok" && (
           <button
             onClick={() => exportCSV(state.data.forest)}

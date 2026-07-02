@@ -1,9 +1,27 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react'
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 import Tree from 'react-d3-tree'
 import type { CustomNodeElementProps } from 'react-d3-tree'
 import type { OrgNode } from '../../shared/types.js'
 import NodeCard, { deptColor } from './NodeCard.tsx'
 import type { PersonDetail } from './DetailPanel.tsx'
+
+function findChain(forest: OrgNode[], targetId: string): Set<string> {
+  function search(node: OrgNode, path: string[]): string[] | null {
+    const id = node.attributes.id ?? ''
+    const next = [...path, id]
+    if (id === targetId) return next
+    for (const child of node.children ?? []) {
+      const r = search(child, next)
+      if (r) return r
+    }
+    return null
+  }
+  for (const root of forest) {
+    const r = search(root, [])
+    if (r) return new Set(r)
+  }
+  return new Set()
+}
 
 interface Props {
   forest: OrgNode[]
@@ -23,6 +41,7 @@ function SingleTree({
   onSelect,
   selectedId,
   onSelectId,
+  chainIds,
 }: {
   root: OrgNode
   initialDepth?: number
@@ -30,6 +49,7 @@ function SingleTree({
   onSelect?: (p: PersonDetail) => void
   selectedId: string | null
   onSelectId: (id: string | null) => void
+  chainIds: Set<string>
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [translate, setTranslate] = useState({ x: 0, y: 80 })
@@ -53,6 +73,7 @@ function SingleTree({
           <NodeCard
             nodeData={nd}
             selected={!!id && id === selectedId}
+            onChain={!!id && chainIds.has(id) && id !== selectedId}
             onToggle={toggleNode}
             onSelect={() => {
               onSelectId(id || null)
@@ -68,7 +89,7 @@ function SingleTree({
         </foreignObject>
       )
     },
-    [onSelect, selectedId, onSelectId],
+    [onSelect, selectedId, onSelectId, chainIds],
   )
 
   return (
@@ -88,6 +109,11 @@ function SingleTree({
         enableLegacyTransitions
         collapsible
         initialDepth={initialDepth}
+        pathClassFunc={({ source, target }) => {
+          const srcId = (source.data.attributes as Record<string, unknown>)?.id as string ?? ''
+          const tgtId = (target.data.attributes as Record<string, unknown>)?.id as string ?? ''
+          return chainIds.has(srcId) && chainIds.has(tgtId) ? 'rd3t-link rd3t-link-chain' : 'rd3t-link'
+        }}
       />
     </div>
   )
@@ -169,6 +195,11 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
   const [treeKey, setTreeKey] = useState(0)
   const [zoom, setZoom] = useState(0.8)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+
+  const chainIds = useMemo(
+    () => selectedId ? findChain(forest, selectedId) : new Set<string>(),
+    [forest, selectedId],
+  )
 
   function applyMode(mode: 'all' | 'collapsed') {
     setExpandMode(mode)
@@ -279,6 +310,7 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
             onSelect={onSelect}
             selectedId={selectedId}
             onSelectId={setSelectedId}
+            chainIds={chainIds}
           />
         ))}
 

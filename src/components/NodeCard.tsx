@@ -16,6 +16,7 @@ interface Props {
   onSelect?: () => void
   onToggle?: () => void
   selected?: boolean
+  onChain?: boolean
 }
 
 const DEPT_COLORS: Record<string, string> = {
@@ -61,7 +62,7 @@ function PeopleIcon() {
   )
 }
 
-export default function NodeCard({ nodeData, onSelect, onToggle, selected }: Props) {
+export default function NodeCard({ nodeData, onSelect, onToggle, selected, onChain }: Props) {
   const { name, attributes = {}, children, __rd3t } = nodeData
   const { title, department, isExternal } = attributes
   const displayName = name === '—' ? 'Unknown Employee' : name
@@ -79,13 +80,14 @@ export default function NodeCard({ nodeData, onSelect, onToggle, selected }: Pro
     <div
       onClick={onSelect}
       style={{
-        background: 'var(--surface)',
-        border: `1.5px solid ${selected ? '#3b82f6' : 'var(--border)'}`,
+        background: onChain && !selected ? 'rgba(245,158,11,0.04)' : 'var(--surface)',
+        border: `1.5px solid ${selected ? '#3b82f6' : onChain ? '#f59e0b' : 'var(--border)'}`,
         borderRadius: 12,
         padding: '12px 14px',
         width: 224,
         boxShadow: selected
           ? '0 0 0 3px rgba(59,130,246,0.18), 0 4px 12px rgba(0,0,0,0.1)'
+          : onChain ? '0 0 0 2px rgba(245,158,11,0.2), 0 4px 12px rgba(0,0,0,0.07)'
           : 'var(--shadow-card)',
         cursor: 'pointer',
         transition: 'box-shadow 0.15s, border-color 0.15s',
