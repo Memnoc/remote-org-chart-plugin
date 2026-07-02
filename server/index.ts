@@ -27,11 +27,20 @@ function loadSnapshot(): OrgResponse {
   }
 }
 
+function countNodes(node: { children?: unknown[] }): number {
+  return 1 + (node.children ?? []).reduce((acc: number, c) => acc + countNodes(c as { children?: unknown[] }), 0)
+}
+
 async function fetchLive(token: string): Promise<OrgResponse> {
+  const t0 = Date.now()
+  console.log('[org] starting live fetch')
   const employments = await fetchAllEmployments(token)
   const people = employments.map(mapEmployment).filter((p) => p.name !== '—' || p.title !== '—' || p.department !== '—')
+  const forest = buildForest(people)
+  const totalNodes = forest.reduce((acc, root) => acc + countNodes(root), 0)
+  console.log(`[org] done — ${people.length} people, ${forest.length} root(s), ${totalNodes} total nodes, ${Date.now() - t0}ms`)
   return {
-    forest: buildForest(people),
+    forest,
     source: 'live',
     fetchedAt: new Date().toISOString(),
   }
