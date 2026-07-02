@@ -4,6 +4,7 @@ interface Props {
   nodeData: {
     name: string
     attributes?: {
+      id?: string
       title?: string
       department?: string
       badge?: string
@@ -14,17 +15,21 @@ interface Props {
   }
   onSelect?: () => void
   onToggle?: () => void
+  selected?: boolean
 }
 
 const DEPT_COLORS: Record<string, string> = {
-  engineering: '#6366f1',
+  engineering: '#22c55e',
   sales: '#10b981',
   executive: '#f59e0b',
   ops: '#ef4444',
-  finance: '#0ea5e9',
-  hr: '#ec4899',
-  marketing: '#8b5cf6',
-  design: '#14b8a6',
+  finance: '#ec4899',
+  hr: '#22c55e',
+  'human resources': '#22c55e',
+  marketing: '#3b82f6',
+  design: '#06b6d4',
+  legal: '#8b5cf6',
+  product: '#f97316',
   external: '#64748b',
   unassigned: '#94a3b8',
 }
@@ -37,137 +42,145 @@ export function deptColor(department?: string): string {
   }
   let hash = 0
   for (let i = 0; i < key.length; i++) hash = key.charCodeAt(i) + ((hash << 5) - hash)
-  const palette = ['#6366f1','#10b981','#f59e0b','#0ea5e9','#ec4899','#8b5cf6','#14b8a6','#f97316']
+  const palette = ['#3b82f6', '#22c55e', '#f59e0b', '#06b6d4', '#ec4899', '#8b5cf6', '#f97316', '#6366f1']
   return palette[Math.abs(hash) % palette.length]
 }
 
 function initials(name: string): string {
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((w) => w[0] ?? '')
-    .join('')
-    .toUpperCase()
+  return name.split(' ').slice(0, 2).map((w) => w[0] ?? '').join('').toUpperCase()
 }
 
-export default function NodeCard({ nodeData, onSelect, onToggle }: Props) {
+function PeopleIcon() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <circle cx="6" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M1 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="12.5" cy="5" r="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M15.5 14c0-2.21-1.34-4-3-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export default function NodeCard({ nodeData, onSelect, onToggle, selected }: Props) {
   const { name, attributes = {}, children, __rd3t } = nodeData
   const { title, department, isExternal } = attributes
   const displayName = name === '—' ? 'Unknown Employee' : name
   const isUnknown = name === '—'
   const hasChildren = Array.isArray(children) && children.length > 0
+  const childCount = hasChildren ? (children as unknown[]).length : 0
   const collapsed = __rd3t?.collapsed ?? false
-  const color = deptColor(department)
+
+  const deptLabel = (!department || department === '—')
+    ? (isExternal ? 'External' : 'Unassigned')
+    : department
+  const color = deptColor(deptLabel)
 
   return (
     <div
       onClick={onSelect}
       style={{
-        background: 'var(--card-gradient)',
-        border: '1px solid var(--border)',
+        background: 'var(--surface)',
+        border: `1.5px solid ${selected ? '#3b82f6' : 'var(--border)'}`,
         borderRadius: 12,
-        padding: '12px 14px 12px 12px',
-        width: 210,
-        boxShadow: 'var(--shadow-card)',
-        textAlign: 'left',
-        position: 'relative',
-        borderLeft: `4px solid ${color}`,
-        cursor: onSelect ? 'pointer' : 'default',
+        padding: '12px 14px',
+        width: 224,
+        boxShadow: selected
+          ? '0 0 0 3px rgba(59,130,246,0.18), 0 4px 12px rgba(0,0,0,0.1)'
+          : 'var(--shadow-card)',
+        cursor: 'pointer',
+        transition: 'box-shadow 0.15s, border-color 0.15s',
+        userSelect: 'none',
+      }}
+    >
+      {/* Department label */}
+      <div style={{
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: '0.09em',
+        textTransform: 'uppercase',
+        color,
+        marginBottom: 8,
       }}>
+        {deptLabel}
+      </div>
 
-      {/* Avatar + name row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 9, paddingRight: hasChildren ? 22 : 0 }}>
+      {/* Avatar + Name + Title */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <div style={{
-          width: 32,
-          height: 32,
+          width: 38,
+          height: 38,
           borderRadius: '50%',
           background: isUnknown ? 'var(--border-subtle)' : `${color}18`,
           color: isUnknown ? 'var(--text-muted)' : color,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: 700,
           flexShrink: 0,
-          border: `1.5px solid ${color}30`,
+          border: `1.5px solid ${isUnknown ? 'var(--border)' : `${color}35`}`,
         }}>
           {isUnknown ? '?' : initials(displayName)}
         </div>
-        <div style={{ fontWeight: 700, fontSize: 12.5, color: isUnknown ? 'var(--text-muted)' : 'var(--text)', lineHeight: 1.25 }}>
-          {displayName}
-        </div>
-      </div>
-
-      {/* Title */}
-      {title && title !== '—' && (
-        <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 7, marginLeft: 41, lineHeight: 1.3 }}>
-          {title}
-        </div>
-      )}
-
-      {/* Department pill + external tag */}
-      <div style={{ marginTop: 6, marginLeft: 41, display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
-        {(() => {
-          const deptLabel = (!department || department === '—')
-            ? (isExternal ? 'External' : 'Unassigned')
-            : department
-          const c = deptColor(deptLabel)
-          return (
-            <span style={{
-              fontSize: 10, fontWeight: 600, color: c,
-              background: `${c}18`, borderRadius: 20,
-              padding: '2px 8px', display: 'inline-block', letterSpacing: '0.02em',
-            }}>
-              {deptLabel}
-            </span>
-          )
-        })()}
-        {isExternal && (
-          <span style={{
-            fontSize: 10, fontWeight: 600,
-            color: '#64748b', background: 'var(--border-subtle)',
-            borderRadius: 20, padding: '2px 7px',
-            display: 'inline-block', letterSpacing: '0.02em',
+        <div style={{ minWidth: 0, paddingTop: 1 }}>
+          <div style={{
+            fontWeight: 700,
+            fontSize: 14,
+            color: isUnknown ? 'var(--text-muted)' : 'var(--text)',
+            lineHeight: 1.25,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}>
-            Contractor
-          </span>
-        )}
+            {displayName}
+          </div>
+          {title && title !== '—' && (
+            <div style={{
+              fontSize: 12,
+              color: 'var(--text-secondary)',
+              marginTop: 2,
+              lineHeight: 1.3,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}>
+              {title}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Expand/collapse chevron */}
+      {/* Direct reports pill */}
       {hasChildren && (
-        <div onClick={(e) => { e.stopPropagation(); onToggle?.() }} style={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-          width: 22,
-          height: 22,
-          borderRadius: '50%',
-          background: collapsed ? color : 'var(--border-subtle)',
-          border: `1.5px solid ${collapsed ? color : 'var(--border)'}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'all 0.2s ease',
-        }}>
-          <svg
-            width="10"
-            height="10"
-            viewBox="0 0 10 10"
+        <div style={{ marginTop: 10 }}>
+          <button
+            onClick={(e) => { e.stopPropagation(); onToggle?.() }}
             style={{
-              transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
-              transition: 'transform 0.2s ease',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--text-secondary)',
+              background: 'var(--border-subtle)',
+              border: '1px solid var(--border)',
+              borderRadius: 20,
+              padding: '4px 10px',
+              cursor: 'pointer',
+              transition: 'background 0.1s',
             }}
           >
-            <path
-              d="M1.5 3.5 L5 7 L8.5 3.5"
-              stroke={collapsed ? '#fff' : 'var(--text-secondary)'}
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-            />
-          </svg>
+            <PeopleIcon />
+            <span>{childCount}</span>
+            <svg
+              width="9"
+              height="9"
+              viewBox="0 0 10 10"
+              style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+            >
+              <path d="M1.5 3.5 L5 7 L8.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            </svg>
+          </button>
         </div>
       )}
     </div>
