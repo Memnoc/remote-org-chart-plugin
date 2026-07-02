@@ -15,6 +15,7 @@ interface Props {
   }
   onSelect?: () => void
   onToggle?: () => void
+  onFocus?: () => void
   selected?: boolean
   onChain?: boolean
 }
@@ -62,7 +63,7 @@ function PeopleIcon() {
   )
 }
 
-export default function NodeCard({ nodeData, onSelect, onToggle, selected, onChain }: Props) {
+export default function NodeCard({ nodeData, onSelect, onToggle, onFocus, selected, onChain }: Props) {
   const { name, attributes = {}, children, __rd3t } = nodeData
   const { title, department, isExternal } = attributes
   const displayName = name === '—' ? 'Unknown Employee' : name
@@ -152,9 +153,9 @@ export default function NodeCard({ nodeData, onSelect, onToggle, selected, onCha
         </div>
       </div>
 
-      {/* Direct reports pill */}
+      {/* Direct reports pill + View team */}
       {hasChildren && (
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button
             onClick={(e) => { e.stopPropagation(); onToggle?.() }}
             style={{
@@ -175,14 +176,31 @@ export default function NodeCard({ nodeData, onSelect, onToggle, selected, onCha
             <PeopleIcon />
             <span>{childCount}</span>
             <svg
-              width="9"
-              height="9"
-              viewBox="0 0 10 10"
+              width="9" height="9" viewBox="0 0 10 10"
               style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
             >
               <path d="M1.5 3.5 L5 7 L8.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
             </svg>
           </button>
+          {onFocus && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onFocus() }}
+              title="Focus on this team"
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                color: color,
+                background: `${color}14`,
+                border: `1px solid ${color}30`,
+                borderRadius: 20,
+                padding: '3px 9px',
+                cursor: 'pointer',
+                letterSpacing: '0.02em',
+              }}
+            >
+              View team →
+            </button>
+          )}
         </div>
       )}
     </div>
