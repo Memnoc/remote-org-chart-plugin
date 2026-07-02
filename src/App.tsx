@@ -227,9 +227,26 @@ export default function App() {
         boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
         zIndex: 10,
       }}>
-        <span style={{ fontWeight: 700, fontSize: 16, color: "var(--text)", letterSpacing: "-0.01em" }}>
-          Org chart
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 8,
+            background: "linear-gradient(135deg, #5b21b6, #c4a7e7)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 2px 12px rgba(91,33,182,0.35)",
+            flexShrink: 0,
+          }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="3" r="2" fill="white" />
+              <circle cx="3" cy="12" r="2" fill="white" />
+              <circle cx="13" cy="12" r="2" fill="white" />
+              <line x1="8" y1="5" x2="3" y2="10" stroke="white" strokeWidth="1.2" />
+              <line x1="8" y1="5" x2="13" y2="10" stroke="white" strokeWidth="1.2" />
+            </svg>
+          </div>
+          <span style={{ fontWeight: 800, fontSize: 17, color: "var(--text)", letterSpacing: "-0.02em" }}>
+            Org Chart Plugin
+          </span>
+        </div>
 
         <div style={{ flex: 1 }} />
 
