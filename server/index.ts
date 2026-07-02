@@ -17,7 +17,7 @@ let cacheTime = 0
 const CACHE_TTL_MS = 5 * 60 * 1000 // 5 min
 
 function loadSnapshot(): OrgResponse {
-  const raw = readFileSync(path.join(__dirname, '..', '..', 'server', 'snapshot.json'), 'utf-8')
+  const raw = readFileSync(path.join(process.cwd(), 'server', 'snapshot.json'), 'utf-8')
   const employments = JSON.parse(raw) as RemoteEmployment[]
   const people = employments.map(mapEmployment).filter((p) => p.name !== '—' || p.title !== '—' || p.department !== '—')
   return {

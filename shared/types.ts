@@ -13,7 +13,7 @@ export interface RemoteEmployment {
 
 /** Raw paginated list response from GET /v1/employments */
 export interface RemoteEmploymentList {
-  data: Array<{
+  employments: Array<{
     id: string
     full_name: string | null
     job_title: string | null

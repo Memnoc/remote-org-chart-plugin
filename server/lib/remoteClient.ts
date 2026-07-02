@@ -1,6 +1,6 @@
 import type { RemoteEmployment, RemoteEmploymentList } from '../../shared/types.js'
 
-const BASE = 'https://gateway.remote.com/v1'
+const BASE = 'https://gateway.remote-sandbox.com/v1'
 
 function headers(token: string) {
   return {
@@ -9,7 +9,7 @@ function headers(token: string) {
   }
 }
 
-export async function listAllEmploymentIds(token: string): Promise<string[]> {
+async function listAllEmploymentIds(token: string): Promise<string[]> {
   const ids: string[] = []
   let page = 1
   let totalPages = 1
@@ -21,9 +21,9 @@ export async function listAllEmploymentIds(token: string): Promise<string[]> {
     if (!res.ok) throw new Error(`Remote API ${res.status}: ${await res.text()}`)
     const json = (await res.json()) as { data: RemoteEmploymentList; [k: string]: unknown }
     const body = json.data
-    for (const emp of body.data) ids.push(emp.id)
+    for (const emp of body.employments) ids.push(emp.id)
     totalPages = body.total_pages
-    console.log(`[remote] list page ${page}/${totalPages} — ${body.data.length} ids (total so far: ${ids.length})`)
+    console.log(`[remote] list page ${page}/${totalPages} — ${body.employments.length} ids (total so far: ${ids.length})`)
     page++
   }
 
@@ -34,8 +34,8 @@ export async function listAllEmploymentIds(token: string): Promise<string[]> {
 async function fetchEmployment(id: string, token: string): Promise<RemoteEmployment> {
   const res = await fetch(`${BASE}/employments/${id}`, { headers: headers(token) })
   if (!res.ok) throw new Error(`Remote API ${res.status} for employment ${id}`)
-  const json = (await res.json()) as { data: RemoteEmployment }
-  return json.data
+  const json = (await res.json()) as { data: { employment: RemoteEmployment } }
+  return json.data.employment
 }
 
 /** Fetch all employment details with bounded concurrency (pool size 8). */
