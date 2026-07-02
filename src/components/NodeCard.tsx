@@ -48,7 +48,7 @@ export function deptColor(department?: string): string {
   return palette[Math.abs(hash) % palette.length]
 }
 
-function initials(name: string): string {
+export function initials(name: string): string {
   return name.split(' ').slice(0, 2).map((w) => w[0] ?? '').join('').toUpperCase()
 }
 

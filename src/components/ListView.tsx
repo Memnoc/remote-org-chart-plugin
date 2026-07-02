@@ -59,7 +59,7 @@ function NodeRow({ node, depth, search }: { node: OrgNode; depth: number; search
 
 interface FlatRow { node: OrgNode; depth: number }
 
-function flattenForest(forest: OrgNode[]): FlatRow[] {
+function toFlatRows(forest: OrgNode[]): FlatRow[] {
   const rows: FlatRow[] = []
   function walk(node: OrgNode, depth: number) {
     rows.push({ node, depth })
@@ -78,7 +78,7 @@ export default function ListView({ forest, search = '' }: Props) {
     return <div style={{ padding: 40, color: 'var(--text-muted)' }}>No org data available.</div>
   }
 
-  const rows = flattenForest(forest)
+  const rows = toFlatRows(forest)
   const totalPages = Math.ceil(rows.length / PAGE_SIZE)
   const pageRows = rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
 

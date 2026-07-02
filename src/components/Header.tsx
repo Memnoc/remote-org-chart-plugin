@@ -78,6 +78,13 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, onR
         </span>
       </div>
 
+      <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#d97706', userSelect: 'all' }} title="Build SHA">
+        <GitCommitIcon />
+        <span style={{ fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.04em', opacity: 0.75 }}>
+          {__GIT_SHA__}
+        </span>
+      </div>
+
       <div style={{ flex: 1 }} />
 
       {status === 'ok' && (
@@ -99,13 +106,6 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, onR
           </button>
         </div>
       )}
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#d97706', userSelect: 'all' }} title="Build SHA">
-        <GitCommitIcon />
-        <span style={{ fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.04em', opacity: 0.75 }}>
-          {__GIT_SHA__}
-        </span>
-      </div>
 
       <div style={{ position: 'relative' }}>
         <button ref={btnRef} onClick={() => setOpen((o) => !o)} title="Theme" style={iconBtnStyle}>
