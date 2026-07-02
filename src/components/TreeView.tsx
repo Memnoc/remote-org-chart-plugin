@@ -218,7 +218,7 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
 
       {/* D-pad navigator */}
       <div style={{
-        position: 'absolute', bottom: 16, right: 16, zIndex: 10,
+        position: 'absolute', bottom: 16, right: 32, zIndex: 10,
         background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
         padding: 3,
