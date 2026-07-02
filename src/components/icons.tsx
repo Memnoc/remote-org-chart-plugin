@@ -56,6 +56,16 @@ export function SystemIcon() {
   )
 }
 
+export function GitCommitIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+      <circle cx="7" cy="7" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+      <line x1="0" y1="7" x2="4.5" y2="7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="9.5" y1="7" x2="14" y2="7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function FilterIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none">

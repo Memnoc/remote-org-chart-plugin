@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import type { ThemeMode } from '../hooks/useTheme.ts'
-import { RefreshIcon, SunIcon, MoonIcon, SystemIcon, iconBtnStyle } from './icons.tsx'
+import { RefreshIcon, SunIcon, MoonIcon, SystemIcon, GitCommitIcon, iconBtnStyle } from './icons.tsx'
 
 const THEME_LABELS: Record<ThemeMode, string> = { light: 'Light', dark: 'Dark', system: 'System' }
 
@@ -100,9 +100,12 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, onR
         </div>
       )}
 
-      <span style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--text-subtle)', letterSpacing: '0.04em', userSelect: 'all' }}>
-        {__GIT_SHA__}
-      </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#d97706', userSelect: 'all' }} title="Build SHA">
+        <GitCommitIcon />
+        <span style={{ fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.04em', opacity: 0.75 }}>
+          {__GIT_SHA__}
+        </span>
+      </div>
 
       <div style={{ position: 'relative' }}>
         <button ref={btnRef} onClick={() => setOpen((o) => !o)} title="Theme" style={iconBtnStyle}>
