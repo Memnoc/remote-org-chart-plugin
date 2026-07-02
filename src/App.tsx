@@ -9,7 +9,7 @@ import DetailPanel from './components/DetailPanel.tsx'
 import type { PersonDetail } from './components/DetailPanel.tsx'
 import StatsPanel, { computeStats } from './components/StatsPanel.tsx'
 import type { OrgNode } from '../shared/types.js'
-import { filterForest, filterByDept, exportCSV, readParams } from './lib/orgUtils.ts'
+import { filterForest, filterByDept, exportCSV, readParams, isEmpty } from './lib/orgUtils.ts'
 import type { ViewMode } from './lib/orgUtils.ts'
 
 export default function App() {
@@ -22,12 +22,14 @@ export default function App() {
   const [selectedPerson, setSelectedPerson] = useState<PersonDetail | null>(null)
   const [statsOpen, setStatsOpen] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
+  const selectedPersonRef = useRef<PersonDetail | null>(null)
+  selectedPersonRef.current = selectedPerson
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement).tagName
       if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') { e.preventDefault(); searchRef.current?.focus() }
-      if (e.key === 'Escape') { setSearch(''); searchRef.current?.blur() }
+      if (e.key === 'Escape' && !selectedPersonRef.current) { setSearch(''); searchRef.current?.blur() }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -53,7 +55,7 @@ export default function App() {
   const deptList = useMemo(() => {
     const map = new Map<string, number>()
     for (const n of allNodes) {
-      const d = (!n.attributes.department || n.attributes.department === '—') ? 'Unassigned' : n.attributes.department
+      const d = isEmpty(n.attributes.department) ? 'Unassigned' : n.attributes.department!
       map.set(d, (map.get(d) ?? 0) + 1)
     }
     return [...map.entries()].sort((a, b) => b[1] - a[1])

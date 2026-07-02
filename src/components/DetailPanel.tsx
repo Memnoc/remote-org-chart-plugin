@@ -1,5 +1,5 @@
 import React from 'react'
-import { deptColor, initials } from './NodeCard.tsx'
+import { deptColor, initials, isEmpty } from '../lib/orgUtils.ts'
 
 export interface PersonDetail {
   name: string
@@ -15,10 +15,10 @@ interface Props {
 }
 
 function PersonDetailContent({ person, onClose }: { person: PersonDetail; onClose: () => void }) {
-  const displayName = person.name === '—' ? 'Unknown Employee' : person.name
-  const dept = (!person.department || person.department === '—')
+  const displayName = isEmpty(person.name) ? 'Unknown Employee' : person.name
+  const dept = isEmpty(person.department)
     ? (person.isExternal ? 'External' : 'Unassigned')
-    : person.department
+    : person.department!
   const color = deptColor(dept)
 
   return (
@@ -50,7 +50,7 @@ function PersonDetailContent({ person, onClose }: { person: PersonDetail; onClos
         <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--text)', lineHeight: 1.2 }}>
           {displayName}
         </div>
-        {person.title && person.title !== '—' && (
+        {!isEmpty(person.title) && (
           <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
             {person.title}
           </div>
@@ -70,7 +70,7 @@ function PersonDetailContent({ person, onClose }: { person: PersonDetail; onClos
             {person.isExternal ? 'Contractor' : 'Full-time'}
           </span>
         </Row>
-        {person.badge && person.badge !== '—' && (
+        {!isEmpty(person.badge) && (
           <Row label="Badge">
             <span style={{ fontSize: 13, color: 'var(--text)' }}>{person.badge}</span>
           </Row>

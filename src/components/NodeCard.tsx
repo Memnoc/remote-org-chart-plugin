@@ -1,4 +1,5 @@
 import React from 'react'
+import { deptColor, initials, isEmpty } from '../lib/orgUtils.ts'
 
 interface Props {
   nodeData: {
@@ -20,38 +21,6 @@ interface Props {
   onChain?: boolean
 }
 
-const DEPT_COLORS: Record<string, string> = {
-  engineering: '#22c55e',
-  sales: '#10b981',
-  executive: '#f59e0b',
-  ops: '#ef4444',
-  finance: '#ec4899',
-  hr: '#22c55e',
-  'human resources': '#22c55e',
-  marketing: '#3b82f6',
-  design: '#06b6d4',
-  legal: '#8b5cf6',
-  product: '#f97316',
-  external: '#64748b',
-  unassigned: '#94a3b8',
-}
-
-export function deptColor(department?: string): string {
-  if (!department || department === '—') return '#94a3b8'
-  const key = department.toLowerCase()
-  for (const [k, v] of Object.entries(DEPT_COLORS)) {
-    if (key.includes(k)) return v
-  }
-  let hash = 0
-  for (let i = 0; i < key.length; i++) hash = key.charCodeAt(i) + ((hash << 5) - hash)
-  const palette = ['#3b82f6', '#22c55e', '#f59e0b', '#06b6d4', '#ec4899', '#8b5cf6', '#f97316', '#6366f1']
-  return palette[Math.abs(hash) % palette.length]
-}
-
-export function initials(name: string): string {
-  return name.split(' ').slice(0, 2).map((w) => w[0] ?? '').join('').toUpperCase()
-}
-
 function PeopleIcon() {
   return (
     <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
@@ -66,15 +35,13 @@ function PeopleIcon() {
 export default function NodeCard({ nodeData, onSelect, onToggle, onFocus, selected, onChain }: Props) {
   const { name, attributes = {}, children, __rd3t } = nodeData
   const { title, department, isExternal } = attributes
-  const displayName = name === '—' ? 'Unknown Employee' : name
-  const isUnknown = name === '—'
+  const isUnknown = isEmpty(name)
+  const displayName = isUnknown ? 'Unknown Employee' : name
   const hasChildren = Array.isArray(children) && children.length > 0
   const childCount = hasChildren ? (children as unknown[]).length : 0
   const collapsed = __rd3t?.collapsed ?? false
 
-  const deptLabel = (!department || department === '—')
-    ? (isExternal ? 'External' : 'Unassigned')
-    : department
+  const deptLabel = isEmpty(department) ? (isExternal ? 'External' : 'Unassigned') : department!
   const color = deptColor(deptLabel)
 
   return (
@@ -137,7 +104,7 @@ export default function NodeCard({ nodeData, onSelect, onToggle, onFocus, select
           }}>
             {displayName}
           </div>
-          {title && title !== '—' && (
+          {!isEmpty(title) && (
             <div style={{
               fontSize: 12,
               color: 'var(--text-secondary)',

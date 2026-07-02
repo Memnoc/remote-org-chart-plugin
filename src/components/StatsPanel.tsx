@@ -1,6 +1,6 @@
 import React from 'react'
 import type { OrgNode } from '../../shared/types.js'
-import { deptColor } from './NodeCard.tsx'
+import { deptColor, isEmpty } from '../lib/orgUtils.ts'
 
 interface Stats {
   total: number
@@ -24,7 +24,7 @@ export function computeStats(allNodes: OrgNode[], forest: OrgNode[]): Stats {
 
   const deptMap = new Map<string, number>()
   for (const n of allNodes) {
-    const d = (!n.attributes.department || n.attributes.department === '—') ? 'Unassigned' : n.attributes.department
+    const d = isEmpty(n.attributes.department) ? 'Unassigned' : n.attributes.department!
     deptMap.set(d, (deptMap.get(d) ?? 0) + 1)
   }
   const deptList = [...deptMap.entries()].sort((a, b) => b[1] - a[1])

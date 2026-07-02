@@ -1,6 +1,6 @@
 import React from 'react'
 import type { OrgNode } from '../../shared/types.js'
-import { deptColor } from './NodeCard.tsx'
+import { deptColor } from '../lib/orgUtils.ts'
 
 interface Props {
   forest: OrgNode[]

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import type { OrgNode } from '../../shared/types.js'
+import { isEmpty } from '../lib/orgUtils.ts'
 
 const PAGE_SIZE = 20
 
@@ -39,12 +40,12 @@ function NodeRow({ node, depth, search }: { node: OrgNode; depth: number; search
           {depth > 0 && <span style={{ color: 'var(--border)', marginRight: 6 }}>{'└─'}</span>}
           <Highlight text={node.name} query={search} />
         </span>
-        {node.attributes.title && node.attributes.title !== '—' && (
+        {!isEmpty(node.attributes.title) && (
           <span style={{ fontSize: 11, color: 'var(--primary)' }}>
             <Highlight text={node.attributes.title} query={search} />
           </span>
         )}
-        {node.attributes.department && node.attributes.department !== '—' && (
+        {!isEmpty(node.attributes.department) && (
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
             <Highlight text={node.attributes.department} query={search} />
           </span>

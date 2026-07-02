@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import type { ViewMode } from '../lib/orgUtils.ts'
 import { FilterIcon } from './icons.tsx'
-import { deptColor } from './NodeCard.tsx'
+import { deptColor } from '../lib/orgUtils.ts'
 
 interface Props {
   search: string
