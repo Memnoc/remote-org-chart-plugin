@@ -65,3 +65,26 @@ export function FilterIcon() {
     </svg>
   )
 }
+
+export function PlusIcon() {
+  return <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="2" x2="7" y2="12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /><line x1="2" y1="7" x2="12" y2="7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+}
+
+export function MinusIcon() {
+  return <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="2" y1="7" x2="12" y2="7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+}
+
+export function PersonIcon() {
+  return <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.6" /><path d="M2 15c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+}
+
+export const zoomBtnStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '8px 10px',
+  border: 'none',
+  background: 'transparent',
+  color: 'var(--text-muted)',
+  cursor: 'pointer',
+}
