@@ -2,7 +2,7 @@
 
 An org chart application built on Remote's API. Displays manager→direct-report hierarchies with interactive tree and list views.
 
-**Live app:** [deployed URL — added after deploy]
+**Live app:** https://remote-org-chart-plugin.onrender.com/
 **Docs:** [`/docs`](./docs/)
 
 ---
