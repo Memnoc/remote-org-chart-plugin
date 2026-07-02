@@ -32,16 +32,18 @@ export default function SingleTree({
   const depth = treeDepth(root)
   const height = Math.max(240, depth * 260 + 80)
 
-  // Draw step paths that terminate at card edges (y=±100) instead of node centers.
-  // Keeps the entire drawn path in the inter-card gap → consistent visible weight.
+  // Bezier curves from card-bottom to card-top (y=±100).
+  // No horizontal bar artifact: each parent→child gets a smooth S-curve.
   const CARD_HALF_H = 100
-  const stepToCardEdge = useCallback(
+  const curveToCardEdge = useCallback(
     (link: { source: { x: number; y: number }; target: { x: number; y: number } }) => {
       const { source: s, target: t } = link
-      const srcY = s.y + CARD_HALF_H
-      const tgtY = t.y - CARD_HALF_H
+      const upper = s.y <= t.y ? s : t
+      const lower = s.y <= t.y ? t : s
+      const srcY = upper.y + CARD_HALF_H
+      const tgtY = lower.y - CARD_HALF_H
       const midY = (srcY + tgtY) / 2
-      return `M${s.x},${srcY} L${s.x},${midY} L${t.x},${midY} L${t.x},${tgtY}`
+      return `M${upper.x},${srcY} C${upper.x},${midY} ${lower.x},${midY} ${lower.x},${tgtY}`
     },
     [],
   )
@@ -76,7 +78,7 @@ export default function SingleTree({
       <Tree
         data={root}
         orientation="vertical"
-        pathFunc={stepToCardEdge as unknown as 'step'}
+        pathFunc={curveToCardEdge as unknown as 'step'}
         translate={translate}
         separation={{ siblings: 1.4, nonSiblings: 1.8 }}
         renderCustomNodeElement={renderNode}
