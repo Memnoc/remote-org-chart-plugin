@@ -100,6 +100,10 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, onR
         </div>
       )}
 
+      <span style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--text-subtle)', letterSpacing: '0.04em', userSelect: 'all' }}>
+        {__GIT_SHA__}
+      </span>
+
       <div style={{ position: 'relative' }}>
         <button ref={btnRef} onClick={() => setOpen((o) => !o)} title="Theme" style={iconBtnStyle}>
           {theme === 'dark' ? <MoonIcon /> : theme === 'light' ? <SunIcon /> : <SystemIcon />}
