@@ -263,7 +263,8 @@ export default function App() {
         gap: 12,
         flexShrink: 0,
         boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-        zIndex: 10,
+        zIndex: 30,
+        position: "relative",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{
