@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useRef } from 'react'
 import type { OrgNode } from '../../shared/types.js'
 import NodeCard from './NodeCard.tsx'
 import SingleTree from './SingleTree.tsx'
@@ -17,6 +17,14 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
   const [zoom, setZoom] = useState(0.8)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [focusedId, setFocusedId] = useState<string | null>(null)
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 })
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const SCROLL_STEP = 240
+
+  function pan(dx: number, dy: number) {
+    if (dx !== 0) setPanOffset((p) => ({ ...p, x: p.x + dx }))
+    if (dy !== 0) scrollRef.current?.scrollBy({ top: dy, behavior: 'smooth' })
+  }
 
   const displayForest = useMemo(() => {
     if (!focusedId) return forest
@@ -38,12 +46,14 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
     setFocusedId(id)
     setSelectedId(null)
     setTreeKey((k) => k + 1)
+    setPanOffset({ x: 0, y: 0 })
   }
 
   function handleBack() {
     setFocusedId(null)
     setSelectedId(null)
     setTreeKey((k) => k + 1)
+    setPanOffset({ x: 0, y: 0 })
   }
 
   function applyMode(mode: 'all' | 'collapsed') {
@@ -53,6 +63,13 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
 
   function changeZoom(delta: number) {
     setZoom((z) => Math.max(0.25, Math.min(2.5, +(z + delta).toFixed(2))))
+  }
+
+  const dpadBtn: React.CSSProperties = {
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    width: '100%', height: '100%',
+    border: 'none', borderRadius: 6, padding: 0,
+    background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer',
   }
 
   if (forest.length === 0) {
@@ -141,7 +158,7 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
       )}
 
       {/* Scrollable tree area */}
-      <div style={{ position: 'relative', zIndex: 1, flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: 60, paddingBottom: 64 }}>
+      <div ref={scrollRef} style={{ position: 'relative', zIndex: 1, flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: 60, paddingBottom: 64 }}>
         {mainTrees.map((root, i) => (
           <SingleTree
             key={`${root.attributes.id ?? i}-${treeKey}`}
@@ -153,6 +170,7 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
             onSelectId={setSelectedId}
             chainIds={chainIds}
             onFocus={handleFocus}
+            panOffset={panOffset}
           />
         ))}
 
@@ -179,23 +197,54 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
         )}
       </div>
 
-      {/* Zoom controls */}
-      <div style={{
-        position: 'absolute', bottom: 16, left: 16, zIndex: 10,
-        display: 'flex', alignItems: 'center',
-        background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', overflow: 'hidden',
-      }}>
-        <button onClick={() => changeZoom(0.1)} style={zoomBtnStyle} title="Zoom in"><PlusIcon /></button>
-        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', minWidth: 42, textAlign: 'center', padding: '0 4px' }}>
-          {Math.round(zoom * 100)}%
-        </span>
-        <button onClick={() => changeZoom(-0.1)} style={zoomBtnStyle} title="Zoom out"><MinusIcon /></button>
-        <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 2px' }} />
-        <button onClick={() => setZoom(0.8)} style={{ ...zoomBtnStyle, gap: 6, padding: '8px 12px' }} title="Reset zoom">
-          <PersonIcon />
-          <span style={{ fontSize: 12, fontWeight: 500 }}>Reset View</span>
-        </button>
+      {/* Zoom + D-pad controls */}
+      <div style={{ position: 'absolute', bottom: 16, left: 16, zIndex: 10, display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+        {/* Zoom pill */}
+        <div style={{
+          display: 'flex', alignItems: 'center',
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', overflow: 'hidden',
+        }}>
+          <button onClick={() => changeZoom(0.1)} style={zoomBtnStyle} title="Zoom in"><PlusIcon /></button>
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', minWidth: 42, textAlign: 'center', padding: '0 4px' }}>
+            {Math.round(zoom * 100)}%
+          </span>
+          <button onClick={() => changeZoom(-0.1)} style={zoomBtnStyle} title="Zoom out"><MinusIcon /></button>
+          <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 2px' }} />
+          <button onClick={() => { setZoom(0.8); setPanOffset({ x: 0, y: 0 }) }} style={{ ...zoomBtnStyle, gap: 6, padding: '8px 12px' }} title="Reset zoom">
+            <PersonIcon />
+            <span style={{ fontSize: 12, fontWeight: 500 }}>Reset View</span>
+          </button>
+        </div>
+
+        {/* D-pad */}
+        <div style={{
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
+          padding: 4,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 26px)',
+          gridTemplateRows: 'repeat(3, 26px)',
+          gap: 2,
+        }}>
+          <span />
+          <button style={dpadBtn} onClick={() => pan(0, -SCROLL_STEP)} title="Scroll up">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 8.5L6 4.5L10 8.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+          <span />
+          <button style={dpadBtn} onClick={() => pan(-SCROLL_STEP, 0)} title="Pan left">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8.5 2L4.5 6L8.5 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+          <span />
+          <button style={dpadBtn} onClick={() => pan(SCROLL_STEP, 0)} title="Pan right">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3.5 2L7.5 6L3.5 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+          <span />
+          <button style={dpadBtn} onClick={() => pan(0, SCROLL_STEP)} title="Scroll down">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 3.5L6 7.5L10 3.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+          <span />
+        </div>
       </div>
     </div>
   )

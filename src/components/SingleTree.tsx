@@ -14,10 +14,11 @@ export interface SingleTreeProps {
   onSelectId: (id: string | null) => void
   chainIds: Set<string>
   onFocus: (id: string) => void
+  panOffset?: { x: number; y: number }
 }
 
 export default function SingleTree({
-  root, initialDepth, zoom, onSelect, selectedId, onSelectId, chainIds, onFocus,
+  root, initialDepth, zoom, onSelect, selectedId, onSelectId, chainIds, onFocus, panOffset,
 }: SingleTreeProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [translate, setTranslate] = useState({ x: 0, y: 80 })
@@ -79,7 +80,7 @@ export default function SingleTree({
         data={root}
         orientation="vertical"
         pathFunc={curveToCardEdge as unknown as 'step'}
-        translate={translate}
+        translate={{ x: translate.x + (panOffset?.x ?? 0), y: translate.y }}
         separation={{ siblings: 1.4, nonSiblings: 1.8 }}
         renderCustomNodeElement={renderNode}
         nodeSize={{ x: 280, y: 260 }}
