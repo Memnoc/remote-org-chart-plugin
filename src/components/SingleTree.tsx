@@ -30,7 +30,21 @@ export default function SingleTree({
   }, [])
 
   const depth = treeDepth(root)
-  const height = Math.max(240, depth * 200 + 80)
+  const height = Math.max(240, depth * 260 + 80)
+
+  // Draw step paths that terminate at card edges (y=±100) instead of node centers.
+  // Keeps the entire drawn path in the inter-card gap → consistent visible weight.
+  const CARD_HALF_H = 100
+  const stepToCardEdge = useCallback(
+    (link: { source: { x: number; y: number }; target: { x: number; y: number } }) => {
+      const { source: s, target: t } = link
+      const srcY = s.y + CARD_HALF_H
+      const tgtY = t.y - CARD_HALF_H
+      const midY = (srcY + tgtY) / 2
+      return `M${s.x},${srcY} L${s.x},${midY} L${t.x},${midY} L${t.x},${tgtY}`
+    },
+    [],
+  )
 
   const renderNode = useCallback(
     ({ nodeDatum, toggleNode }: CustomNodeElementProps) => {
@@ -62,11 +76,11 @@ export default function SingleTree({
       <Tree
         data={root}
         orientation="vertical"
-        pathFunc="step"
+        pathFunc={stepToCardEdge as unknown as 'step'}
         translate={translate}
         separation={{ siblings: 1.4, nonSiblings: 1.8 }}
         renderCustomNodeElement={renderNode}
-        nodeSize={{ x: 280, y: 210 }}
+        nodeSize={{ x: 280, y: 260 }}
         zoom={zoom}
         enableLegacyTransitions
         collapsible
