@@ -110,6 +110,19 @@ function MoonIcon() {
   );
 }
 
+function SystemIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+      <rect x="1" y="2" width="14" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+      <line x1="5" y1="14" x2="11" y2="14" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="8" y1="11" x2="8" y2="14" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+type ThemeMode = 'light' | 'dark' | 'system'
+const THEME_LABELS: Record<ThemeMode, string> = { light: 'Light', dark: 'Dark', system: 'System' }
+
 function FilterIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
@@ -125,7 +138,9 @@ export default function App() {
   const init = readParams();
   const [view, setView] = useState<ViewMode>(init.view);
   const [search, setSearch] = useState(init.search);
-  const [dark, setDark] = useState(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const [theme, setTheme] = useState<ThemeMode>('system');
+  const [sysDark, setSysDark] = useState(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const [themeOpen, setThemeOpen] = useState(false);
   const [activeDepts, setActiveDepts] = useState<Set<string>>(init.depts);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState<PersonDetail | null>(null);
@@ -133,16 +148,39 @@ export default function App() {
   const searchRef = useRef<HTMLInputElement>(null);
   const filterBtnRef = useRef<HTMLButtonElement>(null);
   const filterPanelRef = useRef<HTMLDivElement>(null);
+  const themeBtnRef = useRef<HTMLButtonElement>(null);
+  const themePanelRef = useRef<HTMLDivElement>(null);
+
+  const dark = theme === 'system' ? sysDark : theme === 'dark';
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement).tagName;
       if (e.key === "/" && tag !== "INPUT" && tag !== "TEXTAREA") { e.preventDefault(); searchRef.current?.focus(); }
-      if (e.key === "Escape") { setSearch(""); searchRef.current?.blur(); setFilterOpen(false); }
+      if (e.key === "Escape") { setSearch(""); searchRef.current?.blur(); setFilterOpen(false); setThemeOpen(false); }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e: MediaQueryListEvent) => setSysDark(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (themeOpen
+        && !themeBtnRef.current?.contains(e.target as Node)
+        && !themePanelRef.current?.contains(e.target as Node)) {
+        setThemeOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [themeOpen]);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -167,7 +205,7 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-  }, [dark]);
+  }, [dark, sysDark, theme]);
 
   async function handleRefresh() {
     setRefreshing(true);
@@ -268,9 +306,37 @@ export default function App() {
           </div>
         )}
 
-        <button onClick={() => setDark((d) => !d)} title={dark ? "Light mode" : "Dark mode"} style={iconBtnStyle}>
-          {dark ? <SunIcon /> : <MoonIcon />}
-        </button>
+        <div style={{ position: "relative" }}>
+          <button
+            ref={themeBtnRef}
+            onClick={() => setThemeOpen((o) => !o)}
+            title="Theme"
+            style={iconBtnStyle}
+          >
+            {theme === 'dark' ? <MoonIcon /> : theme === 'light' ? <SunIcon /> : <SystemIcon />}
+          </button>
+          {themeOpen && (
+            <div ref={themePanelRef} style={{
+              position: "absolute", top: "calc(100% + 6px)", right: 0,
+              background: "var(--surface)", border: "1px solid var(--border)",
+              borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+              padding: "6px", zIndex: 100, minWidth: 130,
+            }}>
+              {(["light", "dark", "system"] as ThemeMode[]).map((m) => (
+                <button key={m} onClick={() => { setTheme(m); setThemeOpen(false); }} style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  width: "100%", padding: "7px 10px", border: "none", borderRadius: 7,
+                  background: theme === m ? "var(--border-subtle)" : "transparent",
+                  color: theme === m ? "var(--text)" : "var(--text-muted)",
+                  fontWeight: theme === m ? 600 : 400, fontSize: 13, cursor: "pointer", textAlign: "left",
+                }}>
+                  {m === 'light' ? <SunIcon /> : m === 'dark' ? <MoonIcon /> : <SystemIcon />}
+                  {THEME_LABELS[m]}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Toolbar */}
