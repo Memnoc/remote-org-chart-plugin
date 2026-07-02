@@ -11,11 +11,11 @@ interface Props {
   source?: 'live' | 'snapshot'
   fetchedAt?: string
   onRefresh: () => void
+  refreshing: boolean
 }
 
-export default function Header({ theme, setTheme, status, source, fetchedAt, onRefresh }: Props) {
+export default function Header({ theme, setTheme, status, source, fetchedAt, onRefresh, refreshing }: Props) {
   const [open, setOpen] = useState(false)
-  const [refreshing, setRefreshing] = useState(false)
   const btnRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
@@ -34,12 +34,6 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, onR
       document.removeEventListener('mousedown', onClickOutside)
     }
   }, [open])
-
-  async function handleRefresh() {
-    setRefreshing(true)
-    await Promise.resolve(onRefresh())
-    setRefreshing(false)
-  }
 
   const isLive = status === 'ok' && source === 'live'
 
@@ -101,7 +95,7 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, onR
               · {new Date(fetchedAt).toLocaleTimeString()}
             </span>
           )}
-          <button onClick={handleRefresh} disabled={refreshing} title="Refresh" style={iconBtnStyle}>
+          <button onClick={onRefresh} disabled={refreshing} title="Refresh" style={iconBtnStyle}>
             <RefreshIcon spinning={refreshing} />
           </button>
         </div>

@@ -11,7 +11,7 @@ import type { OrgNode } from '../shared/types.js'
 import { filterForest, filterByDept, exportCSV, readParams, isEmpty, computeStats, walkForest, type PersonDetail, type ViewMode } from './lib/orgUtils.ts'
 
 export default function App() {
-  const { refresh, ...state } = useOrg()
+  const { refresh, refreshing, ...state } = useOrg()
   const { theme, setTheme } = useTheme()
   const init = readParams()
   const [view, setView] = useState<ViewMode>(init.view)
@@ -89,6 +89,7 @@ export default function App() {
         source={hasData ? state.data.source : undefined}
         fetchedAt={hasData ? state.data.fetchedAt : undefined}
         onRefresh={refresh}
+        refreshing={refreshing}
       />
 
       <Toolbar

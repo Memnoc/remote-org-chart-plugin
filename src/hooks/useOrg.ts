@@ -6,19 +6,21 @@ type State =
   | { status: 'error'; message: string }
   | { status: 'ok'; data: OrgResponse }
 
-export function useOrg(): State & { refresh: () => void } {
+export function useOrg(): State & { refresh: () => void; refreshing: boolean } {
   const [state, setState] = useState<State>({ status: 'loading' })
   const [tick, setTick] = useState(0)
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
-    setState({ status: 'loading' })
+    if (tick === 0) setState({ status: 'loading' })
+    else setRefreshing(true)
     fetch('/api/org')
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<OrgResponse>
       })
-      .then((data) => setState({ status: 'ok', data }))
-      .catch((err: Error) => setState({ status: 'error', message: err.message }))
+      .then((data) => { setState({ status: 'ok', data }); setRefreshing(false) })
+      .catch((err: Error) => { setState({ status: 'error', message: err.message }); setRefreshing(false) })
   }, [tick])
 
   const refresh = useCallback(async () => {
@@ -26,5 +28,5 @@ export function useOrg(): State & { refresh: () => void } {
     setTick((t) => t + 1)
   }, [])
 
-  return { ...state, refresh }
+  return { ...state, refresh, refreshing }
 }
