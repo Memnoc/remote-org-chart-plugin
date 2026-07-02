@@ -139,7 +139,7 @@ export default function App() {
   const init = readParams();
   const [view, setView] = useState<ViewMode>(init.view);
   const [search, setSearch] = useState(init.search);
-  const [theme, setTheme] = useState<ThemeMode>('system');
+  const [theme, setTheme] = useState<ThemeMode>(() => (localStorage.getItem('theme') as ThemeMode) ?? 'system');
   const [sysDark, setSysDark] = useState(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
   const [themeOpen, setThemeOpen] = useState(false);
   const [activeDepts, setActiveDepts] = useState<Set<string>>(init.depts);
@@ -206,6 +206,7 @@ export default function App() {
   }, [view, search, activeDepts]);
 
   useEffect(() => {
+    localStorage.setItem('theme', theme);
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   }, [dark, sysDark, theme]);
 
