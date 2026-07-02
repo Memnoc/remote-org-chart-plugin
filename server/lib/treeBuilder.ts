@@ -1,16 +1,16 @@
 import type { Person, OrgNode } from '../../shared/types.js'
 
-function buildBadge(p: Person): string | undefined {
+function buildBadge(p: Person, cycleIds: Set<string>): string | undefined {
   if (p.externalManagerEmail) {
     const label = p.externalManagerName ?? p.externalManagerEmail
     return `reports to ${label} (external)`
   }
-  if (p.cycleFlag) return 'cycle detected'
+  if (cycleIds.has(p.id)) return 'cycle detected'
   return undefined
 }
 
-function toOrgNode(p: Person, childrenMap: Map<string, Person[]>, visited: Set<string>): OrgNode {
-  const badge = buildBadge(p)
+function toOrgNode(p: Person, childrenMap: Map<string, Person[]>, visited: Set<string>, cycleIds: Set<string>): OrgNode {
+  const badge = buildBadge(p, cycleIds)
   const node: OrgNode = {
     name: p.name,
     attributes: {
@@ -23,14 +23,11 @@ function toOrgNode(p: Person, childrenMap: Map<string, Person[]>, visited: Set<s
   }
 
   const children = childrenMap.get(p.id) ?? []
-  const safeChildren = children.filter((c) => {
-    if (visited.has(c.id)) return false
-    return true
-  })
+  const safeChildren = children.filter((c) => !visited.has(c.id))
 
   if (safeChildren.length > 0) {
     const nextVisited = new Set(visited).add(p.id)
-    node.children = safeChildren.map((c) => toOrgNode(c, childrenMap, nextVisited))
+    node.children = safeChildren.map((c) => toOrgNode(c, childrenMap, nextVisited, cycleIds))
   }
 
   return node
@@ -39,7 +36,6 @@ function toOrgNode(p: Person, childrenMap: Map<string, Person[]>, visited: Set<s
 export function buildForest(people: Person[]): OrgNode[] {
   const byId = new Map(people.map((p) => [p.id, p]))
 
-  // Detect cycles: mark any person whose managerId forms a cycle
   function detectCycle(startId: string): boolean {
     const seen = new Set<string>()
     let current: string | null = startId
@@ -51,36 +47,29 @@ export function buildForest(people: Person[]): OrgNode[] {
     return false
   }
 
+  const cycleIds = new Set<string>()
   for (const p of people) {
-    if (p.managerId && detectCycle(p.id)) {
-      p.cycleFlag = true
-    }
+    if (p.managerId && detectCycle(p.id)) cycleIds.add(p.id)
   }
 
-  // Build children map — skip cycled edges where child is flagged to break cycle
   const childrenMap = new Map<string, Person[]>()
-
   for (const p of people) {
     const parentId = p.managerId
-    // Resolve parent: must exist in byId; otherwise treat as orphan root
     const parentExists = parentId !== null && byId.has(parentId)
-
-    if (parentExists && !p.cycleFlag) {
+    if (parentExists && !cycleIds.has(p.id)) {
       const list = childrenMap.get(parentId!) ?? []
       list.push(p)
       childrenMap.set(parentId!, list)
     }
-    // else: root (null parent), external manager, orphan, or cycle-broken → root
   }
 
-  // Roots: no valid internal parent
   const roots = people.filter((p) => {
     if (p.managerId === null) return true
-    if (!byId.has(p.managerId)) return true // orphan (dangling ref)
-    if (p.cycleFlag) return true            // cycle-broken root
+    if (!byId.has(p.managerId)) return true
+    if (cycleIds.has(p.id)) return true
     if (p.externalManagerEmail !== null) return true
     return false
   })
 
-  return roots.map((r) => toOrgNode(r, childrenMap, new Set([r.id])))
+  return roots.map((r) => toOrgNode(r, childrenMap, new Set([r.id]), cycleIds))
 }

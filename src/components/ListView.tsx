@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import type { OrgNode } from '../../shared/types.js'
-import { isEmpty } from '../lib/orgUtils.ts'
+import { isEmpty, walkForest } from '../lib/orgUtils.ts'
 
 const PAGE_SIZE = 20
 
@@ -58,18 +58,6 @@ function NodeRow({ node, depth, search }: { node: OrgNode; depth: number; search
   )
 }
 
-interface FlatRow { node: OrgNode; depth: number }
-
-function toFlatRows(forest: OrgNode[]): FlatRow[] {
-  const rows: FlatRow[] = []
-  function walk(node: OrgNode, depth: number) {
-    rows.push({ node, depth })
-    node.children?.forEach((c) => walk(c, depth + 1))
-  }
-  forest.forEach((r) => walk(r, 0))
-  return rows
-}
-
 export default function ListView({ forest, search = '' }: Props) {
   const [page, setPage] = useState(0)
 
@@ -79,7 +67,7 @@ export default function ListView({ forest, search = '' }: Props) {
     return <div style={{ padding: 40, color: 'var(--text-muted)' }}>No org data available.</div>
   }
 
-  const rows = toFlatRows(forest)
+  const rows = walkForest(forest)
   const totalPages = Math.ceil(rows.length / PAGE_SIZE)
   const pageRows = rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
 

@@ -1,36 +1,5 @@
 import React from 'react'
-import type { OrgNode } from '../../shared/types.js'
-import { deptColor, isEmpty } from '../lib/orgUtils.ts'
-
-interface Stats {
-  total: number
-  managers: number
-  avgSpan: number
-  deepest: number
-  deptList: [string, number][]
-}
-
-export function computeStats(allNodes: OrgNode[], forest: OrgNode[]): Stats {
-  const managers = allNodes.filter((n) => (n.children?.length ?? 0) > 0)
-  const avgSpan = managers.length > 0
-    ? managers.reduce((s, m) => s + (m.children?.length ?? 0), 0) / managers.length
-    : 0
-
-  function maxDepth(node: OrgNode): number {
-    if (!node.children?.length) return 1
-    return 1 + Math.max(...node.children.map(maxDepth))
-  }
-  const deepest = forest.length > 0 ? Math.max(...forest.map(maxDepth)) : 0
-
-  const deptMap = new Map<string, number>()
-  for (const n of allNodes) {
-    const d = isEmpty(n.attributes.department) ? 'Unassigned' : n.attributes.department!
-    deptMap.set(d, (deptMap.get(d) ?? 0) + 1)
-  }
-  const deptList = [...deptMap.entries()].sort((a, b) => b[1] - a[1])
-
-  return { total: allNodes.length, managers: managers.length, avgSpan: +avgSpan.toFixed(1), deepest, deptList }
-}
+import { deptColor, type OrgStats } from '../lib/orgUtils.ts'
 
 // Rosé Pine pastel accents
 const STAT_ACCENTS = ['#ebbcba', '#9ccfd8', '#f6c177', '#c4a7e7']
@@ -55,7 +24,7 @@ function StatCard({ label, value, sub, accent }: { label: string; value: string 
 }
 
 interface Props {
-  stats: Stats
+  stats: OrgStats
   open: boolean
   onClose: () => void
 }

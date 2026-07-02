@@ -14,7 +14,8 @@ interface Props {
     children?: unknown[]
     __rd3t?: { collapsed: boolean }
   }
-  onSelect?: () => void
+  onClick?: () => void
+  onProfile?: () => void
   onToggle?: () => void
   onFocus?: () => void
   selected?: boolean
@@ -32,7 +33,7 @@ function PeopleIcon() {
   )
 }
 
-export default function NodeCard({ nodeData, onSelect, onToggle, onFocus, selected, onChain }: Props) {
+export default function NodeCard({ nodeData, onClick: onCardClick, onProfile, onToggle, onFocus, selected, onChain }: Props) {
   const { name, attributes = {}, children, __rd3t } = nodeData
   const { title, department, isExternal } = attributes
   const isUnknown = isEmpty(name)
@@ -46,8 +47,9 @@ export default function NodeCard({ nodeData, onSelect, onToggle, onFocus, select
 
   return (
     <div
-      onClick={onSelect}
+      onClick={onCardClick}
       style={{
+        position: 'relative',
         background: onChain && !selected ? 'rgba(245,158,11,0.04)' : 'var(--surface)',
         border: `1.5px solid ${selected ? '#3b82f6' : onChain ? '#f59e0b' : 'var(--border)'}`,
         borderRadius: 12,
@@ -57,21 +59,44 @@ export default function NodeCard({ nodeData, onSelect, onToggle, onFocus, select
           ? '0 0 0 3px rgba(59,130,246,0.18), 0 4px 12px rgba(0,0,0,0.1)'
           : onChain ? '0 0 0 2px rgba(245,158,11,0.2), 0 4px 12px rgba(0,0,0,0.07)'
           : 'var(--shadow-card)',
-        cursor: 'pointer',
+        cursor: onCardClick ? 'pointer' : 'default',
         transition: 'box-shadow 0.15s, border-color 0.15s',
         userSelect: 'none',
       }}
     >
-      {/* Department label */}
-      <div style={{
-        fontSize: 9,
-        fontWeight: 700,
-        letterSpacing: '0.09em',
-        textTransform: 'uppercase',
-        color,
-        marginBottom: 8,
-      }}>
-        {deptLabel}
+      {/* Department label + profile button */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <div style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: '0.09em',
+          textTransform: 'uppercase',
+          color,
+        }}>
+          {deptLabel}
+        </div>
+        {onProfile && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onProfile() }}
+            title="View profile"
+            style={{
+              width: 20,
+              height: 20,
+              borderRadius: 5,
+              border: '1px solid var(--border)',
+              background: 'var(--border-subtle)',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 11,
+              flexShrink: 0,
+            }}
+          >
+            ↗
+          </button>
+        )}
       </div>
 
       {/* Avatar + Name + Title */}

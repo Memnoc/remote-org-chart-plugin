@@ -2,6 +2,66 @@ import type { OrgNode } from '../../shared/types.js'
 
 export type ViewMode = 'tree' | 'list'
 
+export interface PersonDetail {
+  name: string
+  title?: string
+  department?: string
+  isExternal?: boolean
+  badge?: string
+}
+
+export function toPersonDetail(node: { name: string; attributes?: { title?: string; department?: string; isExternal?: boolean; badge?: string } }): PersonDetail {
+  return {
+    name: node.name,
+    title: node.attributes?.title,
+    department: node.attributes?.department,
+    isExternal: node.attributes?.isExternal,
+    badge: node.attributes?.badge,
+  }
+}
+
+export interface OrgStats {
+  total: number
+  managers: number
+  avgSpan: number
+  deepest: number
+  deptList: [string, number][]
+}
+
+export function computeStats(allNodes: OrgNode[], forest: OrgNode[]): OrgStats {
+  const managers = allNodes.filter((n) => (n.children?.length ?? 0) > 0)
+  const avgSpan = managers.length > 0
+    ? managers.reduce((s, m) => s + (m.children?.length ?? 0), 0) / managers.length
+    : 0
+  function maxDepth(node: OrgNode): number {
+    if (!node.children?.length) return 1
+    return 1 + Math.max(...node.children.map(maxDepth))
+  }
+  const deepest = forest.length > 0 ? Math.max(...forest.map(maxDepth)) : 0
+  const deptMap = new Map<string, number>()
+  for (const n of allNodes) {
+    const d = isEmpty(n.attributes.department) ? 'Unassigned' : n.attributes.department!
+    deptMap.set(d, (deptMap.get(d) ?? 0) + 1)
+  }
+  return {
+    total: allNodes.length,
+    managers: managers.length,
+    avgSpan: +avgSpan.toFixed(1),
+    deepest,
+    deptList: [...deptMap.entries()].sort((a, b) => b[1] - a[1]),
+  }
+}
+
+export function walkForest(forest: OrgNode[]): { node: OrgNode; depth: number }[] {
+  const result: { node: OrgNode; depth: number }[] = []
+  function walk(node: OrgNode, depth: number) {
+    result.push({ node, depth })
+    node.children?.forEach((c) => walk(c, depth + 1))
+  }
+  forest.forEach((r) => walk(r, 0))
+  return result
+}
+
 export function isEmpty(val?: string): boolean {
   return !val || val === '—'
 }

@@ -6,11 +6,9 @@ import Toolbar from './components/Toolbar.tsx'
 import TreeView from './components/TreeView.tsx'
 import ListView from './components/ListView.tsx'
 import DetailPanel from './components/DetailPanel.tsx'
-import type { PersonDetail } from './components/DetailPanel.tsx'
-import StatsPanel, { computeStats } from './components/StatsPanel.tsx'
+import StatsPanel from './components/StatsPanel.tsx'
 import type { OrgNode } from '../shared/types.js'
-import { filterForest, filterByDept, exportCSV, readParams, isEmpty } from './lib/orgUtils.ts'
-import type { ViewMode } from './lib/orgUtils.ts'
+import { filterForest, filterByDept, exportCSV, readParams, isEmpty, computeStats, walkForest, type PersonDetail, type ViewMode } from './lib/orgUtils.ts'
 
 export default function App() {
   const { refresh, ...state } = useOrg()
@@ -46,10 +44,7 @@ export default function App() {
 
   const allNodes = useMemo(() => {
     if (state.status !== 'ok') return [] as OrgNode[]
-    const nodes: OrgNode[] = []
-    function flatten(n: OrgNode) { nodes.push(n); n.children?.forEach(flatten) }
-    state.data.forest.forEach(flatten)
-    return nodes
+    return walkForest(state.data.forest).map(({ node }) => node)
   }, [state])
 
   const deptList = useMemo(() => {

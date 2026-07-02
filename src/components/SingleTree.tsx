@@ -3,8 +3,7 @@ import Tree from 'react-d3-tree'
 import type { CustomNodeElementProps } from 'react-d3-tree'
 import type { OrgNode } from '../../shared/types.js'
 import NodeCard from './NodeCard.tsx'
-import type { PersonDetail } from './DetailPanel.tsx'
-import { treeDepth } from '../lib/orgUtils.ts'
+import { treeDepth, toPersonDetail, type PersonDetail } from '../lib/orgUtils.ts'
 
 export interface SingleTreeProps {
   root: OrgNode
@@ -39,23 +38,18 @@ export default function SingleTree({
       const id = (nodeDatum.attributes as Record<string, unknown>)?.id as string ?? ''
       const hasKids = Array.isArray(nd.children) && nd.children.length > 0
       return (
-        <foreignObject width={240} height={150} x={-120} y={-75} style={{ overflow: 'visible' }}>
+        <foreignObject width={240} height={200} x={-120} y={-100} style={{ overflow: 'visible' }}>
           <NodeCard
             nodeData={nd}
             selected={!!id && id === selectedId}
             onChain={!!id && chainIds.has(id) && id !== selectedId}
             onToggle={toggleNode}
             onFocus={hasKids && id ? () => onFocus(id) : undefined}
-            onSelect={() => {
+            onClick={() => onSelectId(id || null)}
+            onProfile={onSelect ? () => {
               onSelectId(id || null)
-              onSelect?.({
-                name: nd.name,
-                title: nd.attributes?.title,
-                department: nd.attributes?.department,
-                isExternal: nd.attributes?.isExternal,
-                badge: nd.attributes?.badge,
-              })
-            }}
+              onSelect(toPersonDetail(nd))
+            } : undefined}
           />
         </foreignObject>
       )

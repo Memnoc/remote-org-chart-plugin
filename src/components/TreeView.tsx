@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react'
 import type { OrgNode } from '../../shared/types.js'
-import type { PersonDetail } from './DetailPanel.tsx'
 import NodeCard from './NodeCard.tsx'
 import SingleTree from './SingleTree.tsx'
 import { PlusIcon, MinusIcon, PersonIcon, zoomBtnStyle } from './icons.tsx'
-import { findSubtree, findChain } from '../lib/orgUtils.ts'
+import { findSubtree, findChain, toPersonDetail, type PersonDetail } from '../lib/orgUtils.ts'
 
 interface Props {
   forest: OrgNode[]
@@ -168,16 +167,11 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
                   key={node.attributes.id ?? i}
                   nodeData={node}
                   selected={node.attributes.id === selectedId}
-                  onSelect={() => {
+                  onClick={() => setSelectedId(node.attributes.id ?? null)}
+                  onProfile={onSelect ? () => {
                     setSelectedId(node.attributes.id ?? null)
-                    onSelect?.({
-                      name: node.name,
-                      title: node.attributes.title,
-                      department: node.attributes.department,
-                      isExternal: node.attributes.isExternal,
-                      badge: node.attributes.badge,
-                    })
-                  }}
+                    onSelect(toPersonDetail(node))
+                  } : undefined}
                 />
               ))}
             </div>

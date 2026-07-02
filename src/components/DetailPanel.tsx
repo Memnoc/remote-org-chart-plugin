@@ -1,13 +1,7 @@
 import React from 'react'
-import { deptColor, initials, isEmpty } from '../lib/orgUtils.ts'
+import { deptColor, initials, isEmpty, type PersonDetail } from '../lib/orgUtils.ts'
 
-export interface PersonDetail {
-  name: string
-  title?: string
-  department?: string
-  isExternal?: boolean
-  badge?: string
-}
+export type { PersonDetail }
 
 interface Props {
   person: PersonDetail | null
