@@ -143,3 +143,21 @@ npm run test:watch  # watch mode
 ```
 
 Test files located in `tests/`. Configuration in `vitest.config.ts`.
+
+---
+
+## Documentation Site
+
+**Framework:** Docusaurus 3 (classic preset, TypeScript) in `website/` — its own `package.json` and lockfile, isolated from the app's dependencies.
+
+**Hosting:** GitHub Pages at `https://memnoc.github.io/remote-org-chart-plugin/`, decoupled from the Render app (see [DECISIONS.md](./DECISIONS.md)).
+
+**Deploy:** GitHub Actions (`.github/workflows/deploy-docs.yml`) — builds `website/` and publishes to Pages on every push to `main` touching `website/**`. Independent of the Render app deploy.
+
+**Config:** `baseUrl: /remote-org-chart-plugin/` (Pages project sub-path); `url: https://memnoc.github.io`. Navbar "Open App" and footer link back to the Render app via absolute URLs.
+
+**Scripts (root `package.json`):**
+```
+npm run docs:dev     # Docusaurus dev server, hot reload
+npm run docs:build   # install + production build → website/build/
+```

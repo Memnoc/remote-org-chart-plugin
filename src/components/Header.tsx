@@ -97,6 +97,20 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, ski
         </div>
       )}
 
+      <a
+        href="https://memnoc.github.io/remote-org-chart-plugin/"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Documentation"
+        style={{
+          fontSize: 12, fontWeight: 600, color: 'var(--text-muted)',
+          textDecoration: 'none', padding: '5px 10px', borderRadius: 7,
+          border: '1px solid var(--border)',
+        }}
+      >
+        Docs
+      </a>
+
       <div style={{ position: 'relative' }}>
         <button ref={btnRef} onClick={() => setOpen((o) => !o)} title="Theme" style={iconBtnStyle}>
           {theme === 'dark' ? <MoonIcon /> : theme === 'light' ? <SunIcon /> : <SystemIcon />}

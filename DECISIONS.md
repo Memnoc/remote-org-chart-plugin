@@ -246,3 +246,13 @@
 **Why:** `__rd3t` is a library implementation detail, undocumented in react-d3-tree's public API. Having `NodeCard` depend on it makes `NodeCard` untestable in isolation (you can't construct a valid `nodeData` with `__rd3t` without the tree context) and breaks if the library renames the field. `SingleTree` is already the adapter between react-d3-tree and the rest of the app — the internal field read belongs there.
 
 **Trade-off:** One extra prop on `NodeCard`. The cast at the `SingleTree` boundary (`nodeDatum as { __rd3t?: { collapsed: boolean } }`) documents the fragility explicitly, at the one place it needs to exist.
+
+---
+
+## Docs Site: Docusaurus on GitHub Pages, Decoupled From the App
+
+**Decision:** The project documentation is a Docusaurus site in `website/`, hosted on **GitHub Pages** (`memnoc.github.io/remote-org-chart-plugin/`) via a GitHub Actions workflow — **not** bundled into the Render service.
+
+**Why:** An earlier iteration served the built docs from Express at `/docs`, sharing the app's single service. That coupled two concerns: (1) every app deploy paid the Docusaurus install + build (~1–3 min), and (2) the docs inherited the Render free-tier cold start — a reviewer hitting the docs while the app was asleep waited 30–60 s. GitHub Pages is a static CDN: always instant, independent of the app's sleep state, and free. Decoupling also pulls the docs build out of the app's `npm run build`, so app deploys return to baseline speed. The Actions workflow triggers only on pushes touching `website/**`, so app-only commits don't rebuild the docs.
+
+**Trade-off:** Docs live on a different origin (`memnoc.github.io`) than the app (`onrender.com`), so cross-links between them are absolute URLs, and the docs `baseUrl` is the Pages project sub-path (`/remote-org-chart-plugin/`). A one-time repo setting (Settings → Pages → Source → "GitHub Actions") is required, or the deploy step fails. Two deploy targets instead of one — acceptable because they are genuinely independent artifacts with different runtime characteristics (dynamic app vs static docs).

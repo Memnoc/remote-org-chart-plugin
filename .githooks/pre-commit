@@ -1,0 +1,25 @@
+#!/bin/sh
+# Non-blocking reminder: if staged code has no staged docs, nudge to document.
+# Auto-enabled by the `prepare` script in package.json (runs on `npm install`).
+# Rationale lives in CLAUDE.md ("Documentation discipline").
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged" ] && exit 0
+
+# Code / architecture / ops changes that should be reflected in docs.
+code=$(printf '%s\n' "$staged" | grep -E \
+  '^(src|server|shared)/|^website/(src|docusaurus\.config|sidebars)|^\.github/workflows/|^(package\.json|render\.yaml|vite\.config\.ts|tsconfig.*\.json)$' \
+  || true)
+
+# Anything that counts as documentation.
+docs=$(printf '%s\n' "$staged" | grep -E '\.mdx?$|^website/docs/' || true)
+
+if [ -n "$code" ] && [ -z "$docs" ]; then
+  printf '\n\033[33m⚠  docs reminder\033[0m — this commit changes code but stages no docs.\n'
+  printf '   If it adds a feature or changes architecture, update the docs in THIS commit:\n'
+  printf '     FEATURES.md · DECISIONS.md · TECH_STACK.md · README.md · website/docs/\n'
+  printf '   Pure refactor / test / typo? Ignore this and commit.\n'
+  printf '   (Reminder only — not blocking.)\n\n'
+fi
+
+exit 0

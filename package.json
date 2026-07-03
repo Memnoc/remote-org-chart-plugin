@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks || true",
     "dev": "concurrently \"vite\" \"tsx watch server/index.ts\"",
     "build": "vite build && tsc -p tsconfig.server.json",
+    "docs:build": "npm --prefix website ci && npm --prefix website run build",
+    "docs:dev": "npm --prefix website start",
     "start": "node dist-server/server/index.js",
     "test": "vitest run",
     "test:watch": "vitest"

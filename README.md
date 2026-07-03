@@ -3,7 +3,7 @@
 An org chart application built on Remote's API. Displays manager→direct-report hierarchies with interactive tree and list views.
 
 **Live app:** https://remote-org-chart-plugin.onrender.com/
-**Docs:** [`/docs`](./docs/)
+**Docs site:** https://memnoc.github.io/remote-org-chart-plugin/ (Docusaurus on GitHub Pages, source in [`/website`](./website/))
 
 ---
 
@@ -26,6 +26,10 @@ npm run dev
 Open `http://localhost:5173`.
 
 Without `REMOTE_API_TOKEN`, the app serves snapshot data (fallback mode).
+
+`npm install` also runs a `prepare` step that points git at `.githooks/` — enabling a
+non-blocking `pre-commit` reminder to update docs when a commit changes code. No manual
+setup needed.
 
 ---
 
