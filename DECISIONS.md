@@ -197,6 +197,48 @@
 
 ---
 
+## Express 4 Async Route Handlers Are Not Auto-Caught by Error Middleware
+
+**Decision:** All `async` route handlers in `server/index.ts` contain explicit `try/catch` blocks. No `asyncRoute` wrapper or upgrade to Express 5 has been added.
+
+**Why this matters:** Express 4's 4-argument error middleware only catches synchronous throws. A rejected promise from an `async` route handler is an unhandled rejection — it does not flow to the error middleware. It produces a hanging request (Express 4 never auto-responds) and, on Node 15+, eventually crashes the process. The current handlers are all individually guarded, so this is a latent trap rather than a live bug.
+
+**Why not fix it:** Adding a wrapper (`const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next)`) is three lines, but it introduces an invisible contract: every new route must be wrapped or it silently regresses. Upgrading to Express 5 (which auto-forwards async rejections) would fix it holistically but is a dependency change. Given the server has exactly three routes and they are all guarded, the cure adds complexity without removing a current failure mode.
+
+**What a future developer must know:** Any new `async` route added to `server/index.ts` **must** include its own `try/catch` — or the error middleware will not catch its failures. If the server grows beyond ~5 routes, the `wrap` helper or an Express 5 upgrade should be reconsidered.
+
+---
+
+## No Retry Logic on Remote API Failures
+
+**Decision:** `remoteClient.ts` makes a single attempt per request (list pages and individual detail fetches). There is no exponential backoff, no jitter, no retry loop.
+
+**Why:** The snapshot fallback is the recovery path for total pipeline failures. `Promise.allSettled` handles individual detail-fetch failures by skipping that employee and continuing — so transient per-employee errors are tolerated without retry. Adding retry with proper backoff (avoid thundering-herd on rate limits, cap total elapsed time) would require meaningful complexity for a scenario that the snapshot already handles acceptably.
+
+**Trade-off:** A transient 5xx on any list-page fetch aborts the entire ID collection phase, falling back to snapshot. Under poor network conditions with a large org this could cause stale data more often than ideal. If the Remote API proves unreliable in practice, per-page retry with backoff on list fetches is the highest-value addition.
+
+---
+
+## No Error Telemetry
+
+**Decision:** Render errors caught by `ErrorBoundary` are displayed to the user but not reported to any external service. There is no `componentDidCatch` integration with Sentry, Datadog, or similar.
+
+**Why:** This is an assignment project with no telemetry infrastructure. Adding an SDK (Sentry, etc.) would require account setup, API keys, and environment configuration that are out of scope. `console.error` is used at every catch site so errors are visible in browser DevTools and server logs.
+
+**Trade-off:** Render errors in production are invisible unless a user reports them. For a production system, `componentDidCatch` should forward the error and `React.ErrorInfo` stack trace to an observability platform. The `ErrorBoundary` class already has the right lifecycle hook (`componentDidCatch`) — it just needs a call to the reporting SDK.
+
+---
+
+## No process.on('unhandledRejection') Handler
+
+**Decision:** `server/index.ts` does not register a `process.on('unhandledRejection', ...)` handler.
+
+**Why:** All async paths inside route handlers are guarded with `try/catch`, so unhandled rejections are not expected in normal operation. On Node 15+ an unhandled rejection crashes the process — Render.com's process supervisor restarts it automatically, so the service recovers. The gap window (restart latency, ~1–2 s) is acceptable for an internal tool.
+
+**Trade-off:** A future code path outside the route handlers (a timer callback, an event emitter) could introduce an unhandled rejection that crashes the process without a log entry. If the server grows in complexity, a one-line handler (`process.on('unhandledRejection', (r) => console.error('[server] unhandled rejection:', r))`) should be added — it prevents crashes and makes the root cause visible in logs.
+
+---
+
 ## NodeCard Isolated From react-d3-tree Internals
 
 **Decision:** `NodeCard` no longer receives or reads `__rd3t` (react-d3-tree's internal collapsed-state field). Instead, `SingleTree` reads `nodeDatum.__rd3t?.collapsed` and passes it as an explicit `collapsed?: boolean` prop.
