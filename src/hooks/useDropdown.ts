@@ -6,11 +6,13 @@ export function useDropdown() {
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // Only listen while open — no global listeners for closed dropdowns.
+    if (!open) return
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setOpen(false)
     }
     function onClickOutside(e: MouseEvent) {
-      if (open && !triggerRef.current?.contains(e.target as Node) && !panelRef.current?.contains(e.target as Node))
+      if (!triggerRef.current?.contains(e.target as Node) && !panelRef.current?.contains(e.target as Node))
         setOpen(false)
     }
     window.addEventListener('keydown', onKey)

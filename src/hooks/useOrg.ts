@@ -12,6 +12,10 @@ export function useOrg(): State & { refresh: () => void; refreshing: boolean } {
   const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
+    // Stale-response guard: a refresh mid-flight re-runs this effect; without
+    // the flag the older fetch could resolve last and overwrite newer data.
+    // (react.dev/learn/you-might-not-need-an-effect — "Fetching data")
+    let ignore = false
     if (tick === 0) setState({ status: 'loading' })
     else setRefreshing(true)
     fetch('/api/org', { signal: AbortSignal.timeout(120_000) })
@@ -19,8 +23,17 @@ export function useOrg(): State & { refresh: () => void; refreshing: boolean } {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<OrgResponse>
       })
-      .then((data) => { setState({ status: 'ok', data }); setRefreshing(false) })
-      .catch((err: Error) => { setState({ status: 'error', message: err.message }); setRefreshing(false) })
+      .then((data) => {
+        if (ignore) return
+        setState({ status: 'ok', data })
+        setRefreshing(false)
+      })
+      .catch((err: Error) => {
+        if (ignore) return
+        setState({ status: 'error', message: err.message })
+        setRefreshing(false)
+      })
+    return () => { ignore = true }
   }, [tick])
 
   const refresh = useCallback(async () => {

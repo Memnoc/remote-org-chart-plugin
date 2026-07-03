@@ -266,3 +266,15 @@
 **Why:** An earlier iteration served the built docs from Express at `/docs`, sharing the app's single service. That coupled two concerns: (1) every app deploy paid the Docusaurus install + build (~1–3 min), and (2) the docs inherited the Render free-tier cold start — a reviewer hitting the docs while the app was asleep waited 30–60 s. GitHub Pages is a static CDN: always instant, independent of the app's sleep state, and free. Decoupling also pulls the docs build out of the app's `npm run build`, so app deploys return to baseline speed. The Actions workflow triggers only on pushes touching `website/**`, so app-only commits don't rebuild the docs.
 
 **Trade-off:** Docs live on a different origin (`memnoc.github.io`) than the app (`onrender.com`), so cross-links between them are absolute URLs, and the docs `baseUrl` is the Pages project sub-path (`/remote-org-chart-plugin/`). A one-time repo setting (Settings → Pages → Source → "GitHub Actions") is required, or the deploy step fails. Two deploy targets instead of one — acceptable because they are genuinely independent artifacts with different runtime characteristics (dynamic app vs static docs).
+
+---
+
+## Effects Only for External-System Sync
+
+**Decision:** `useEffect` is reserved for synchronizing with systems outside React — DOM event listeners, `matchMedia`, `localStorage`/`data-theme` writes, `history.replaceState`, network fetches. State-to-state logic never lives in an effect. Audited against [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect) (July 2026).
+
+**Why:** Effects that derive or adjust state cause extra render passes and frame-late UI, and fetch effects without cleanup race. The audit found and fixed: `useOrg` fetch had no stale-response guard (a refresh racing the initial fetch could resolve last and overwrite newer data — real bug, fixed with an `ignore` flag cleanup); `ListView` reset its page in an effect after render (new data flashed at a stale page index — fixed by adjusting state during render); `useTheme` subscribed to `prefers-color-scheme` via `useState` + `useEffect` (replaced with `useSyncExternalStore`, the primitive built for external stores); `useDropdown` kept global key/click listeners attached while closed (now gated on `open`).
+
+**Kept as effects (correctly external):** global keyboard shortcuts (`App`, `DetailPanel`), URL sync via `history.replaceState` (the URL is a projection of state into an external system, written from multiple update paths), container measurement in `SingleTree`, and the `localStorage` + `data-theme` write in `useTheme` (must also react to OS theme changes, which are not events).
+
+**Trade-off:** The during-render state adjustment in `ListView` (`prevInputs` comparison) is less familiar than an effect and triggers an immediate synchronous re-render — but that is one clean pass instead of a committed-then-corrected frame, and it is the React-documented pattern for this exact case.

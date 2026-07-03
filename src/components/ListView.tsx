@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import type { OrgNode } from '../../shared/types.js'
 import { walkForest } from '../lib/forestNav.ts'
 
@@ -58,7 +58,14 @@ function NodeRow({ node, depth, search }: { node: OrgNode; depth: number; search
 export default function ListView({ forest, search = '' }: Props) {
   const [page, setPage] = useState(0)
 
-  useEffect(() => { setPage(0) }, [forest, search])
+  // Reset pagination when the data or query changes — adjusted during render
+  // (not in an effect) so the new data never flashes at a stale page index.
+  // (react.dev/learn/you-might-not-need-an-effect — "Adjusting state when a prop changes")
+  const [prevInputs, setPrevInputs] = useState({ forest, search })
+  if (prevInputs.forest !== forest || prevInputs.search !== search) {
+    setPrevInputs({ forest, search })
+    setPage(0)
+  }
 
   if (forest.length === 0) {
     return <div style={{ padding: 40, color: 'var(--text-muted)' }}>No org data available.</div>
