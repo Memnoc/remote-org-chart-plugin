@@ -1,11 +1,10 @@
 import React, { useState, useMemo, useRef } from 'react'
 import type { OrgNode } from '../../shared/types.js'
-import NodeCard from './NodeCard.tsx'
 import SingleTree from './SingleTree.tsx'
 import ErrorBoundary from './ErrorBoundary.tsx'
 import { PlusIcon, MinusIcon, PersonIcon, zoomBtnStyle } from './icons.tsx'
-import { findSubtree, findChain } from '../lib/forestNav.ts'
-import { toPersonDetail, type PersonDetail } from '../lib/orgPresentation.ts'
+import { findSubtree, findChain, joinForest } from '../lib/forestNav.ts'
+import type { PersonDetail } from '../lib/orgPresentation.ts'
 
 interface Props {
   forest: OrgNode[]
@@ -88,9 +87,13 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
     )
   }
 
-  const mainTrees = displayForest.filter((r) => (r.children?.length ?? 0) > 0)
-  const loneNodes = displayForest.filter((r) => !r.children?.length)
-  const initialDepth = expandMode === 'collapsed' ? 0 : undefined
+  // Multi-root forests render as ONE expandable tree under a synthetic "Org"
+  // root (render-layer only — data forest stays honest, see DECISIONS.md).
+  const renderForest = joinForest(displayForest)
+  const hasVirtualRoot = renderForest[0]?.attributes.isVirtual === true
+  // With a virtual root, "collapse all" must keep depth 1 or the whole org
+  // hides behind a single chip.
+  const initialDepth = expandMode === 'collapsed' ? (hasVirtualRoot ? 1 : 0) : undefined
 
   const displayCount = totalPeople !== undefined && !focusedId
     ? totalPeople
@@ -139,7 +142,7 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
       </div>
 
       {/* Expand / Collapse all */}
-      {mainTrees.length > 0 && (
+      {renderForest.some((r) => (r.children?.length ?? 0) > 0) && (
         <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', gap: 6 }}>
           {(['all', 'collapsed'] as const).map((mode) => (
             <button
@@ -161,7 +164,7 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
 
       {/* Scrollable tree area */}
       <div ref={scrollRef} style={{ position: 'relative', zIndex: 1, flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: 60, paddingBottom: 64 }}>
-        {mainTrees.map((root, i) => (
+        {renderForest.map((root, i) => (
           <ErrorBoundary key={`${root.attributes.id ?? i}-${treeKey}`}>
             <SingleTree
               root={root}
@@ -176,29 +179,6 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
             />
           </ErrorBoundary>
         ))}
-
-        {loneNodes.length > 0 && (
-          <div style={{ padding: '24px 40px' }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-subtle)', marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              No reporting line · {loneNodes.length}
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-              {loneNodes.map((node, i) => (
-                <ErrorBoundary key={node.attributes.id ?? i}>
-                  <NodeCard
-                    nodeData={node}
-                    selected={node.attributes.id === selectedId}
-                    onClick={() => setSelectedId(node.attributes.id ?? null)}
-                    onProfile={onSelect ? () => {
-                      setSelectedId(node.attributes.id ?? null)
-                      onSelect(toPersonDetail(node))
-                    } : undefined}
-                  />
-                </ErrorBoundary>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Zoom controls */}

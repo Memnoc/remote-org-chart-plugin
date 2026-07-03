@@ -13,7 +13,7 @@ The Express server serves both the compiled SPA (`/dist`) and the `/api/org` end
 **Data flow:**
 1. Frontend calls `GET /api/org`
 2. Server checks in-memory cache (5-minute TTL)
-3. If `REMOTE_API_TOKEN` is present → fetches live data from Remote API (`/v1/employments`), paginates all pages with bounded concurrency (pool size 8), maps to internal `OrgNode` shape, builds reporting tree
+3. If `REMOTE_API_TOKEN` is present → fetches live data from Remote API (`/v1/employments`), paginates all pages with bounded concurrency (pool size 8), filters to `status === 'active'` (archived/pre-hire employments are excluded), maps to internal `OrgNode` shape, builds reporting tree
 4. If token absent or live fetch fails → falls back to `server/snapshot.json`
 5. Response envelope: `{ forest: OrgNode[], source: 'live' | 'snapshot', fetchedAt: string }`
 
@@ -73,7 +73,7 @@ Org data is rendered as an interactive hierarchy using `react-d3-tree`.
 
 - Vertical orientation, Bézier S-curve connectors (path goes from card bottom to card top, midpoint computed from vertical centre between nodes)
 - Canvas background: dot-grid pattern (`radial-gradient`, CSS custom properties)
-- Multiple root nodes each render as a separate tree section in a single scrollable canvas
+- **Single expandable tree:** when the data has multiple roots (no-manager, external-manager, cycle-broken), they are joined under a synthetic **"Org" chip node** so the whole org renders as one tree — Remote's look, with nobody hidden. The chip collapses/expands the full org; it is not selectable and never appears in list view, stats, or CSV (render-layer only)
 - Connector lines: light slate in light mode, deep purple in dark mode
 - **Known visual limitation:** for managers with many direct reports (≥ 8–10), the Bézier curves from the parent to widely-spread children cross each other visually. This is geometric — the S-curve uses the parent's x-coordinate as its first control point, which causes curves to intersect when children span a wide horizontal range. Use **Subtree Focus** ("View team →") to narrow the canvas to a single manager's tree.
 

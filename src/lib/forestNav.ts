@@ -1,5 +1,21 @@
 import type { OrgNode } from '../../shared/types.js'
 
+export const VIRTUAL_ROOT_ID = '__org__'
+
+/**
+ * Join a multi-root forest under one synthetic "Org" root so it renders as a
+ * single expandable tree. Render-layer only — the data forest stays honest
+ * (see DECISIONS.md). Single-root and empty forests pass through untouched.
+ */
+export function joinForest(forest: OrgNode[]): OrgNode[] {
+  if (forest.length <= 1) return forest
+  return [{
+    name: 'Org',
+    attributes: { id: VIRTUAL_ROOT_ID, isVirtual: true },
+    children: forest,
+  }]
+}
+
 export function treeDepth(node: OrgNode): number {
   if (!node.children?.length) return 1
   return 1 + Math.max(...node.children.map(treeDepth))

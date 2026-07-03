@@ -10,6 +10,7 @@ interface Props {
       department?: string
       badge?: string
       isExternal?: boolean
+      isVirtual?: boolean
     }
     children?: unknown[]
   }
@@ -40,6 +41,35 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
   const displayName = name || 'Unknown Employee'
   const hasChildren = Array.isArray(children) && children.length > 0
   const childCount = hasChildren ? (children as unknown[]).length : 0
+
+  // Synthetic org root — compact chip, not a person card
+  if (attributes.isVirtual) {
+    return (
+      <div style={{ width: 224, display: 'flex', justifyContent: 'center' }}>
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggle?.() }}
+          title={collapsed ? 'Expand org' : 'Collapse org'}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)',
+            background: 'var(--surface)', border: '1.5px solid var(--border)',
+            borderRadius: 20, padding: '7px 16px', cursor: 'pointer',
+            boxShadow: 'var(--shadow-card)', userSelect: 'none',
+          }}
+        >
+          <PeopleIcon />
+          <span>Org</span>
+          <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>· {childCount} {childCount === 1 ? 'branch' : 'branches'}</span>
+          <svg
+            width="9" height="9" viewBox="0 0 10 10"
+            style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+          >
+            <path d="M1.5 3.5 L5 7 L8.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          </svg>
+        </button>
+      </div>
+    )
+  }
 
   const deptLabel = department ?? (isExternal ? 'External' : 'Unassigned')
   const color = deptColor(deptLabel)

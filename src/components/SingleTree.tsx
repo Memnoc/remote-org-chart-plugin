@@ -54,6 +54,7 @@ export default function SingleTree({
     ({ nodeDatum, toggleNode }: CustomNodeElementProps) => {
       const nd = nodeDatum as Parameters<typeof NodeCard>[0]['nodeData']
       const id = (nodeDatum.attributes as Record<string, unknown>)?.id as string ?? ''
+      const isVirtual = !!(nodeDatum.attributes as Record<string, unknown>)?.isVirtual
       const hasKids = Array.isArray(nd.children) && nd.children.length > 0
       const collapsed = (nodeDatum as { __rd3t?: { collapsed: boolean } }).__rd3t?.collapsed ?? false
       return (
@@ -61,12 +62,12 @@ export default function SingleTree({
           <NodeCard
             nodeData={nd}
             collapsed={collapsed}
-            selected={!!id && id === selectedId}
-            onChain={!!id && chainIds.has(id) && id !== selectedId}
+            selected={!isVirtual && !!id && id === selectedId}
+            onChain={!isVirtual && !!id && chainIds.has(id) && id !== selectedId}
             onToggle={toggleNode}
-            onFocus={hasKids && id ? () => onFocus(id) : undefined}
-            onClick={() => onSelectId(id || null)}
-            onProfile={onSelect ? () => {
+            onFocus={!isVirtual && hasKids && id ? () => onFocus(id) : undefined}
+            onClick={isVirtual ? undefined : () => onSelectId(id || null)}
+            onProfile={onSelect && !isVirtual ? () => {
               onSelectId(id || null)
               onSelect(toPersonDetail(nd))
             } : undefined}

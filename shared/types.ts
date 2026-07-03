@@ -7,6 +7,8 @@ export interface OrgNode {
     id: string
     badge?: string
     isExternal?: boolean
+    /** Synthetic render-layer root joining a multi-root forest — not a person */
+    isVirtual?: boolean
   }
   children?: OrgNode[]
 }

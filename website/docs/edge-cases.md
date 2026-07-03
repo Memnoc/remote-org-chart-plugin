@@ -15,7 +15,8 @@ assuming a single clean CEO-rooted tree.
 | Dangling manager reference (id not in dataset) | Treated as a root (orphan) |
 | Reporting cycle (A → B → A) | Cycle detected; cycle nodes rendered as roots with a "cycle detected" badge |
 | Missing name / title / department | Displayed as `—`, never blank |
-| Multiple root nodes | Full forest rendered; no single-CEO assumption |
+| Multiple root nodes | Joined under a virtual "Org" root — one expandable tree, no one hidden |
+| Non-active employments (archived / pre-hire) | Filtered out server-side (`status === 'active'`) |
 
 Cycle detection walks each node's manager chain and flags any node seen twice; flagged
 nodes are promoted to roots, which breaks the cycle while keeping every person visible. See

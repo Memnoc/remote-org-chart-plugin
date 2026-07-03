@@ -32,13 +32,23 @@
 
 ---
 
-## Forest Instead of Single Root
+## Forest at the Data Layer, Virtual Root at the Render Layer
 
-**Decision:** The data model is a `forest` (array of trees) rather than a single root node.
+**Decision:** The data model is a `forest` (array of trees) rather than a single root node. When the forest has multiple roots, the **tree view** joins them under one synthetic "Org" node (`joinForest()` in `src/lib/forestNav.ts`, `id: '__org__'`, `isVirtual: true`) so the whole org renders as a single expandable tree.
 
-**Why:** Real org structures are not always a single hierarchy. The Remote API may return employees with no manager (orphans), employees whose manager is not on Remote (external managers), or employees caught in a reporting cycle (cycle-broken roots). Forcing a single artificial root ("Company") would misrepresent the data. A forest handles all these cases honestly.
+**Why:** Real org structures are not always a single hierarchy. The Remote API returns employees with no manager (orphans), employees whose manager is not on Remote (external managers), and employees caught in a reporting cycle (cycle-broken roots) — the sandbox org has 9 genuine roots among active employees. Forcing a single artificial root into the *data* would misrepresent it; hiding the unconnected people (Remote's own UI does this, with a "missing reporting lines" banner) trades completeness for cleanliness. The virtual root splits the difference: the API response and every consumer (list view, stats, CSV export, search) see the honest forest, while the canvas shows one Remote-style expandable tree with nobody hidden.
 
-**Trade-off:** The UI must handle rendering multiple trees. The tree view renders each root as a separate `SingleTree` component. The list view flattens the forest in order. Slightly more complex than a single-root assumption but more correct.
+**Trade-off:** The virtual root is a UI-only concept that must be special-cased: it renders as a compact chip (not a person card), can't be selected/focused/profiled, is excluded from reporting-chain highlights, and "collapse all" uses depth 1 instead of 0 so the org doesn't vanish behind a single chip. Single-root forests (e.g. a focused subtree, or a search that prunes to one tree) bypass the join entirely.
+
+---
+
+## Active-Only Employment Filter
+
+**Decision:** The server filters employments to `status === 'active'` (`isActive()` in `server/lib/mapper.ts`) before building the forest, on both the live and snapshot paths.
+
+**Why:** The API returns every employment lifecycle state. Measured against the sandbox account: 175 total = 148 active + 23 archived (offboarded) + 2 created + 1 invited + 1 initiated (pre-hires who haven't started). Rendering all of them put 27 junk singletons on the chart — the bulk of the visual clutter — and made our headcount disagree with Remote's own org chart. Offboarded people and not-yet-started hires don't belong on an org chart.
+
+**Trade-off:** No way to view archived/pre-hire employments in the UI. If that's ever needed, the filter is one predicate behind a query param. Note Remote's own chart shows 125, not 148 — it additionally hides active people whose reporting lines don't connect to the main tree; we deliberately keep those visible (see the virtual-root ADR above).
 
 ---
 

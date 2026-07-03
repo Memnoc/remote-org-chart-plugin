@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mapEmployment } from '../server/lib/mapper.js'
+import { mapEmployment, isActive } from '../server/lib/mapper.js'
 import type { RemoteEmployment } from '../shared/types.js'
 
 const base: RemoteEmployment = {
@@ -25,11 +25,11 @@ describe('mapEmployment', () => {
     expect(p.externalManagerEmail).toBeNull()
   })
 
-  it('replaces null fields with placeholder', () => {
+  it('keeps null fields null (formatting happens at render)', () => {
     const p = mapEmployment({ ...base, full_name: null, job_title: null, department: null })
-    expect(p.name).toBe('—')
-    expect(p.title).toBe('—')
-    expect(p.department).toBe('—')
+    expect(p.name).toBeNull()
+    expect(p.title).toBeNull()
+    expect(p.department).toBeNull()
   })
 
   it('sets managerId when manager_employment_id present', () => {
@@ -43,5 +43,15 @@ describe('mapEmployment', () => {
     expect(p.managerId).toBeNull()
     expect(p.externalManagerEmail).toBe('ext@board.com')
     expect(p.externalManagerName).toBe('Board Member')
+  })
+})
+
+describe('isActive', () => {
+  it('accepts active employments', () => {
+    expect(isActive(base)).toBe(true)
+  })
+
+  it.each(['archived', 'created', 'invited', 'initiated'])('rejects %s employments', (status) => {
+    expect(isActive({ ...base, status })).toBe(false)
   })
 })

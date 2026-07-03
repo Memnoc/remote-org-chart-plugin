@@ -71,7 +71,8 @@ Remote MCP is designed for LLM agents — structured tool definitions for AI mod
 | Dangling manager reference (id not in dataset) | Treated as root (orphan) |
 | Reporting cycle (A → B → A) | Cycle detected; cycle nodes rendered as roots with "cycle detected" badge |
 | Missing name / title / department | Displayed as `—`, never blank |
-| Multiple root nodes | Full forest rendered; no single-CEO assumption |
+| Multiple root nodes | Joined under a virtual "Org" root — one expandable tree, no one hidden |
+| Non-active employments (archived / pre-hire) | Filtered out server-side; org chart shows current staff only |
 
 ---
 

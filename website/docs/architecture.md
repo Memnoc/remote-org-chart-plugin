@@ -22,8 +22,9 @@ Express proxy (holds API token server-side)
 1. Frontend calls `GET /api/org`.
 2. Server checks the in-memory cache (5-minute TTL). Fresh cache is returned as-is.
 3. If `REMOTE_API_TOKEN` is present → fetch live data from the Remote API, paginate all
-   pages, fetch per-employee detail with bounded concurrency, map to the internal `OrgNode`
-   shape, and build the reporting forest.
+   pages, fetch per-employee detail with bounded concurrency, **filter to
+   `status === 'active'`** (archived and pre-hire employments don't belong on an org
+   chart), map to the internal `OrgNode` shape, and build the reporting forest.
 4. If the token is absent **or** the live fetch throws → fall back to `server/snapshot.json`.
 5. Response envelope:
    `{ forest: OrgNode[], source: 'live' | 'snapshot', fetchedAt: string, skippedCount?: number }`
@@ -43,6 +44,11 @@ See [Remote API integration](./api-integration.md) for the fetch details and
    nodes, or external-manager nodes.
 4. **External managers** — employees whose manager is not on Remote get `isExternal: true`
    and render as root nodes with a badge.
+
+The forest stays multi-root in the data (9 genuine roots in the sandbox org). The **tree
+view** joins those roots under one synthetic "Org" node at render time (`joinForest()`),
+so the canvas shows a single expandable tree without hiding anyone. List view, stats, and
+CSV export consume the honest forest directly.
 
 The snapshot doubles as the tree-builder's test fixture: it embeds every edge case, so the
 Vitest suite exercises real irregular shapes rather than synthetic ones.

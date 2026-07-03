@@ -5,7 +5,7 @@ import { readFileSync } from 'fs'
 import type { OrgResponse } from '../shared/types.js'
 import type { RemoteEmployment } from './lib/types.js'
 import { fetchAllEmployments } from './lib/remoteClient.js'
-import { mapEmployment } from './lib/mapper.js'
+import { mapEmployment, isActive } from './lib/mapper.js'
 import { buildForest } from './lib/treeBuilder.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -30,7 +30,7 @@ function loadSnapshot(): OrgResponse {
   } catch {
     throw new Error('Snapshot file contains invalid JSON')
   }
-  const people = employments.map(mapEmployment).filter((p) => p.name != null || p.title != null || p.department != null)
+  const people = employments.filter(isActive).map(mapEmployment).filter((p) => p.name != null || p.title != null || p.department != null)
   return {
     forest: buildForest(people),
     source: 'snapshot',
@@ -46,7 +46,9 @@ async function fetchLive(token: string): Promise<OrgResponse> {
   const t0 = Date.now()
   console.log('[org] starting live fetch')
   const { employments, skipped } = await fetchAllEmployments(token)
-  const people = employments.map(mapEmployment).filter((p) => p.name != null || p.title != null || p.department != null)
+  const active = employments.filter(isActive)
+  console.log(`[org] status filter — ${active.length}/${employments.length} active (${employments.length - active.length} archived/pre-hire excluded)`)
+  const people = active.map(mapEmployment).filter((p) => p.name != null || p.title != null || p.department != null)
   const forest = buildForest(people)
   const totalNodes = forest.reduce((acc, root) => acc + countNodes(root), 0)
   console.log(`[org] done — ${people.length} people, ${forest.length} root(s), ${totalNodes} total nodes, ${skipped} skipped, ${Date.now() - t0}ms`)

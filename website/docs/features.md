@@ -29,7 +29,8 @@ Interactive hierarchy rendered with `react-d3-tree`.
 
 - Vertical orientation, Bézier S-curve connectors.
 - Dot-grid canvas background via CSS custom properties.
-- Multiple roots each render as a separate tree section in one scrollable canvas.
+- **Single expandable tree** — multiple data roots are joined under a synthetic "Org"
+  chip node at render time, so the whole org expands from one tree without hiding anyone.
 - **Zoom controls:** floating bar, ±10% steps clamped 25%–250%, live % readout, reset to 80%.
 - **Expand / collapse all:** remounts the tree with `initialDepth` set to `undefined` or `0`.
 
