@@ -34,9 +34,9 @@ export function useOrg(): State & { refresh: () => void; refreshing: boolean } {
     // Stale-response guard: a refresh mid-flight re-runs this effect; without
     // the flag the older fetch could resolve last and overwrite newer data.
     // (react.dev/learn/you-might-not-need-an-effect — "Fetching data")
+    // No setState at effect start on purpose: initial state is already
+    // 'loading', and refresh() sets `refreshing` before bumping tick.
     let ignore = false
-    if (tick === 0) setState({ status: 'loading' })
-    else setRefreshing(true)
     fetch('/api/org', { signal: AbortSignal.timeout(120_000) })
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)

@@ -60,6 +60,12 @@ server/index.ts` (port 3001) concurrently. The proxy means the frontend calls `/
 with the same code path in dev and production — no CORS config. The docs site runs
 separately with `npm --prefix website start` (Docusaurus dev server on port 3000).
 
+## Linting
+
+**ESLint** (flat config) with `typescript-eslint` and `eslint-plugin-react-hooks` —
+rules-of-hooks and `exhaustive-deps` run as errors, mechanically enforcing the effect
+discipline documented in [Design decisions](./decisions.md). `npm run lint`.
+
 ## Testing
 
 **Vitest 2.** `npm test` runs once; `npm run test:watch` watches. Tests live in `tests/`,

@@ -133,6 +133,16 @@ services:
 
 ---
 
+## Linting
+
+**ESLint** (flat config, `eslint.config.js`) with `typescript-eslint` and **`eslint-plugin-react-hooks`** — rules-of-hooks and `exhaustive-deps` (as errors) guard effect dependency correctness per [react.dev/learn/escape-hatches](https://react.dev/learn/escape-hatches).
+
+```
+npm run lint
+```
+
+---
+
 ## Testing
 
 **Framework:** Vitest 2

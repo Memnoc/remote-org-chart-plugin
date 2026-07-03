@@ -18,7 +18,7 @@
  * URL not updating → the replaceState effect; keyboard shortcuts dead →
  * the window keydown effect (it ignores keys typed into inputs).
  */
-import React, { useState, useMemo, useEffect, useRef } from 'react'
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useOrg } from './hooks/useOrg.ts'
 import { useTheme } from './hooks/useTheme.ts'
 import Header from './components/Header.tsx'
@@ -44,24 +44,26 @@ export default function App() {
   const [activeDepts, setActiveDepts] = useState<Set<string>>(init.depts)
   const [selectedPerson, setSelectedPerson] = useState<PersonDetail | null>(null)
   const [statsOpen, setStatsOpen] = useState(false)
+  // Stable identity: DetailPanel's Esc-listener effect depends on onClose —
+  // an inline arrow would re-attach the window listener on every App render
+  // (react.dev/learn/removing-effect-dependencies).
+  const closeDetail = useCallback(() => setSelectedPerson(null), [])
   const searchRef = useRef<HTMLInputElement>(null)
-  // Ref mirror of selectedPerson so the mount-once keydown effect below can
-  // read the CURRENT value without re-subscribing on every selection change.
-  const selectedPersonRef = useRef<PersonDetail | null>(null)
-  selectedPersonRef.current = selectedPerson
 
   // Global shortcuts: "/" focuses search (unless already typing in a field);
   // Esc clears search — but only when no detail panel is open, because the
-  // panel owns Esc for closing itself (see DetailPanel).
+  // panel owns Esc for closing itself (see DetailPanel). selectedPerson is a
+  // real dependency: the listener re-attaches when selection changes, which
+  // is user-paced and cheap (unlike per-keystroke churn).
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement).tagName
       if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') { e.preventDefault(); searchRef.current?.focus() }
-      if (e.key === 'Escape' && !selectedPersonRef.current) { setSearch(''); searchRef.current?.blur() }
+      if (e.key === 'Escape' && !selectedPerson) { setSearch(''); searchRef.current?.blur() }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  }, [selectedPerson])
 
   // Write half of shareable-URL state (read half: lib/urlState.ts on mount).
   // replaceState, not pushState — filter tweaks shouldn't pollute Back-button
@@ -97,7 +99,8 @@ export default function App() {
   function toggleDept(dept: string) {
     setActiveDepts((prev) => {
       const next = new Set(prev)
-      next.has(dept) ? next.delete(dept) : next.add(dept)
+      if (next.has(dept)) next.delete(dept)
+      else next.add(dept)
       return next
     })
   }
@@ -110,7 +113,7 @@ export default function App() {
           data" escape hatch — plain Retry would re-render the same bad data
           and crash again (see ErrorBoundary.tsx). */}
       <ErrorBoundary onRefresh={refresh}>
-        <DetailPanel person={selectedPerson} onClose={() => setSelectedPerson(null)} />
+        <DetailPanel person={selectedPerson} onClose={closeDetail} />
         {orgStats && <StatsPanel stats={orgStats} open={statsOpen} onClose={() => setStatsOpen(false)} />}
 
         <Header
