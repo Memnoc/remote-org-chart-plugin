@@ -9,6 +9,8 @@ function headers(token: string) {
   }
 }
 
+const TIMEOUT_MS = 10_000
+
 async function listAllEmploymentIds(token: string): Promise<string[]> {
   const ids: string[] = []
   let page = 1
@@ -17,6 +19,7 @@ async function listAllEmploymentIds(token: string): Promise<string[]> {
   while (page <= totalPages) {
     const res = await fetch(`${BASE}/employments?page=${page}&page_size=100`, {
       headers: headers(token),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     })
     if (!res.ok) throw new Error(`Remote API ${res.status}: ${await res.text()}`)
     const json = (await res.json()) as { data: RemoteEmploymentList; [k: string]: unknown }
@@ -32,7 +35,7 @@ async function listAllEmploymentIds(token: string): Promise<string[]> {
 }
 
 async function fetchEmployment(id: string, token: string): Promise<RemoteEmployment> {
-  const res = await fetch(`${BASE}/employments/${id}`, { headers: headers(token) })
+  const res = await fetch(`${BASE}/employments/${id}`, { headers: headers(token), signal: AbortSignal.timeout(TIMEOUT_MS) })
   if (!res.ok) throw new Error(`Remote API ${res.status} for employment ${id}`)
   const json = (await res.json()) as { data: { employment: RemoteEmployment } }
   return json.data.employment

@@ -1,9 +1,11 @@
 import type { OrgNode } from '../../shared/types.js'
 
+// Strip newlines so Excel doesn't split a field value across rows
+const esc = (v: string) => `"${v.replace(/[\r\n]+/g, ' ').replace(/"/g, '""')}"`
+
 function flattenForest(forest: OrgNode[], parentName = ''): string[][] {
   const rows: string[][] = []
   for (const node of forest) {
-    const esc = (v: string) => `"${v.replace(/"/g, '""')}"`
     rows.push([esc(node.name), esc(node.attributes.title ?? ''), esc(node.attributes.department ?? ''), esc(parentName), node.attributes.isExternal ? 'Yes' : 'No'])
     rows.push(...flattenForest(node.children ?? [], node.name))
   }
@@ -17,5 +19,5 @@ export function exportCSV(forest: OrgNode[]) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url; a.download = 'org-chart.csv'; a.click()
-  URL.revokeObjectURL(url)
+  setTimeout(() => URL.revokeObjectURL(url), 100)
 }

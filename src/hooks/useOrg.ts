@@ -24,8 +24,13 @@ export function useOrg(): State & { refresh: () => void; refreshing: boolean } {
   }, [tick])
 
   const refresh = useCallback(async () => {
-    await fetch('/api/org/refresh', { method: 'POST' })
-    setTick((t) => t + 1)
+    setRefreshing(true)
+    try {
+      await fetch('/api/org/refresh', { method: 'POST' })
+      setTick((t) => t + 1)
+    } catch {
+      setRefreshing(false)
+    }
   }, [])
 
   return { ...state, refresh, refreshing }

@@ -122,13 +122,13 @@
 
 ---
 
-## Error Boundary at the Application Root
+## Error Boundary Strategy: Root + Per-Subtree
 
-**Decision:** A single React Error Boundary wraps `<App />` at the root in `main.tsx`.
+**Decision:** Two layers of React Error Boundaries: a root boundary in `main.tsx` wraps `<App />`, and a per-`SingleTree` boundary wraps each tree in `TreeView.tsx`.
 
-**Why:** Catches any render-phase error from any component in the tree and shows a recovery UI instead of a blank screen. A single root boundary is the right default — component-level boundaries only make sense when you want to isolate a specific sub-tree and allow the rest of the app to keep working.
+**Why:** The root boundary is the last line of defence — a blank screen replaced by a recovery UI. The per-`SingleTree` boundaries prevent a single bad node or corrupted subtree from killing the entire canvas. With N trees on screen, one render failure is isolated; the remaining N-1 trees stay interactive.
 
-**Trade-off:** The boundary only catches render-phase errors (thrown during `render`, `useEffect` cleanup, etc.). It does not catch async errors (rejected promises in event handlers). Those are handled separately (the `useOrg` hook catches fetch errors and surfaces them as `state.status === 'error'`).
+**Trade-off:** The boundary only catches render-phase errors. Async errors (rejected promises in event handlers) are not caught — those are handled inline in `useOrg` (fetch failures → `status === 'error'`) and `refresh()` (try/catch on the POST).
 
 ---
 

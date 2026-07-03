@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from 'react'
 import type { OrgNode } from '../../shared/types.js'
 import NodeCard from './NodeCard.tsx'
 import SingleTree from './SingleTree.tsx'
+import ErrorBoundary from './ErrorBoundary.tsx'
 import { PlusIcon, MinusIcon, PersonIcon, zoomBtnStyle } from './icons.tsx'
 import { findSubtree, findChain } from '../lib/forestNav.ts'
 import { toPersonDetail, type PersonDetail } from '../lib/orgPresentation.ts'
@@ -161,18 +162,19 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
       {/* Scrollable tree area */}
       <div ref={scrollRef} style={{ position: 'relative', zIndex: 1, flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingTop: 60, paddingBottom: 64 }}>
         {mainTrees.map((root, i) => (
-          <SingleTree
-            key={`${root.attributes.id ?? i}-${treeKey}`}
-            root={root}
-            initialDepth={initialDepth}
-            zoom={zoom}
-            onSelect={onSelect}
-            selectedId={selectedId}
-            onSelectId={setSelectedId}
-            chainIds={chainIds}
-            onFocus={handleFocus}
-            panOffset={panOffset}
-          />
+          <ErrorBoundary key={`${root.attributes.id ?? i}-${treeKey}`}>
+            <SingleTree
+              root={root}
+              initialDepth={initialDepth}
+              zoom={zoom}
+              onSelect={onSelect}
+              selectedId={selectedId}
+              onSelectId={setSelectedId}
+              chainIds={chainIds}
+              onFocus={handleFocus}
+              panOffset={panOffset}
+            />
+          </ErrorBoundary>
         ))}
 
         {loneNodes.length > 0 && (
