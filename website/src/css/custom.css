@@ -4,27 +4,28 @@
  * work well for content-centric websites.
  */
 
-/* Brand palette — matches the app (violet / Rosé Pine iris). */
+/* Restrained green accent, Remote-style. Tune the base hex to the exact brand
+   green if you have it; the ramp below is derived from #1e9e6a. */
 :root {
-  --ifm-color-primary: #6d28d9;
-  --ifm-color-primary-dark: #6223c4;
-  --ifm-color-primary-darker: #5c21b9;
-  --ifm-color-primary-darkest: #4c1b98;
-  --ifm-color-primary-light: #7c3aed;
-  --ifm-color-primary-lighter: #8b5cf6;
-  --ifm-color-primary-lightest: #a78bfa;
+  --ifm-color-primary: #1e9e6a;
+  --ifm-color-primary-dark: #1c8f60;
+  --ifm-color-primary-darker: #1a875b;
+  --ifm-color-primary-darkest: #156f4b;
+  --ifm-color-primary-light: #22ad74;
+  --ifm-color-primary-lighter: #26b579;
+  --ifm-color-primary-lightest: #3cc78d;
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.08);
 }
 
-/* Lighter iris tones for dark mode readability. */
+/* Lighter green for dark-mode contrast. */
 [data-theme='dark'] {
-  --ifm-color-primary: #c4a7e7;
-  --ifm-color-primary-dark: #b389e0;
-  --ifm-color-primary-darker: #aa7edd;
-  --ifm-color-primary-darkest: #8f5ad2;
-  --ifm-color-primary-light: #d5c1ee;
-  --ifm-color-primary-lighter: #dfd0f2;
-  --ifm-color-primary-lightest: #e9e0f7;
+  --ifm-color-primary: #4ecb8e;
+  --ifm-color-primary-dark: #35c47f;
+  --ifm-color-primary-darker: #2abf78;
+  --ifm-color-primary-darkest: #1f9d62;
+  --ifm-color-primary-light: #67d29e;
+  --ifm-color-primary-lighter: #75d6a7;
+  --ifm-color-primary-lightest: #98e0bd;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
