@@ -142,10 +142,40 @@
 
 ---
 
-## Shared TypeScript Types Between Frontend and Backend
+## Shared TypeScript Types: HTTP Contract Only
 
-**Decision:** `shared/types.ts` is imported by both `server/` and `src/` (frontend). A single source of truth for `RemoteEmployment`, `Person`, `OrgNode`, and `OrgResponse`.
+**Decision:** `shared/types.ts` contains only `OrgNode` and `OrgResponse` — the exact shape of the `/api/org` HTTP response. Server-internal types (`RemoteEmployment`, `RemoteEmploymentList`, `Person`) live in `server/lib/types.ts` and are never imported by the frontend.
 
-**Why:** Eliminates drift between what the server sends and what the client expects. If the API response shape changes, TypeScript compilation catches mismatches in both layers simultaneously.
+**Why:** `shared/` is the HTTP contract — only the types that both sides of the wire must agree on belong there. Server-internal types (`Person`, `RemoteEmployment`) are implementation details of the fetch-and-map pipeline; leaking them into shared/ couples the frontend to server internals. Separating them means the server can change its internal representation without touching shared/.
 
-**Trade-off:** The `shared/` directory is compiled twice — once by Vite (bundled into the frontend) and once by `tsc` with `tsconfig.server.json` (output to `dist-server/`). This is a minor build complexity but the type safety is worth it.
+**Trade-off:** The `shared/` directory is compiled twice — once by Vite (bundled into the frontend) and once by `tsc` with `tsconfig.server.json` (output to `dist-server/`). Minor build complexity; the boundary is worth it.
+
+---
+
+## Null/Undefined Over Sentinel Strings
+
+**Decision:** Missing data in `OrgNode.attributes` (`title`, `department`) is represented as `undefined` (field omitted in JSON). Missing data in the server-internal `Person` type uses `null`. Sentinel string `'—'` is not used anywhere.
+
+**Why:** `'—'` as a sentinel string leaked into all comparison sites (`isEmpty()`) and made field presence ambiguous. `null` is semantically correct for "field has no value." `undefined` is used in `OrgNode.attributes` because react-d3-tree's `RawNodeDatum.attributes` type is `Record<string, string | number | boolean>` — `null` is not assignable, so undefined (which omits the key in JSON serialization) is the only valid representation of a missing string attribute.
+
+**Trade-off:** The `Person → OrgNode` boundary in `treeBuilder.ts` must explicitly convert `null → undefined` (`p.title ?? undefined`). This conversion is intentional and documented at the type boundary.
+
+---
+
+## orgUtils God Module Split
+
+**Decision:** The original `orgUtils.ts` (192 lines, 5 concerns) was decomposed into five focused modules: `forestNav.ts` (tree navigation), `forestFilter.ts` (search + dept filtering), `orgPresentation.ts` (stats, display formatting, colours), `orgExport.ts` (CSV), `urlState.ts` (URL param parsing).
+
+**Why:** A module with 5 unrelated concerns fails the deletion test — deleting it would scatter complexity to 9 import sites. Each split module earns its existence: callers import only what they need, the interface of each module is narrow relative to its implementation, and locality is preserved (filtering bugs live in `forestFilter.ts`, colour bugs live in `orgPresentation.ts`).
+
+**Trade-off:** 9 import sites updated. The original file is blanked (not deleted) because the pre-commit hook blocks `rm`. Future cleanup can remove it once all consumers are verified.
+
+---
+
+## NodeCard Isolated From react-d3-tree Internals
+
+**Decision:** `NodeCard` no longer receives or reads `__rd3t` (react-d3-tree's internal collapsed-state field). Instead, `SingleTree` reads `nodeDatum.__rd3t?.collapsed` and passes it as an explicit `collapsed?: boolean` prop.
+
+**Why:** `__rd3t` is a library implementation detail, undocumented in react-d3-tree's public API. Having `NodeCard` depend on it makes `NodeCard` untestable in isolation (you can't construct a valid `nodeData` with `__rd3t` without the tree context) and breaks if the library renames the field. `SingleTree` is already the adapter between react-d3-tree and the rest of the app — the internal field read belongs there.
+
+**Trade-off:** One extra prop on `NodeCard`. The cast at the `SingleTree` boundary (`nodeDatum as { __rd3t?: { collapsed: boolean } }`) documents the fragility explicitly, at the one place it needs to exist.

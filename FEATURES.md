@@ -71,10 +71,11 @@ Clicking the card body (not the pill or "View team") selects the node:
 
 Org data is rendered as an interactive hierarchy using `react-d3-tree`.
 
-- Vertical orientation, step-style connectors
+- Vertical orientation, Bézier S-curve connectors (path goes from card bottom to card top, midpoint computed from vertical centre between nodes)
 - Canvas background: dot-grid pattern (`radial-gradient`, CSS custom properties)
 - Multiple root nodes each render as a separate tree section in a single scrollable canvas
 - Connector lines: light slate in light mode, deep purple in dark mode
+- **Known visual limitation:** for managers with many direct reports (≥ 8–10), the Bézier curves from the parent to widely-spread children cross each other visually. This is geometric — the S-curve uses the parent's x-coordinate as its first control point, which causes curves to intersect when children span a wide horizontal range. Use **Subtree Focus** ("View team →") to narrow the canvas to a single manager's tree.
 
 ### Zoom Controls
 

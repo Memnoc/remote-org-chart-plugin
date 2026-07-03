@@ -39,7 +39,7 @@
 - **ESM** — `"type": "module"` in `package.json`, compiled with `moduleResolution: NodeNext`
 
 ### API Integration
-- **Remote API base URL:** `https://gateway.remote.com/v1`
+- **Remote API base URL:** `https://gateway.remote-sandbox.com/v1`
 - **Auth:** Bearer token via `REMOTE_API_TOKEN` env var
 - **Pagination:** `GET /v1/employments?page=N&page_size=100` iterated until `total_pages` exhausted — collects all employment IDs
 - **Detail fetch:** `GET /v1/employments/{id}` per employee — fields used: `full_name`, `job_title`, `department`, `manager_employment_id`, `status`
