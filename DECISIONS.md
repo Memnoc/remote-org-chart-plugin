@@ -122,13 +122,38 @@
 
 ---
 
-## Error Boundary Strategy: Root + Per-Subtree
+## Error Boundary Strategy: Four-Layer Isolation
 
-**Decision:** Two layers of React Error Boundaries: a root boundary in `main.tsx` wraps `<App />`, and a per-`SingleTree` boundary wraps each tree in `TreeView.tsx`.
+**Decision:** Four layers of React Error Boundaries, from outermost to innermost:
+1. **Root boundary** (`main.tsx`) — last-resort backstop. No `onRefresh`. Shows "Retry" only.
+2. **App content boundary** (`App.tsx`, wrapping Header + Toolbar + canvas) — receives `onRefresh={refresh}` from `useOrg`. Shows "Refresh data" + "Retry", giving the user an escape when a crash is data-driven.
+3. **Per-`SingleTree` boundary** (`TreeView.tsx`) — isolates individual tree subtrees. One corrupt subtree doesn't kill the canvas.
+4. **Per-lone-node boundary** (`TreeView.tsx`) — wraps each rootless employee card. Matches the per-tree isolation for the "no reporting line" section.
+5. **ListView boundary** (`App.tsx`) — tighter ring inside the App content boundary; isolates list render errors without taking down the Header.
 
-**Why:** The root boundary is the last line of defence — a blank screen replaced by a recovery UI. The per-`SingleTree` boundaries prevent a single bad node or corrupted subtree from killing the entire canvas. With N trees on screen, one render failure is isolated; the remaining N-1 trees stay interactive.
+**Why:** The per-`SingleTree` boundaries prevent a single bad node from killing the canvas. The App content boundary, added later, solves the "Retry re-crashes immediately" problem for data-driven render errors — it holds a reference to `refresh` so the user can re-fetch fresh data without navigating away. The root boundary remains the catch-all for errors that occur before `useOrg` even runs.
 
-**Trade-off:** The boundary only catches render-phase errors. Async errors (rejected promises in event handlers) are not caught — those are handled inline in `useOrg` (fetch failures → `status === 'error'`) and `refresh()` (try/catch on the POST).
+**Trade-off:** The boundary only catches render-phase errors. Async errors (rejected promises in event handlers) are not caught — those are handled inline in `useOrg` (fetch failures → `status === 'error'`) and `refresh()` (try/catch on the POST). The `exportCSV` event handler is guarded with its own try/catch since event-handler errors bypass ErrorBoundaries entirely.
+
+---
+
+## Client-Side Fetch Timeouts
+
+**Decision:** `fetch('/api/org')` in `useOrg.ts` is given a 120 s `AbortSignal.timeout`; the `/api/org/refresh` POST is given 10 s. The server-side Remote API calls use a separate 10 s timeout per upstream request.
+
+**Why:** The server-side timeout bounds each individual Remote API call, but not the total response time — fetching a large org in batches of 8 can take tens of seconds. Without a client-side ceiling, the browser spinner runs indefinitely if the server hangs mid-batch. The `TimeoutError` thrown by `AbortSignal.timeout` is caught by the existing `.catch()` in `useOrg`, so the error state is surfaced the same as any other network failure.
+
+**Trade-off:** 120 s is generous intentionally — it allows a full large-org fetch to complete without a false timeout. If the observed p99 server latency is known, this should be tuned. The refresh POST is 10 s because it's a cache-bust, not a data fetch.
+
+---
+
+## Remote API Response Shape Validation
+
+**Decision:** After casting the Remote API JSON response, `remoteClient.ts` performs a runtime shape check before iterating: `!Array.isArray(json?.data?.employments)` for the list endpoint and `json?.data?.employment == null` for the detail endpoint. A failed check throws a descriptive error.
+
+**Why:** TypeScript casts are compile-time only. If the Remote API changes its response shape (field rename, restructured envelope), the cast succeeds silently but the downstream `for...of` throws a `TypeError` that is indistinguishable from a network failure in logs. An explicit check makes the root cause immediately visible as a shape mismatch, not a mystery network error.
+
+**Trade-off:** Not full schema validation (no Zod or JSON Schema). The checks are minimal — just enough to detect the failure early with a useful message. Full validation is overkill given the API is controlled by Remote.
 
 ---
 

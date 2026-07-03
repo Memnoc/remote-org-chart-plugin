@@ -14,7 +14,7 @@ export function useOrg(): State & { refresh: () => void; refreshing: boolean } {
   useEffect(() => {
     if (tick === 0) setState({ status: 'loading' })
     else setRefreshing(true)
-    fetch('/api/org')
+    fetch('/api/org', { signal: AbortSignal.timeout(120_000) })
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<OrgResponse>
@@ -26,7 +26,7 @@ export function useOrg(): State & { refresh: () => void; refreshing: boolean } {
   const refresh = useCallback(async () => {
     setRefreshing(true)
     try {
-      await fetch('/api/org/refresh', { method: 'POST' })
+      await fetch('/api/org/refresh', { method: 'POST', signal: AbortSignal.timeout(10_000) })
       setTick((t) => t + 1)
     } catch {
       setRefreshing(false)

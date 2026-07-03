@@ -22,7 +22,10 @@ async function listAllEmploymentIds(token: string): Promise<string[]> {
       signal: AbortSignal.timeout(TIMEOUT_MS),
     })
     if (!res.ok) throw new Error(`Remote API ${res.status}: ${await res.text()}`)
-    const json = (await res.json()) as { data: RemoteEmploymentList; [k: string]: unknown }
+    const json = await res.json() as { data: RemoteEmploymentList; [k: string]: unknown }
+    if (!Array.isArray(json?.data?.employments)) {
+      throw new Error(`Remote list API shape unexpected: ${JSON.stringify(Object.keys(json ?? {}))}`)
+    }
     const body = json.data
     for (const emp of body.employments) ids.push(emp.id)
     totalPages = body.total_pages
@@ -37,7 +40,10 @@ async function listAllEmploymentIds(token: string): Promise<string[]> {
 async function fetchEmployment(id: string, token: string): Promise<RemoteEmployment> {
   const res = await fetch(`${BASE}/employments/${id}`, { headers: headers(token), signal: AbortSignal.timeout(TIMEOUT_MS) })
   if (!res.ok) throw new Error(`Remote API ${res.status} for employment ${id}`)
-  const json = (await res.json()) as { data: { employment: RemoteEmployment } }
+  const json = await res.json() as { data: { employment: RemoteEmployment } }
+  if (json?.data?.employment == null) {
+    throw new Error(`Remote detail API shape unexpected for ${id}: ${JSON.stringify(Object.keys(json ?? {}))}`)
+  }
   return json.data.employment
 }
 

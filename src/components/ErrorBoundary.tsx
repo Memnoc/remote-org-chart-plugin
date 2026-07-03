@@ -1,8 +1,9 @@
 import React from 'react'
 
+interface Props extends React.PropsWithChildren { onRefresh?: () => void }
 interface State { error: Error | null }
 
-export default class ErrorBoundary extends React.Component<React.PropsWithChildren, State> {
+export default class ErrorBoundary extends React.Component<Props, State> {
   state: State = { error: null }
 
   static getDerivedStateFromError(error: Error): State {
@@ -11,6 +12,7 @@ export default class ErrorBoundary extends React.Component<React.PropsWithChildr
 
   render() {
     if (this.state.error) {
+      const { onRefresh } = this.props
       return (
         <div style={{
           margin: '60px auto',
@@ -34,22 +36,31 @@ export default class ErrorBoundary extends React.Component<React.PropsWithChildr
           }}>
             {this.state.error.message}
           </pre>
-          <button
-            onClick={() => this.setState({ error: null })}
-            style={{
-              marginTop: 16,
-              padding: '7px 16px',
-              borderRadius: 8,
-              border: 'none',
-              background: 'var(--primary)',
-              color: '#fff',
-              fontWeight: 600,
-              fontSize: 13,
-              cursor: 'pointer',
-            }}
-          >
-            Retry
-          </button>
+          <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+            {onRefresh && (
+              <button
+                onClick={() => { this.setState({ error: null }); onRefresh() }}
+                style={{
+                  padding: '7px 16px', borderRadius: 8, border: 'none',
+                  background: 'var(--primary)', color: '#fff',
+                  fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                }}
+              >
+                Refresh data
+              </button>
+            )}
+            <button
+              onClick={() => this.setState({ error: null })}
+              style={{
+                padding: '7px 16px', borderRadius: 8,
+                border: '1px solid var(--border)',
+                background: 'var(--surface)', color: 'var(--text)',
+                fontWeight: 600, fontSize: 13, cursor: 'pointer',
+              }}
+            >
+              Retry
+            </button>
+          </div>
         </div>
       )
     }

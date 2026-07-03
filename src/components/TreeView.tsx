@@ -184,16 +184,17 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
               {loneNodes.map((node, i) => (
-                <NodeCard
-                  key={node.attributes.id ?? i}
-                  nodeData={node}
-                  selected={node.attributes.id === selectedId}
-                  onClick={() => setSelectedId(node.attributes.id ?? null)}
-                  onProfile={onSelect ? () => {
-                    setSelectedId(node.attributes.id ?? null)
-                    onSelect(toPersonDetail(node))
-                  } : undefined}
-                />
+                <ErrorBoundary key={node.attributes.id ?? i}>
+                  <NodeCard
+                    nodeData={node}
+                    selected={node.attributes.id === selectedId}
+                    onClick={() => setSelectedId(node.attributes.id ?? null)}
+                    onProfile={onSelect ? () => {
+                      setSelectedId(node.attributes.id ?? null)
+                      onSelect(toPersonDetail(node))
+                    } : undefined}
+                  />
+                </ErrorBoundary>
               ))}
             </div>
           </div>
