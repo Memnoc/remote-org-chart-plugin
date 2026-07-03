@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from 'vitest'
 import { buildForest } from '../server/lib/treeBuilder.js'
-import type { Person } from '../shared/types.js'
+import type { Person } from '../server/lib/types.js'
 
 function person(overrides: Partial<Person> & { id: string }): Person {
   return {

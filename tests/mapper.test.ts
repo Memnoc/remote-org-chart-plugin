@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from 'vitest'
 import { mapEmployment, isActive } from '../server/lib/mapper.js'
-import type { RemoteEmployment } from '../shared/types.js'
+import type { RemoteEmployment } from '../server/lib/types.js'
 
 const base: RemoteEmployment = {
   id: 'emp-001',

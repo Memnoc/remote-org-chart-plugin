@@ -137,9 +137,8 @@
 **Decision:** Four layers of React Error Boundaries, from outermost to innermost:
 1. **Root boundary** (`main.tsx`) — last-resort backstop. No `onRefresh`. Shows "Retry" only.
 2. **App content boundary** (`App.tsx`, wrapping Header + Toolbar + canvas) — receives `onRefresh={refresh}` from `useOrg`. Shows "Refresh data" + "Retry", giving the user an escape when a crash is data-driven.
-3. **Per-`SingleTree` boundary** (`TreeView.tsx`) — isolates individual tree subtrees. One corrupt subtree doesn't kill the canvas.
-4. **Per-lone-node boundary** (`TreeView.tsx`) — wraps each rootless employee card. Matches the per-tree isolation for the "no reporting line" section.
-5. **ListView boundary** (`App.tsx`) — tighter ring inside the App content boundary; isolates list render errors without taking down the Header.
+3. **Per-`SingleTree` boundary** (`TreeView.tsx`) — isolates individual tree subtrees. One corrupt subtree doesn't kill the canvas. (A separate per-lone-node boundary existed before the virtual-root refactor; lone nodes now render through `SingleTree` and share this ring.)
+4. **ListView boundary** (`App.tsx`) — tighter ring inside the App content boundary; isolates list render errors without taking down the Header.
 
 **Why:** The per-`SingleTree` boundaries prevent a single bad node from killing the canvas. The App content boundary, added later, solves the "Retry re-crashes immediately" problem for data-driven render errors — it holds a reference to `refresh` so the user can re-fetch fresh data without navigating away. The root boundary remains the catch-all for errors that occur before `useOrg` even runs.
 

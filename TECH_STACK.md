@@ -44,7 +44,7 @@
 - **Pagination:** `GET /v1/employments?page=N&page_size=100` iterated until `total_pages` exhausted — collects all employment IDs
 - **Detail fetch:** `GET /v1/employments/{id}` per employee — fields used: `full_name`, `job_title`, `department`, `manager_employment_id`, `status`
 - **Concurrency:** individual detail fetches run in batches of 8 (`Promise.allSettled`) — individual failures are silently skipped, rest of org still renders
-- **Fallback:** if token absent or live fetch throws → loads `server/snapshot.json` (10-employee seed dataset)
+- **Fallback:** if token absent or live fetch throws → loads `server/snapshot.json` (seed dataset: 11 raw entries; one all-null entry is dropped by the mapper guard, 10 people render)
 
 ### Caching
 - In-memory cache: single `cache` variable + `cacheTime` timestamp

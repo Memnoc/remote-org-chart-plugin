@@ -43,7 +43,7 @@ This page summarises the load-bearing ones.
 ## Resilience
 
 - **Four-layer error boundaries** — root, app content (with a refresh action), each
-  `SingleTree`, and each lone node / the list view. A render fault degrades to a recoverable
+  `SingleTree`, and the list view. A render fault degrades to a recoverable
   card, isolated to the smallest region.
 - **Client-side fetch timeouts** — `AbortSignal.timeout` on both GET (120 s) and refresh
   POST (10 s) so the UI never hangs on a stalled server.
