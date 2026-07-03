@@ -8,6 +8,8 @@ import Heading from '@theme/Heading';
 
 import styles from './index.module.css';
 
+const APP_URL = 'https://remote-org-chart-plugin.onrender.com/';
+
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
   return (
@@ -21,7 +23,7 @@ function HomepageHeader() {
           <Link className="button button--secondary button--lg" to="/overview">
             Read the docs →
           </Link>
-          <Link className="button button--outline button--secondary button--lg" href="/">
+          <Link className="button button--outline button--secondary button--lg" to={APP_URL}>
             Open the app
           </Link>
         </div>
