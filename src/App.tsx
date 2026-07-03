@@ -160,7 +160,12 @@ export default function App() {
         )}
         {hasData && (
           view === 'tree' ? (
-            <TreeView forest={filteredForest} onSelect={setSelectedPerson} totalPeople={allNodes.length} />
+            <TreeView
+              forest={filteredForest}
+              onSelect={setSelectedPerson}
+              totalPeople={allNodes.length}
+              hasActiveFilters={search !== '' || activeDepts.size > 0}
+            />
           ) : (
             <ErrorBoundary>
               <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', background: 'var(--bg)' }}>

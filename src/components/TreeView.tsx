@@ -34,9 +34,11 @@ interface Props {
   forest: OrgNode[]
   onSelect?: (person: PersonDetail) => void
   totalPeople?: number
+  /** True while search/department filters are active — auto-expands the collapsed-by-default tree so matches are visible. */
+  hasActiveFilters?: boolean
 }
 
-export default function TreeView({ forest, onSelect, totalPeople }: Props) {
+export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilters = false }: Props) {
   const [expandMode, setExpandMode] = useState<'all' | 'collapsed' | 'default'>('default')
   const [treeKey, setTreeKey] = useState(0)
   const [zoom, setZoom] = useState(0.8)
@@ -122,9 +124,19 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
   }
 
   const hasVirtualRoot = renderForest[0]?.attributes.isVirtual === true
-  // With a virtual root, "collapse all" must keep depth 1 or the whole org
-  // hides behind a single chip.
-  const initialDepth = expandMode === 'collapsed' ? (hasVirtualRoot ? 1 : 0) : undefined
+  // Depth 1 under a virtual root shows the Org chip + top-level roots;
+  // depth 0 would hide the whole org behind a single chip.
+  const collapsedDepth = hasVirtualRoot ? 1 : 0
+  // Initial-depth policy:
+  //   'all' / 'collapsed'  → explicit user override via the buttons
+  //   'default'            → collapsed on app start, but auto-expanded while
+  //                          searching/filtering (matches must be visible)
+  //                          or when a team is focused ("View team →" should
+  //                          show the team, not one lone card).
+  const initialDepth =
+    expandMode === 'all' ? undefined
+    : expandMode === 'collapsed' ? collapsedDepth
+    : (hasActiveFilters || focusedId) ? undefined : collapsedDepth
 
   const displayCount = totalPeople !== undefined && !focusedId
     ? totalPeople

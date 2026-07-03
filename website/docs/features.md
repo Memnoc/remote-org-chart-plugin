@@ -32,7 +32,9 @@ Interactive hierarchy rendered with `react-d3-tree`.
 - **Single expandable tree** — multiple data roots are joined under a synthetic "Org"
   chip node at render time, so the whole org expands from one tree without hiding anyone.
 - **Zoom controls:** floating bar, ±10% steps clamped 25%–250%, live % readout, reset to 80%.
-- **Expand / collapse all:** remounts the tree with `initialDepth` set to `undefined` or `0`.
+- **Starts collapsed** — Org chip + top-level roots, like Remote's own chart. Auto-expands
+  while searching/filtering or when a team is focused; Expand/Collapse-all overrides.
+- **Expand / collapse all:** remounts the tree with a new `initialDepth`.
 
 :::note Known visual limitation
 For managers with many direct reports (≥ 8–10), the Bézier curves cross visually — the

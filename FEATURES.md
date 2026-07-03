@@ -89,7 +89,9 @@ Wired to react-d3-tree's reactive `zoom` prop — no remount needed.
 
 ### Expand / Collapse All
 
-Buttons top-right of the canvas. Force all nodes to expand or collapse by remounting the tree with `initialDepth: undefined` (expanded) or `0` (collapsed to roots).
+Buttons top-right of the canvas. Force all nodes to expand or collapse by remounting the tree with a new `initialDepth` (`undefined` = expanded; depth 1 under the virtual Org root = collapsed to top-level roots).
+
+**The app starts collapsed** — Org chip + top-level roots only, like Remote's own chart. The tree auto-expands while search/department filters are active (matches must be visible) and when focusing a team via "View team →"; the Expand/Collapse-all buttons override explicitly.
 
 ### Reporting Chain Highlight
 
