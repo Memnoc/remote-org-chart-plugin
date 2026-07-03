@@ -241,7 +241,7 @@ Wraps `<App />` in `main.tsx`. Catches render-phase errors, shows an error card 
 
 A **Docusaurus** documentation site lives in `website/`, hosted on **GitHub Pages** at https://memnoc.github.io/remote-org-chart-plugin/ (decoupled from the Render app — see [DECISIONS.md](./DECISIONS.md)).
 
-- Pages: Overview, Features, Architecture, Remote API integration, Edge cases, Tech stack, Deployment, Design decisions — sourced from the root `.md` files, with a curated grouped sidebar.
+- Pages: Overview, Getting started (five-minute tour: what/how/why), Features, Architecture, Remote API integration, Edge cases, Tech stack, Deployment, Design decisions — sourced from the root `.md` files, with a curated grouped sidebar.
 - Landing hero with feature cards linking into the docs; "Open App" and "GitHub" in the navbar.
 - Deployed by a GitHub Actions workflow (`.github/workflows/deploy-docs.yml`) on every push to `main` that touches `website/**`.
 - The app **Header** has a **Docs** link that opens the site in a new tab.

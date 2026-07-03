@@ -14,8 +14,9 @@ committed snapshot as a guaranteed fallback.
 - **Source:** [github.com/Memnoc/remote-org-chart-plugin](https://github.com/Memnoc/remote-org-chart-plugin)
 
 :::tip Reviewing this for the assignment?
-Start with [Features](./features.md) for the product surface, then
-[Architecture](./architecture.md) for how it is wired, and
+Start with [Getting started](./getting-started.md) — a five-minute tour of what it is,
+how to use it, and why it works the way it does. Then [Features](./features.md) for the
+full product surface, [Architecture](./architecture.md) for how it is wired, and
 [Decisions](./decisions.md) for the trade-offs behind it.
 :::
 
