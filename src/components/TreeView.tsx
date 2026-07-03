@@ -43,6 +43,13 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
     [displayForest, selectedId],
   )
 
+  // Multi-root forests render as ONE expandable tree under a synthetic "Org"
+  // root (render-layer only — data forest stays honest, see DECISIONS.md).
+  // Memoized: react-d3-tree resets all collapse state whenever the `data`
+  // prop changes identity, so the joined root must be stable across
+  // re-renders (zoom, selection, pan).
+  const renderForest = useMemo(() => joinForest(displayForest), [displayForest])
+
   function handleFocus(id: string) {
     setFocusedId(id)
     setSelectedId(null)
@@ -87,9 +94,6 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
     )
   }
 
-  // Multi-root forests render as ONE expandable tree under a synthetic "Org"
-  // root (render-layer only — data forest stays honest, see DECISIONS.md).
-  const renderForest = joinForest(displayForest)
   const hasVirtualRoot = renderForest[0]?.attributes.isVirtual === true
   // With a virtual root, "collapse all" must keep depth 1 or the whole org
   // hides behind a single chip.
