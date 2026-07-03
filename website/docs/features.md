@@ -77,7 +77,8 @@ rows show name, title, department; matched search substrings are highlighted. Pa
 
 - **Search** matches name, title, and department simultaneously; applied before the
   department filter. In tree view, non-matching branches are pruned but ancestors leading
-  to a match are kept. `/` focuses search anywhere; `Esc` clears and blurs.
+  to a match are kept — rendered **dimmed** (in tree and list) so matches pop while the
+  reporting chain stays navigable. `/` focuses search anywhere; `Esc` clears and blurs.
 - **Department filter** dropdown: per-department checkboxes with counts (colour-matched),
   multi-select (OR within dept, AND with search), reset, active-count badge.
 

@@ -2,6 +2,8 @@
  * Search & department filters for the forest. Both filters share one rule:
  * a node is kept if IT matches or ANY DESCENDANT matches — ancestors of a
  * match survive so the tree never shows an orphaned hit without its chain.
+ * Ancestors kept that way are marked `attributes.isContext` so NodeCard and
+ * ListView render them dimmed: matches pop, chain stays navigable.
  *
  * Two subtleties worth knowing before "fixing" anything here:
  * - Non-mutating: matched nodes are shallow-copied ({ ...node }); the
@@ -25,9 +27,16 @@ export function filterForest(forest: OrgNode[], query: string): OrgNode[] {
   }
   function filterNode(node: OrgNode): OrgNode | null {
     const childMatches = (node.children ?? []).flatMap((c) => { const r = filterNode(c); return r ? [r] : [] })
-    if (matchesNode(node) || childMatches.length > 0)
-      return { ...node, children: childMatches.length ? childMatches : node.children }
-    return null
+    const direct = matchesNode(node)
+    if (!direct && childMatches.length === 0) return null
+    return {
+      ...node,
+      // Kept only for its descendants → mark as context so the UI can dim it.
+      // A direct match keeps its attributes as-is (an isContext flag from an
+      // earlier filter stage survives — it still isn't a match of THAT filter).
+      attributes: direct ? node.attributes : { ...node.attributes, isContext: true },
+      children: childMatches.length ? childMatches : node.children,
+    }
   }
   return forest.flatMap((root) => { const r = filterNode(root); return r ? [r] : [] })
 }
@@ -39,9 +48,13 @@ export function filterByDept(forest: OrgNode[], depts: Set<string>): OrgNode[] {
   }
   function keep(node: OrgNode): OrgNode | null {
     const childMatches = (node.children ?? []).flatMap((c) => { const r = keep(c); return r ? [r] : [] })
-    if (nodeMatches(node) || childMatches.length > 0)
-      return { ...node, children: childMatches.length ? childMatches : node.children }
-    return null
+    const direct = nodeMatches(node)
+    if (!direct && childMatches.length === 0) return null
+    return {
+      ...node,
+      attributes: direct ? node.attributes : { ...node.attributes, isContext: true },
+      children: childMatches.length ? childMatches : node.children,
+    }
   }
   return forest.flatMap((r) => { const res = keep(r); return res ? [res] : [] })
 }

@@ -133,6 +133,7 @@ Flat list of all employees in depth-first tree order.
 - Filters across **name**, **job title**, and **department** simultaneously
 - Applied before department filter: search → dept filter → render
 - Tree view: non-matching branches pruned; parent nodes leading to matches are preserved
+- **Context dimming:** ancestors kept only to preserve a match's reporting chain (not matches themselves) render at reduced opacity in both tree and list — matches pop, the chain stays navigable. Selecting or chain-highlighting a dimmed card restores full opacity.
 - **`/`** focuses search from anywhere on the page; **`Esc`** clears and blurs
 
 ---

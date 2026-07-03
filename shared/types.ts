@@ -20,6 +20,8 @@ export interface OrgNode {
     isExternal?: boolean
     /** Synthetic render-layer root joining a multi-root forest — not a person */
     isVirtual?: boolean
+    /** Set by the client-side filters: kept only as an ancestor of a match, not a match itself — rendered dimmed */
+    isContext?: boolean
   }
   children?: OrgNode[]
 }

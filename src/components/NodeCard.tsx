@@ -26,6 +26,7 @@ interface Props {
       badge?: string
       isExternal?: boolean
       isVirtual?: boolean
+      isContext?: boolean
     }
     children?: unknown[]
   }
@@ -88,12 +89,16 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
 
   const deptLabel = department ?? (isExternal ? 'External' : 'Unassigned')
   const color = deptColor(deptLabel)
+  // Filter-context ancestor (kept only so a match keeps its chain) — dimmed
+  // so matches pop. Selection/chain interaction overrides the dim.
+  const dimmed = Boolean(attributes.isContext) && !selected && !onChain
 
   return (
     <div
       onClick={onCardClick}
       style={{
         position: 'relative',
+        opacity: dimmed ? 0.45 : 1,
         background: onChain && !selected ? 'rgba(245,158,11,0.04)' : 'var(--surface)',
         border: `1.5px solid ${selected ? '#3b82f6' : onChain ? '#f59e0b' : 'var(--border)'}`,
         borderRadius: 12,
@@ -104,7 +109,7 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
           : onChain ? '0 0 0 2px rgba(245,158,11,0.2), 0 4px 12px rgba(0,0,0,0.07)'
           : 'var(--shadow-card)',
         cursor: onCardClick ? 'pointer' : 'default',
-        transition: 'box-shadow 0.15s, border-color 0.15s',
+        transition: 'box-shadow 0.15s, border-color 0.15s, opacity 0.15s',
         userSelect: 'none',
       }}
     >

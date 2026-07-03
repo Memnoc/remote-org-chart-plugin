@@ -45,6 +45,8 @@ function NodeRow({ node, depth, search }: { node: OrgNode; depth: number; search
         display: 'flex',
         alignItems: 'baseline',
         gap: 8,
+        // Filter-context ancestor (see forestFilter.ts) — dimmed, same as tree
+        opacity: node.attributes.isContext ? 0.45 : 1,
       }}>
         <span style={{ fontWeight: depth === 0 ? 700 : 500, fontSize: 13, color: 'var(--text)' }}>
           {depth > 0 && <span style={{ color: 'var(--border)', marginRight: 6 }}>{'└─'}</span>}
