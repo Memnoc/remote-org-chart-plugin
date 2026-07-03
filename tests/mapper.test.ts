@@ -1,3 +1,9 @@
+/**
+ * Mapper tests — the RemoteEmployment → Person translation and the
+ * active-status filter. The external-manager distinction (email set, id
+ * absent) is the subtlest rule; if external managers ever misrender, start
+ * with those cases.
+ */
 import { describe, it, expect } from 'vitest'
 import { mapEmployment, isActive } from '../server/lib/mapper.js'
 import type { RemoteEmployment } from '../shared/types.js'

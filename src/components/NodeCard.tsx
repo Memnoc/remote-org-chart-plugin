@@ -1,3 +1,18 @@
+/**
+ * NodeCard — one person on the canvas. Pure presentational: receives plain
+ * data + callbacks, knows nothing about react-d3-tree (SingleTree adapts).
+ *
+ * Interaction zones on a card:
+ *   card body        → onClick   (select: blue ring + detail drawer + chain)
+ *   ↗ button         → onProfile (select AND open drawer explicitly)
+ *   count pill       → onToggle  (expand/collapse this subtree)
+ *   "View team →"    → onFocus   (Subtree Focus mode)
+ * Pill/team buttons stopPropagation so they don't also select the card.
+ *
+ * Visual states: selected = blue border+glow; onChain = amber (reporting
+ * chain); isExternal/missing dept tint the department label & avatar.
+ * The virtual "Org" root renders the compact chip in the early return below.
+ */
 import React from 'react'
 import { deptColor, initials } from '../lib/orgPresentation.ts'
 

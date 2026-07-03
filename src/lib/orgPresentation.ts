@@ -1,5 +1,15 @@
+/**
+ * Presentation helpers — everything about how org data LOOKS: stats,
+ * department colours, avatar initials, and the OrgNode → PersonDetail
+ * projection for the detail drawer. Pure functions, no React.
+ *
+ * This file (plus orgExport/forestNav/forestFilter) is the result of
+ * splitting a former orgUtils god module — one reason to change per file
+ * (see "orgUtils God Module Split" in DECISIONS.md).
+ */
 import type { OrgNode } from '../../shared/types.js'
 
+/** What the DetailPanel drawer needs — a flat view-model, not a tree node. */
 export type PersonDetail = {
   name: string
   title?: string
@@ -44,6 +54,9 @@ export function computeStats(allNodes: OrgNode[], forest: OrgNode[]): OrgStats {
   }
 }
 
+// Known departments get fixed colours (matched by substring, lowercase).
+// Unknown departments fall through to a stable hash-derived colour below,
+// so a new department is always coloured and always the SAME colour.
 const DEPT_COLORS: Record<string, string> = {
   engineering: '#22c55e',
   sales: '#10b981',
@@ -66,6 +79,7 @@ export function deptColor(department?: string | null): string {
   for (const [k, v] of Object.entries(DEPT_COLORS)) {
     if (key.includes(k)) return v
   }
+  // djb2-style string hash → deterministic palette pick for unknown depts.
   let hash = 0
   for (let i = 0; i < key.length; i++) hash = key.charCodeAt(i) + ((hash << 5) - hash)
   const palette = ['#3b82f6', '#22c55e', '#f59e0b', '#06b6d4', '#ec4899', '#8b5cf6', '#f97316', '#6366f1']

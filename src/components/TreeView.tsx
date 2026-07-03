@@ -1,3 +1,27 @@
+/**
+ * TreeView — the canvas screen. Owns everything about how the org chart is
+ * VIEWED (zoom, pan, expand/collapse, subtree focus, selection) but none of
+ * the data: it receives an already-filtered forest from App.
+ *
+ * Layers of derived forest, in order:
+ *   forest (prop, filtered) → displayForest (subtree when focused)
+ *     → renderForest (joined under virtual "Org" root when multi-root)
+ *
+ * Key mechanisms a newcomer needs:
+ * - treeKey: react-d3-tree has NO imperative expand/collapse API; bumping the
+ *   React key remounts the tree with a new initialDepth. That is the
+ *   expand/collapse-all implementation, and it deliberately resets viewport.
+ * - renderForest MUST stay referentially stable across zoom/selection renders
+ *   (useMemo below) — react-d3-tree wipes all collapse state whenever its
+ *   `data` prop changes identity. This was a real bug: zoom used to
+ *   re-expand every node.
+ * - chainIds is computed from displayForest (real nodes only), so the
+ *   virtual root never highlights as part of a reporting chain.
+ *
+ * Debugging: nodes re-expanding on unrelated interactions → something broke
+ * renderForest's identity. Whole-org disappeared behind one chip → check
+ * initialDepth logic for the virtual root (must be 1, not 0, on collapse).
+ */
 import React, { useState, useMemo, useRef } from 'react'
 import type { OrgNode } from '../../shared/types.js'
 import SingleTree from './SingleTree.tsx'
@@ -27,6 +51,9 @@ export default function TreeView({ forest, onSelect, totalPeople }: Props) {
     if (dy !== 0) scrollRef.current?.scrollBy({ top: dy, behavior: 'smooth' })
   }
 
+  // Subtree Focus ("View team →"): when focusedId is set, the canvas narrows
+  // to that person's subtree. Falls back to the full forest if the id
+  // vanished (e.g. filters removed it).
   const displayForest = useMemo(() => {
     if (!focusedId) return forest
     const sub = findSubtree(forest, focusedId)

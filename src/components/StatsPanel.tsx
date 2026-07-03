@@ -1,3 +1,9 @@
+/**
+ * StatsPanel — right-hand slide-in with org metrics and the per-department
+ * bar chart. Purely presentational: all numbers are computed upstream by
+ * computeStats() in lib/orgPresentation.ts from the UNfiltered forest
+ * (stats describe the whole org, not the current search results).
+ */
 import React from 'react'
 import { deptColor, type OrgStats } from '../lib/orgPresentation.ts'
 

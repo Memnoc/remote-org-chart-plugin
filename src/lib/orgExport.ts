@@ -1,6 +1,14 @@
+/**
+ * CSV export — fully client-side, no server round-trip. Walks the UNFILTERED
+ * forest depth-first (parent always precedes its reports), builds a Blob and
+ * clicks a synthetic <a download>. Called from the Toolbar via App, wrapped
+ * in try/catch there because a synthetic-event throw would bypass the
+ * ErrorBoundary.
+ */
 import type { OrgNode } from '../../shared/types.js'
 
-// Strip newlines so Excel doesn't split a field value across rows
+// CSV escaping: wrap in quotes, double inner quotes, strip newlines so
+// Excel doesn't split a field value across rows.
 const esc = (v: string) => `"${v.replace(/[\r\n]+/g, ' ').replace(/"/g, '""')}"`
 
 function flattenForest(forest: OrgNode[], parentName = ''): string[][] {

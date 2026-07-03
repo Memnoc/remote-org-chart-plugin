@@ -1,5 +1,20 @@
+/**
+ * Search & department filters for the forest. Both filters share one rule:
+ * a node is kept if IT matches or ANY DESCENDANT matches — ancestors of a
+ * match survive so the tree never shows an orphaned hit without its chain.
+ *
+ * Two subtleties worth knowing before "fixing" anything here:
+ * - Non-mutating: matched nodes are shallow-copied ({ ...node }); the
+ *   original forest from useOrg is never touched.
+ * - `children: childMatches.length ? childMatches : node.children` — when a
+ *   node matches directly but no child does, it keeps its FULL subtree
+ *   (searching a manager shows their whole team, which is the intent).
+ *
+ * App.tsx applies them in order: search first, then department.
+ */
 import type { OrgNode } from '../../shared/types.js'
 
+/** Case-insensitive substring match across name, title and department. */
 export function filterForest(forest: OrgNode[], query: string): OrgNode[] {
   if (!query) return forest
   const q = query.toLowerCase()
@@ -17,6 +32,7 @@ export function filterForest(forest: OrgNode[], query: string): OrgNode[] {
   return forest.flatMap((root) => { const r = filterNode(root); return r ? [r] : [] })
 }
 
+/** Keep nodes whose department is in the active set ('Unassigned' when missing). OR within the set. */
 export function filterByDept(forest: OrgNode[], depts: Set<string>): OrgNode[] {
   function nodeMatches(node: OrgNode): boolean {
     return depts.has(node.attributes.department ?? 'Unassigned')

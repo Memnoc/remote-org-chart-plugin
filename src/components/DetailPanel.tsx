@@ -1,3 +1,10 @@
+/**
+ * DetailPanel — right-hand slide-in drawer for the selected person. Always
+ * mounted; visibility is a CSS transform (translateX) so open/close animates.
+ * Closes on ×, backdrop click, or Esc — the Esc listener attaches only while
+ * open, and App's own Esc handler backs off while a person is selected so
+ * the two don't fight.
+ */
 import React from 'react'
 import { deptColor, initials, type PersonDetail } from '../lib/orgPresentation.ts'
 

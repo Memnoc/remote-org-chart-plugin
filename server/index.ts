@@ -1,3 +1,26 @@
+/**
+ * Express server — the single production process. Serves three things from
+ * one origin (no CORS anywhere): the /api routes, the compiled SPA (dist/),
+ * and /health for Render's health check. The docs site is NOT served here —
+ * it lives on GitHub Pages (see "Docs Site" ADR in DECISIONS.md).
+ *
+ * Request lifecycle for GET /api/org:
+ *   cache fresh? → serve cache
+ *   token set?   → live fetch (remoteClient) → filter active (mapper)
+ *                  → buildForest (treeBuilder) → cache → serve
+ *   no token / live fetch throws → snapshot.json fallback → serve
+ * The client learns which path ran via OrgResponse.source ('live'|'snapshot')
+ * — that's the green/amber dot in the app Header.
+ *
+ * ⚠ Express 4 gotcha: async route handler REJECTIONS bypass the error
+ * middleware at the bottom of this file. Every async route here wraps its
+ * awaits in try/catch — keep doing that for new routes (see "Express 4 Async
+ * Route Handlers" ADR in DECISIONS.md).
+ *
+ * Debugging: all server logs are prefixed — [org] for route/orchestration,
+ * [remote] for API client batches, [server] for unhandled errors. On Render,
+ * these are in the service logs.
+ */
 import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -12,11 +35,19 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
 const PORT = process.env.PORT ?? 3001
 
-// In-memory cache
+// In-memory cache — one module-level variable, per-process (fine for a
+// single Render instance; would need Redis if scaled out — see DECISIONS.md).
+// POST /api/org/refresh nulls it; the client Refresh button calls that.
 let cache: OrgResponse | null = null
 let cacheTime = 0
 const CACHE_TTL_MS = 5 * 60 * 1000 // 5 min
 
+/**
+ * Fallback data path. snapshot.json is a committed seed dataset that doubles
+ * as the tree-builder test fixture — it contains every edge case (cycle,
+ * dangling manager, external manager, missing fields). Guarantees a reviewer
+ * always sees a working chart even with no token or a dead API.
+ */
 function loadSnapshot(): OrgResponse {
   let raw: string
   try {
@@ -42,6 +73,7 @@ function countNodes(node: { children?: unknown[] }): number {
   return 1 + (node.children ?? []).reduce((acc: number, c) => acc + countNodes(c as { children?: unknown[] }), 0)
 }
 
+/** Live data path: Remote API → active-only filter → forest. Can take tens of seconds for large orgs (N+1 detail fetch). */
 async function fetchLive(token: string): Promise<OrgResponse> {
   const t0 = Date.now()
   console.log('[org] starting live fetch')
@@ -70,6 +102,8 @@ app.post('/api/org/refresh', (_req, res) => {
   res.json({ ok: true })
 })
 
+// Main data route. Note the try/catch around every await — Express 4 does
+// not route async rejections to the error middleware (see file header).
 app.get('/api/org', async (_req, res) => {
   // Serve cache if fresh
   if (cache && Date.now() - cacheTime < CACHE_TTL_MS) {
@@ -102,7 +136,8 @@ app.get('/api/org', async (_req, res) => {
   }
 })
 
-// Serve built SPA in production
+// Serve built SPA in production. ORDER MATTERS: this catch-all must stay
+// after the /api routes or it would swallow them and serve index.html.
 const distPath = path.join(__dirname, '..', '..', 'dist')
 app.use(express.static(distPath))
 app.get('*', (_req, res) => {

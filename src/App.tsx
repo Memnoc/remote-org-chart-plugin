@@ -1,3 +1,23 @@
+/**
+ * App — the composition root. All page-level state lives here and flows
+ * down as props; there is no global store (see "No Global State Library"
+ * in DECISIONS.md).
+ *
+ * State map:
+ *   useOrg()        → server data (the only fetch in the app)
+ *   useTheme()      → light/dark/system
+ *   view/search/activeDepts → user filters, mirrored to the URL (?view=&q=&depts=)
+ *   selectedPerson  → detail drawer;  statsOpen → stats drawer
+ *
+ * Render pipeline per keystroke:
+ *   state.data.forest → filterForest(search) → filterByDept(depts)
+ *     → TreeView (joins roots under a virtual "Org" node) or ListView.
+ * Stats and CSV export intentionally use the UNfiltered forest.
+ *
+ * Debugging: filters behaving oddly → filteredForest memo below;
+ * URL not updating → the replaceState effect; keyboard shortcuts dead →
+ * the window keydown effect (it ignores keys typed into inputs).
+ */
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { useOrg } from './hooks/useOrg.ts'
 import { useTheme } from './hooks/useTheme.ts'
@@ -25,9 +45,14 @@ export default function App() {
   const [selectedPerson, setSelectedPerson] = useState<PersonDetail | null>(null)
   const [statsOpen, setStatsOpen] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
+  // Ref mirror of selectedPerson so the mount-once keydown effect below can
+  // read the CURRENT value without re-subscribing on every selection change.
   const selectedPersonRef = useRef<PersonDetail | null>(null)
   selectedPersonRef.current = selectedPerson
 
+  // Global shortcuts: "/" focuses search (unless already typing in a field);
+  // Esc clears search — but only when no detail panel is open, because the
+  // panel owns Esc for closing itself (see DetailPanel).
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement).tagName
@@ -38,6 +63,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  // Write half of shareable-URL state (read half: lib/urlState.ts on mount).
+  // replaceState, not pushState — filter tweaks shouldn't pollute Back-button
+  // history. Defaults are omitted so the bare URL stays clean.
   useEffect(() => {
     const p = new URLSearchParams()
     if (view !== 'tree') p.set('view', view)
@@ -47,11 +75,14 @@ export default function App() {
     window.history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname)
   }, [view, search, activeDepts])
 
+  // Flat node list from the UNfiltered forest — feeds stats and headcount.
   const allNodes = useMemo(() => {
     if (state.status !== 'ok') return [] as OrgNode[]
     return walkForest(state.data.forest).map(({ node }) => node)
   }, [state])
 
+  // The filter pipeline: search prunes first, then departments. Order
+  // matters only for readability — both keep ancestors of matches.
   const filteredForest = useMemo(() => {
     if (state.status !== 'ok') return []
     const afterSearch = filterForest(state.data.forest, search)
@@ -75,6 +106,9 @@ export default function App() {
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg)' }}>
+      {/* Ring 2 of 4 error boundaries. onRefresh gives the user a "Refresh
+          data" escape hatch — plain Retry would re-render the same bad data
+          and crash again (see ErrorBoundary.tsx). */}
       <ErrorBoundary onRefresh={refresh}>
         <DetailPanel person={selectedPerson} onClose={() => setSelectedPerson(null)} />
         {orgStats && <StatsPanel stats={orgStats} open={statsOpen} onClose={() => setStatsOpen(false)} />}
@@ -104,6 +138,8 @@ export default function App() {
           onStatsToggle={() => setStatsOpen((o) => !o)}
           onExportCSV={() => {
             if (state.status !== 'ok') return
+            // try/catch, not ErrorBoundary: throws inside React synthetic
+            // event handlers never reach boundaries.
             try { exportCSV(state.data.forest) } catch (e) { console.error('[export] CSV failed:', e) }
           }}
           hasData={hasData}

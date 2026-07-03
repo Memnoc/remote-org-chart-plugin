@@ -1,3 +1,22 @@
+/**
+ * ErrorBoundary — used at four nesting levels so a render crash degrades to
+ * the smallest possible region (see "Error Boundary Strategy" in
+ * DECISIONS.md):
+ *   1. main.tsx (root, last resort)
+ *   2. App content — gets onRefresh
+ *   3. each SingleTree in TreeView
+ *   4. ListView wrapper
+ *
+ * Two recovery buttons: "Retry" just clears the error and re-renders — if
+ * the crash came from bad DATA that loops forever, which is why the App-level
+ * boundary passes onRefresh ("Refresh data") to re-fetch instead.
+ *
+ * Limits worth knowing: boundaries only catch RENDER-phase errors — not
+ * event handlers (use try/catch, e.g. the CSV export in App), not async
+ * code. Class component because getDerivedStateFromError has no hook
+ * equivalent. componentDidCatch is the ready hook for an error-telemetry
+ * SDK if one is ever added (see "No Error Telemetry" ADR).
+ */
 import React from 'react'
 
 interface Props extends React.PropsWithChildren { onRefresh?: () => void }

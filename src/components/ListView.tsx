@@ -1,3 +1,13 @@
+/**
+ * ListView — flat alternative to the tree canvas. Rows come from
+ * walkForest() in depth-first order (a parent always directly precedes its
+ * reports); indentation depth conveys hierarchy, `└─` marks non-roots.
+ * Search-match substrings are highlighted; App has already PRUNED the forest
+ * to matches — the highlight here is cosmetic on what survived.
+ *
+ * Pagination over virtualisation on purpose: simpler, and fine at org scale
+ * (see "Pagination Over Virtualisation" in DECISIONS.md).
+ */
 import React, { useState } from 'react'
 import type { OrgNode } from '../../shared/types.js'
 import { walkForest } from '../lib/forestNav.ts'

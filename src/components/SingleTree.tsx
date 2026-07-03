@@ -1,3 +1,27 @@
+/**
+ * SingleTree — the adapter between react-d3-tree and the rest of the app.
+ * Renders ONE root (TreeView hands it the joined forest) and translates
+ * library concepts into ours:
+ *   renderCustomNodeElement → NodeCard inside a <foreignObject>
+ *   pathFunc                → custom Bézier from card-bottom to card-top
+ *   pathClassFunc           → amber chain-highlight class on connector links
+ *   __rd3t.collapsed        → explicit `collapsed` prop for NodeCard
+ *
+ * All react-d3-tree internals stop here on purpose — NodeCard knows nothing
+ * about the library (see "NodeCard Isolated From react-d3-tree Internals"
+ * in DECISIONS.md).
+ *
+ * Geometry notes:
+ * - CARD_HALF_H (100) = half the foreignObject height; connectors start/end
+ *   at card edges instead of card centres, so no line crosses a card.
+ * - Canvas height comes from treeDepth × row height; width is centred once
+ *   on mount from the container width.
+ * - Known limitation: with many direct reports the S-curves visually cross —
+ *   geometric, documented in FEATURES.md; Subtree Focus is the workaround.
+ *
+ * Debugging: cards clipped → foreignObject width/height vs NodeCard size;
+ * connectors detached from cards → CARD_HALF_H no longer matches card height.
+ */
 import React, { useRef, useEffect, useState, useCallback } from 'react'
 import Tree from 'react-d3-tree'
 import type { CustomNodeElementProps } from 'react-d3-tree'
@@ -54,8 +78,11 @@ export default function SingleTree({
     ({ nodeDatum, toggleNode }: CustomNodeElementProps) => {
       const nd = nodeDatum as Parameters<typeof NodeCard>[0]['nodeData']
       const id = (nodeDatum.attributes as Record<string, unknown>)?.id as string ?? ''
+      // Virtual "Org" root: render-only container — no select/profile/focus.
       const isVirtual = !!(nodeDatum.attributes as Record<string, unknown>)?.isVirtual
       const hasKids = Array.isArray(nd.children) && nd.children.length > 0
+      // __rd3t is react-d3-tree's internal state field — read it HERE (the
+      // adapter) and pass a plain prop down, so NodeCard stays library-free.
       const collapsed = (nodeDatum as { __rd3t?: { collapsed: boolean } }).__rd3t?.collapsed ?? false
       return (
         <foreignObject width={240} height={200} x={-120} y={-100} style={{ overflow: 'visible' }}>

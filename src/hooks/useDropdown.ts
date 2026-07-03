@@ -1,3 +1,10 @@
+/**
+ * useDropdown — shared open/close behaviour for popover panels (theme picker
+ * in Header, filter panel in Toolbar). Owns the two standard dismissals:
+ * Escape and click-outside. Attach `triggerRef` to the button and `panelRef`
+ * to the panel — clicks inside either do NOT close (that's the two
+ * `contains` checks below).
+ */
 import { useState, useRef, useEffect } from 'react'
 
 export function useDropdown() {

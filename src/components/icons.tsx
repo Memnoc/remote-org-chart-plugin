@@ -1,3 +1,9 @@
+/**
+ * Inline SVG icons + the shared icon-button style. No icon library on
+ * purpose — a handful of hand-drawn 14px SVGs beats a dependency
+ * (see TECH_STACK.md). All stroke `currentColor`, so they inherit the
+ * parent's CSS colour and theme automatically.
+ */
 import React from 'react'
 
 export const iconBtnStyle: React.CSSProperties = {

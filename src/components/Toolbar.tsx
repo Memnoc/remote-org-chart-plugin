@@ -1,3 +1,10 @@
+/**
+ * Toolbar — the control strip under the Header. Fully controlled: every
+ * control is (value, onChange) props from App; no data state lives here,
+ * only the open/closed state of the filter dropdown (useDropdown).
+ * Left→right: search ("/" focuses it — see App's keydown effect), department
+ * filter, tree/list switch, Stats toggle, CSV export.
+ */
 import React from 'react'
 import type { ViewMode } from '../lib/urlState.ts'
 import { FilterIcon } from './icons.tsx'

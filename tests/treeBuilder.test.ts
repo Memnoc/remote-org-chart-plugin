@@ -1,3 +1,9 @@
+/**
+ * treeBuilder tests — one test per edge case in the README table: normal
+ * hierarchy, no-manager root, dangling manager, external manager, cycle
+ * breaking, multiple roots. If you change the root predicate in
+ * buildForest(), a failure here tells you exactly which case regressed.
+ */
 import { describe, it, expect } from 'vitest'
 import { buildForest } from '../server/lib/treeBuilder.js'
 import type { Person } from '../shared/types.js'

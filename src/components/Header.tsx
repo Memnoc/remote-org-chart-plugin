@@ -1,3 +1,14 @@
+/**
+ * Header — top bar: brand, build SHA, data-source status, theme picker,
+ * docs link. The status cluster is the ops surface of the app:
+ *   green dot  = live Remote API data
+ *   amber dot  = snapshot fallback (no token, or the live fetch failed)
+ *   "N skipped" amber badge = employees the server couldn't fetch
+ *                             (OrgResponse.skippedCount — see remoteClient)
+ *   Refresh    = busts the server cache, then refetches (useOrg.refresh)
+ * The build SHA (__GIT_SHA__, injected by vite.config define) answers
+ * "which commit is actually deployed?" at a glance.
+ */
 import React from 'react'
 import type { ThemeMode } from '../hooks/useTheme.ts'
 import { useDropdown } from '../hooks/useDropdown.ts'

@@ -1,3 +1,15 @@
+/*
+ * The entire theme system. Components use inline styles referencing the
+ * custom properties defined here; useTheme flips <html data-theme="dark">
+ * and every var() below re-resolves — no CSS-in-JS, no theme context.
+ * To change a colour app-wide, change it here (both blocks).
+ *
+ * .rd3t-link* rules style react-d3-tree's SVG connector paths — the library
+ * renders them outside our components, so a global class (assigned per-link
+ * via pathClassFunc in SingleTree) is the only styling hook. -chain is the
+ * amber reporting-chain highlight. !important beats the library's inline
+ * stroke defaults.
+ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 .rd3t-link { stroke: #cbd5e1 !important; stroke-width: 1.5 !important; }

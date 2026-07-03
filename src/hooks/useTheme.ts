@@ -1,3 +1,17 @@
+/**
+ * useTheme — three-way theme (light / dark / system) with persistence.
+ *
+ * Two inputs decide the effective colour scheme:
+ *   theme   — the user's picker choice, persisted to localStorage
+ *   sysDark — the OS preference, live-subscribed via matchMedia
+ * `dark` combines them; the effect below projects it onto
+ * <html data-theme="…">, which is what every CSS custom property in
+ * index.css keys off. No CSS-in-JS theme context — the DOM attribute IS
+ * the theme mechanism.
+ *
+ * Debugging: theme looks wrong → inspect <html> in devtools; data-theme
+ * should flip when you change the picker or the OS setting.
+ */
 import { useState, useEffect, useSyncExternalStore } from 'react'
 
 export type ThemeMode = 'light' | 'dark' | 'system'

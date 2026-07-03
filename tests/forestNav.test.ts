@@ -1,3 +1,9 @@
+/**
+ * joinForest tests — the virtual-root join used by TreeView. The
+ * pass-through identity test matters most: TreeView memoizes on it, and
+ * react-d3-tree wipes collapse state if data identity churns (that was the
+ * zoom-reset bug).
+ */
 import { describe, it, expect } from 'vitest'
 import { joinForest, VIRTUAL_ROOT_ID } from '../src/lib/forestNav.ts'
 import type { OrgNode } from '../shared/types.js'
