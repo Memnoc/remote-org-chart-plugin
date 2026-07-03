@@ -59,7 +59,8 @@ chain highlight all keep working inside the focused subtree.
 ## Node cards
 
 Each person renders as a card with a department label (small-caps, colour by deterministic
-hash), an initials avatar, name (falls back to "Unknown Employee"), truncated job title, a
+hash), an initials avatar, name (falls back to "Unknown Employee"), a job title clamped
+to two lines (full text on hover), a
 **direct-reports pill** (count + expand/collapse chevron, managers only), and the **"View
 team →"** button.
 

@@ -167,7 +167,7 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
           {isUnknown ? '?' : initials(displayName)}
         </div>
         <div style={{ minWidth: 0, paddingTop: 1 }}>
-          <div style={{
+          <div title={displayName} style={{
             fontWeight: 700,
             fontSize: 14,
             color: isUnknown ? 'var(--text-muted)' : 'var(--text)',
@@ -179,14 +179,19 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
             {displayName}
           </div>
           {title && (
-            <div style={{
+            // Two-line clamp, not single-line ellipsis: job titles are the
+            // longest field and a mid-word cut reads badly. The foreignObject
+            // frame (240×200) leaves ~80px headroom, so one extra line never
+            // clips or detaches connectors. Full text on hover via title attr.
+            <div title={title} style={{
               fontSize: 12,
               color: 'var(--text-secondary)',
               marginTop: 2,
               lineHeight: 1.3,
               overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
             }}>
               {title}
             </div>

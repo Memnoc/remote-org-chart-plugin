@@ -52,7 +52,7 @@ Each person is rendered as a white card (`NodeCard`) with:
 - **Department label** — small-caps, coloured by department (deterministic hash)
 - **Avatar** — circular initials badge, tinted to match department colour
 - **Name** — bold; shown as "Unknown Employee" when data is missing
-- **Job title** — secondary text, truncated with ellipsis
+- **Job title** — secondary text, clamped to two lines; full text on hover
 - **Direct reports pill** — shows count + chevron; clicking it expands/collapses that subtree. Only appears on manager nodes.
 - **"View team →" button** — appears alongside the direct reports pill on manager nodes. Clicking it activates **Subtree Focus** mode (see below).
 
