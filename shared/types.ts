@@ -17,4 +17,6 @@ export interface OrgResponse {
   /** 'live' = fetched from Remote API; 'snapshot' = fallback data */
   source: 'live' | 'snapshot'
   fetchedAt: string
+  /** Number of employees silently dropped due to detail-fetch failures */
+  skippedCount?: number
 }

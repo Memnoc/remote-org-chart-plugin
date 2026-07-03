@@ -11,11 +11,12 @@ interface Props {
   status: 'loading' | 'ok' | 'error'
   source?: 'live' | 'snapshot'
   fetchedAt?: string
+  skippedCount?: number
   onRefresh: () => void
   refreshing: boolean
 }
 
-export default function Header({ theme, setTheme, status, source, fetchedAt, onRefresh, refreshing }: Props) {
+export default function Header({ theme, setTheme, status, source, fetchedAt, skippedCount, onRefresh, refreshing }: Props) {
   const { open, setOpen, triggerRef: btnRef, panelRef } = useDropdown()
 
   const isLive = status === 'ok' && source === 'live'
@@ -81,6 +82,18 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, onR
           <button onClick={onRefresh} disabled={refreshing} title="Refresh" style={iconBtnStyle}>
             <RefreshIcon spinning={refreshing} />
           </button>
+          {skippedCount !== undefined && skippedCount > 0 && (
+            <span
+              title={`${skippedCount} employee${skippedCount === 1 ? '' : 's'} could not be loaded from the Remote API and are missing from this chart.`}
+              style={{
+                fontSize: 11, fontWeight: 600, color: '#92400e',
+                background: '#fef3c7', border: '1px solid #fde68a',
+                borderRadius: 10, padding: '2px 8px', cursor: 'default',
+              }}
+            >
+              {skippedCount} skipped
+            </span>
+          )}
         </div>
       )}
 

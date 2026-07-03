@@ -42,11 +42,12 @@ async function fetchEmployment(id: string, token: string): Promise<RemoteEmploym
 }
 
 /** Fetch all employment details with bounded concurrency (pool size 8). */
-export async function fetchAllEmployments(token: string): Promise<RemoteEmployment[]> {
+export async function fetchAllEmployments(token: string): Promise<{ employments: RemoteEmployment[], skipped: number }> {
   const ids = await listAllEmploymentIds(token)
-  const results: RemoteEmployment[] = []
+  const employments: RemoteEmployment[] = []
   const POOL = 8
   const totalBatches = Math.ceil(ids.length / POOL)
+  let skipped = 0
 
   for (let i = 0; i < ids.length; i += POOL) {
     const batchNum = Math.floor(i / POOL) + 1
@@ -55,15 +56,16 @@ export async function fetchAllEmployments(token: string): Promise<RemoteEmployme
     let ok = 0
     for (const [j, r] of settled.entries()) {
       if (r.status === 'fulfilled') {
-        results.push(r.value)
+        employments.push(r.value)
         ok++
       } else {
+        skipped++
         console.warn(`[remote] batch ${batchNum} — SKIP ${batch[j]}: ${r.reason}`)
       }
     }
     console.log(`[remote] batch ${batchNum}/${totalBatches} — ${ok}/${batch.length} ok`)
   }
 
-  console.log(`[remote] detail fetch done — ${results.length}/${ids.length} employments fetched`)
-  return results
+  console.log(`[remote] detail fetch done — ${employments.length}/${ids.length} fetched, ${skipped} skipped`)
+  return { employments, skipped }
 }

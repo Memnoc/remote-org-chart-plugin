@@ -45,15 +45,16 @@ function countNodes(node: { children?: unknown[] }): number {
 async function fetchLive(token: string): Promise<OrgResponse> {
   const t0 = Date.now()
   console.log('[org] starting live fetch')
-  const employments = await fetchAllEmployments(token)
+  const { employments, skipped } = await fetchAllEmployments(token)
   const people = employments.map(mapEmployment).filter((p) => p.name != null || p.title != null || p.department != null)
   const forest = buildForest(people)
   const totalNodes = forest.reduce((acc, root) => acc + countNodes(root), 0)
-  console.log(`[org] done — ${people.length} people, ${forest.length} root(s), ${totalNodes} total nodes, ${Date.now() - t0}ms`)
+  console.log(`[org] done — ${people.length} people, ${forest.length} root(s), ${totalNodes} total nodes, ${skipped} skipped, ${Date.now() - t0}ms`)
   return {
     forest,
     source: 'live',
     fetchedAt: new Date().toISOString(),
+    skippedCount: skipped > 0 ? skipped : undefined,
   }
 }
 

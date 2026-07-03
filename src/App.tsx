@@ -83,6 +83,7 @@ export default function App() {
         status={state.status}
         source={hasData ? state.data.source : undefined}
         fetchedAt={hasData ? state.data.fetchedAt : undefined}
+        skippedCount={hasData ? state.data.skippedCount : undefined}
         onRefresh={refresh}
         refreshing={refreshing}
       />
