@@ -16,7 +16,13 @@ This page summarises the load-bearing ones.
   data is read-only and cheap to rebuild; a database would be dead weight.
 - **Paginated list then per-employee detail fetch** — forced by the API: manager fields
   only exist on the detail endpoint. Mitigated with pool-of-8 concurrency and caching.
-- **Forest instead of a single root** — no CEO assumption; every root shape is first-class.
+- **Active-only employment filter** — the API returns every lifecycle state (measured:
+  175 = 148 active + 23 archived + 4 pre-hire); the server keeps only `status === 'active'`.
+  Offboarded and not-yet-started people don't belong on an org chart.
+- **Forest at the data layer, virtual root at the render layer** — the data keeps its 9
+  genuine roots (no fake CEO); the tree view joins them under a synthetic "Org" chip so the
+  canvas shows one expandable tree, Remote-style, with nobody hidden. List view, stats, and
+  CSV consume the honest forest.
 - **Cycle detection at build time, not render time** — cycles are broken once while the
   forest is built, so the renderer never has to reason about them.
 - **Snapshot fallback instead of an error state** — a reviewer always sees a working chart;

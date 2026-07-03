@@ -21,9 +21,12 @@ Start with [Features](./features.md) for the product surface, then
 
 ## What it does
 
-- Fetches every employment from the Remote sandbox API, resolves manager relationships,
+- Fetches every employment from the Remote sandbox API, keeps **active staff only**
+  (archived and pre-hire employments are filtered out), resolves manager relationships,
   and builds a **forest** of reporting trees.
-- Renders an interactive, pan/zoom/collapse **tree view** and a searchable **list view**.
+- Renders the whole org as **one expandable tree** — multiple data roots are joined under
+  a synthetic "Org" node at render time, so nobody is hidden — plus a searchable
+  **list view**.
 - Handles the messy real-world shapes: no manager, external managers, dangling references,
   reporting cycles, missing fields, and multiple roots — see [Edge cases](./edge-cases.md).
 - Falls back to a committed snapshot so a reviewer **always** sees a working chart, even
