@@ -2,7 +2,8 @@ import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { readFileSync } from 'fs'
-import type { OrgResponse, RemoteEmployment } from '../shared/types.js'
+import type { OrgResponse } from '../shared/types.js'
+import type { RemoteEmployment } from './lib/types.js'
 import { fetchAllEmployments } from './lib/remoteClient.js'
 import { mapEmployment } from './lib/mapper.js'
 import { buildForest } from './lib/treeBuilder.js'
@@ -19,7 +20,7 @@ const CACHE_TTL_MS = 5 * 60 * 1000 // 5 min
 function loadSnapshot(): OrgResponse {
   const raw = readFileSync(path.join(process.cwd(), 'server', 'snapshot.json'), 'utf-8')
   const employments = JSON.parse(raw) as RemoteEmployment[]
-  const people = employments.map(mapEmployment).filter((p) => p.name !== '—' || p.title !== '—' || p.department !== '—')
+  const people = employments.map(mapEmployment).filter((p) => p.name != null || p.title != null || p.department != null)
   return {
     forest: buildForest(people),
     source: 'snapshot',
@@ -35,7 +36,7 @@ async function fetchLive(token: string): Promise<OrgResponse> {
   const t0 = Date.now()
   console.log('[org] starting live fetch')
   const employments = await fetchAllEmployments(token)
-  const people = employments.map(mapEmployment).filter((p) => p.name !== '—' || p.title !== '—' || p.department !== '—')
+  const people = employments.map(mapEmployment).filter((p) => p.name != null || p.title != null || p.department != null)
   const forest = buildForest(people)
   const totalNodes = forest.reduce((acc, root) => acc + countNodes(root), 0)
   console.log(`[org] done — ${people.length} people, ${forest.length} root(s), ${totalNodes} total nodes, ${Date.now() - t0}ms`)

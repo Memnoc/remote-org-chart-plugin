@@ -8,7 +8,11 @@ import ListView from './components/ListView.tsx'
 import DetailPanel from './components/DetailPanel.tsx'
 import StatsPanel from './components/StatsPanel.tsx'
 import type { OrgNode } from '../shared/types.js'
-import { filterForest, filterByDept, exportCSV, readParams, isEmpty, computeStats, walkForest, type PersonDetail, type ViewMode } from './lib/orgUtils.ts'
+import { filterForest, filterByDept } from './lib/forestFilter.ts'
+import { walkForest } from './lib/forestNav.ts'
+import { computeStats, type PersonDetail } from './lib/orgPresentation.ts'
+import { exportCSV } from './lib/orgExport.ts'
+import { readParams, type ViewMode } from './lib/urlState.ts'
 
 export default function App() {
   const { refresh, refreshing, ...state } = useOrg()
@@ -46,15 +50,6 @@ export default function App() {
     if (state.status !== 'ok') return [] as OrgNode[]
     return walkForest(state.data.forest).map(({ node }) => node)
   }, [state])
-
-  const deptList = useMemo(() => {
-    const map = new Map<string, number>()
-    for (const n of allNodes) {
-      const d = isEmpty(n.attributes.department) ? 'Unassigned' : n.attributes.department!
-      map.set(d, (map.get(d) ?? 0) + 1)
-    }
-    return [...map.entries()].sort((a, b) => b[1] - a[1])
-  }, [allNodes])
 
   const filteredForest = useMemo(() => {
     if (state.status !== 'ok') return []
@@ -97,7 +92,7 @@ export default function App() {
         searchRef={searchRef}
         onSearch={setSearch}
         activeDepts={activeDepts}
-        deptList={deptList}
+        deptList={orgStats?.deptList ?? []}
         onToggleDept={toggleDept}
         onResetDepts={() => setActiveDepts(new Set())}
         view={view}

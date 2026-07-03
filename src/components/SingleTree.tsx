@@ -3,7 +3,8 @@ import Tree from 'react-d3-tree'
 import type { CustomNodeElementProps } from 'react-d3-tree'
 import type { OrgNode } from '../../shared/types.js'
 import NodeCard from './NodeCard.tsx'
-import { treeDepth, toPersonDetail, type PersonDetail } from '../lib/orgUtils.ts'
+import { treeDepth } from '../lib/forestNav.ts'
+import { toPersonDetail, type PersonDetail } from '../lib/orgPresentation.ts'
 
 export interface SingleTreeProps {
   root: OrgNode
@@ -54,10 +55,12 @@ export default function SingleTree({
       const nd = nodeDatum as Parameters<typeof NodeCard>[0]['nodeData']
       const id = (nodeDatum.attributes as Record<string, unknown>)?.id as string ?? ''
       const hasKids = Array.isArray(nd.children) && nd.children.length > 0
+      const collapsed = (nodeDatum as { __rd3t?: { collapsed: boolean } }).__rd3t?.collapsed ?? false
       return (
         <foreignObject width={240} height={200} x={-120} y={-100} style={{ overflow: 'visible' }}>
           <NodeCard
             nodeData={nd}
+            collapsed={collapsed}
             selected={!!id && id === selectedId}
             onChain={!!id && chainIds.has(id) && id !== selectedId}
             onToggle={toggleNode}

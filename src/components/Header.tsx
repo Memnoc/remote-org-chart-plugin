@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React from 'react'
 import type { ThemeMode } from '../hooks/useTheme.ts'
+import { useDropdown } from '../hooks/useDropdown.ts'
 import { RefreshIcon, SunIcon, MoonIcon, SystemIcon, GitCommitIcon, iconBtnStyle } from './icons.tsx'
 
 const THEME_LABELS: Record<ThemeMode, string> = { light: 'Light', dark: 'Dark', system: 'System' }
@@ -15,25 +16,7 @@ interface Props {
 }
 
 export default function Header({ theme, setTheme, status, source, fetchedAt, onRefresh, refreshing }: Props) {
-  const [open, setOpen] = useState(false)
-  const btnRef = useRef<HTMLButtonElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false)
-    }
-    function onClickOutside(e: MouseEvent) {
-      if (open && !btnRef.current?.contains(e.target as Node) && !panelRef.current?.contains(e.target as Node))
-        setOpen(false)
-    }
-    window.addEventListener('keydown', onKey)
-    document.addEventListener('mousedown', onClickOutside)
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      document.removeEventListener('mousedown', onClickOutside)
-    }
-  }, [open])
+  const { open, setOpen, triggerRef: btnRef, panelRef } = useDropdown()
 
   const isLive = status === 'ok' && source === 'live'
 

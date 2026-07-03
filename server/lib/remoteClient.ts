@@ -1,4 +1,4 @@
-import type { RemoteEmployment, RemoteEmploymentList } from '../../shared/types.js'
+import type { RemoteEmployment, RemoteEmploymentList } from './types.js'
 
 const BASE = 'https://gateway.remote-sandbox.com/v1'
 

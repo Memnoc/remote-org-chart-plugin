@@ -1,5 +1,5 @@
 import React from 'react'
-import { deptColor, type OrgStats } from '../lib/orgUtils.ts'
+import { deptColor, type OrgStats } from '../lib/orgPresentation.ts'
 
 // Rosé Pine pastel accents
 const STAT_ACCENTS = ['#ebbcba', '#9ccfd8', '#f6c177', '#c4a7e7']

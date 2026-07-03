@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react'
-import type { ViewMode } from '../lib/orgUtils.ts'
+import React from 'react'
+import type { ViewMode } from '../lib/urlState.ts'
 import { FilterIcon } from './icons.tsx'
-import { deptColor } from '../lib/orgUtils.ts'
+import { deptColor } from '../lib/orgPresentation.ts'
+import { useDropdown } from '../hooks/useDropdown.ts'
 
 interface Props {
   search: string
@@ -26,27 +27,7 @@ export default function Toolbar({
   statsOpen, onStatsToggle,
   onExportCSV, hasData,
 }: Props) {
-  const [filterOpen, setFilterOpen] = useState(false)
-  const filterBtnRef = useRef<HTMLButtonElement>(null)
-  const filterPanelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setFilterOpen(false)
-    }
-    function onClickOutside(e: MouseEvent) {
-      if (filterOpen
-        && !filterBtnRef.current?.contains(e.target as Node)
-        && !filterPanelRef.current?.contains(e.target as Node))
-        setFilterOpen(false)
-    }
-    window.addEventListener('keydown', onKey)
-    document.addEventListener('mousedown', onClickOutside)
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      document.removeEventListener('mousedown', onClickOutside)
-    }
-  }, [filterOpen])
+  const { open: filterOpen, setOpen: setFilterOpen, triggerRef: filterBtnRef, panelRef: filterPanelRef } = useDropdown()
 
   return (
     <div style={{

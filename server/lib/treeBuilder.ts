@@ -1,4 +1,5 @@
-import type { Person, OrgNode } from '../../shared/types.js'
+import type { Person } from './types.js'
+import type { OrgNode } from '../../shared/types.js'
 
 function buildBadge(p: Person, cycleIds: Set<string>): string | undefined {
   if (p.externalManagerEmail) {
@@ -12,10 +13,10 @@ function buildBadge(p: Person, cycleIds: Set<string>): string | undefined {
 function toOrgNode(p: Person, childrenMap: Map<string, Person[]>, visited: Set<string>, cycleIds: Set<string>): OrgNode {
   const badge = buildBadge(p, cycleIds)
   const node: OrgNode = {
-    name: p.name,
+    name: p.name ?? 'Unknown Employee',
     attributes: {
-      title: p.title,
-      department: p.department,
+      title: p.title ?? undefined,
+      department: p.department ?? undefined,
       id: p.id,
       ...(badge ? { badge } : {}),
       ...(p.externalManagerEmail ? { isExternal: true } : {}),

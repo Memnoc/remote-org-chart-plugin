@@ -1,5 +1,5 @@
 import React from 'react'
-import { deptColor, initials, isEmpty } from '../lib/orgUtils.ts'
+import { deptColor, initials } from '../lib/orgPresentation.ts'
 
 interface Props {
   nodeData: {
@@ -12,8 +12,8 @@ interface Props {
       isExternal?: boolean
     }
     children?: unknown[]
-    __rd3t?: { collapsed: boolean }
   }
+  collapsed?: boolean
   onClick?: () => void
   onProfile?: () => void
   onToggle?: () => void
@@ -33,16 +33,15 @@ function PeopleIcon() {
   )
 }
 
-export default function NodeCard({ nodeData, onClick: onCardClick, onProfile, onToggle, onFocus, selected, onChain }: Props) {
-  const { name, attributes = {}, children, __rd3t } = nodeData
+export default function NodeCard({ nodeData, collapsed = false, onClick: onCardClick, onProfile, onToggle, onFocus, selected, onChain }: Props) {
+  const { name, attributes = {}, children } = nodeData
   const { title, department, isExternal } = attributes
-  const isUnknown = isEmpty(name)
-  const displayName = isUnknown ? 'Unknown Employee' : name
+  const isUnknown = !name
+  const displayName = name || 'Unknown Employee'
   const hasChildren = Array.isArray(children) && children.length > 0
   const childCount = hasChildren ? (children as unknown[]).length : 0
-  const collapsed = __rd3t?.collapsed ?? false
 
-  const deptLabel = isEmpty(department) ? (isExternal ? 'External' : 'Unassigned') : department!
+  const deptLabel = department ?? (isExternal ? 'External' : 'Unassigned')
   const color = deptColor(deptLabel)
 
   return (
@@ -129,7 +128,7 @@ export default function NodeCard({ nodeData, onClick: onCardClick, onProfile, on
           }}>
             {displayName}
           </div>
-          {!isEmpty(title) && (
+          {title && (
             <div style={{
               fontSize: 12,
               color: 'var(--text-secondary)',

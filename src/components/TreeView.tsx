@@ -3,7 +3,8 @@ import type { OrgNode } from '../../shared/types.js'
 import NodeCard from './NodeCard.tsx'
 import SingleTree from './SingleTree.tsx'
 import { PlusIcon, MinusIcon, PersonIcon, zoomBtnStyle } from './icons.tsx'
-import { findSubtree, findChain, toPersonDetail, type PersonDetail } from '../lib/orgUtils.ts'
+import { findSubtree, findChain } from '../lib/forestNav.ts'
+import { toPersonDetail, type PersonDetail } from '../lib/orgPresentation.ts'
 
 interface Props {
   forest: OrgNode[]
