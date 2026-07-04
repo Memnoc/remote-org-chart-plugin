@@ -28,7 +28,7 @@ canvas so they never push content.
 Interactive hierarchy rendered with `react-d3-tree`.
 
 - Vertical orientation, Bézier S-curve connectors.
-- **Line style toggle** ("Curved" / "Elbow", top-right): swaps the S-curves for rounded
+- **Line style toggle** ("Curved" / "Elbow", top-centre): swaps the S-curves for rounded
   orthogonal elbows. Elbow links from one parent share a trunk and horizontal rail, so
   they merge into a single bus with drops — sibling lines cannot cross in this style.
 - Dot-grid canvas background via CSS custom properties.

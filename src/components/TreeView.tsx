@@ -221,26 +221,30 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
         </div>
       </div>
 
-      {/* Line style A/B toggle + Expand / Collapse all — matching segmented pills */}
+      {/* Line style A/B toggle (top-centre) + Expand / Collapse all (top-right) */}
       {renderForest.some((r) => (r.children?.length ?? 0) > 0) && (
-        <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', gap: 8 }}>
-          <SegmentedPill
-            options={[
-              { value: 'curve', label: 'Curved', title: 'Curved connector lines' },
-              { value: 'elbow', label: 'Elbow', title: 'Right-angle connector lines' },
-            ]}
-            active={linkStyle}
-            onChange={(v) => setLinkStyle(v as LinkStyle)}
-          />
-          <SegmentedPill
-            options={[
-              { value: 'all', label: 'Expand all', title: 'Expand every team' },
-              { value: 'collapsed', label: 'Collapse all', title: 'Collapse to top level' },
-            ]}
-            active={expandMode}
-            onChange={(v) => applyMode(v as 'all' | 'collapsed')}
-          />
-        </div>
+        <>
+          <div style={{ position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
+            <SegmentedPill
+              options={[
+                { value: 'curve', label: 'Curved', title: 'Curved connector lines' },
+                { value: 'elbow', label: 'Elbow', title: 'Right-angle connector lines' },
+              ]}
+              active={linkStyle}
+              onChange={(v) => setLinkStyle(v as LinkStyle)}
+            />
+          </div>
+          <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
+            <SegmentedPill
+              options={[
+                { value: 'all', label: 'Expand all', title: 'Expand every team' },
+                { value: 'collapsed', label: 'Collapse all', title: 'Collapse to top level' },
+              ]}
+              active={expandMode}
+              onChange={(v) => applyMode(v as 'all' | 'collapsed')}
+            />
+          </div>
+        </>
       )}
 
       {/* Scrollable tree area */}
