@@ -199,7 +199,7 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
               background: 'var(--surface)', border: '1px solid var(--border)',
-              borderRadius: 20, padding: '6px 14px', fontSize: 13, fontWeight: 600,
+              borderRadius: 20, padding: '5px 12px', fontSize: 11, fontWeight: 600,
               color: 'var(--text)', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
             }}
           >
@@ -211,7 +211,7 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
         )}
         <div style={{
           background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: 20, padding: '6px 14px', fontSize: 13, color: 'var(--text)',
+          borderRadius: 20, padding: '5px 12px', fontSize: 11, color: 'var(--text)',
           boxShadow: '0 2px 8px rgba(0,0,0,0.07)', pointerEvents: 'none',
         }}>
           {focusedId
