@@ -28,6 +28,9 @@ canvas so they never push content.
 Interactive hierarchy rendered with `react-d3-tree`.
 
 - Vertical orientation, Bézier S-curve connectors.
+- **Line style toggle** ("Curved" / "Elbow", top-right): swaps the S-curves for rounded
+  orthogonal elbows. Elbow links from one parent share a trunk and horizontal rail, so
+  they merge into a single bus with drops — sibling lines cannot cross in this style.
 - Dot-grid canvas background via CSS custom properties.
 - **Single expandable tree** — multiple data roots are joined under a synthetic "Org"
   chip node at render time, so the whole org expands from one tree without hiding anyone.
@@ -36,10 +39,11 @@ Interactive hierarchy rendered with `react-d3-tree`.
   while searching/filtering or when a team is focused; Expand/Collapse-all overrides.
 - **Expand / collapse all:** remounts the tree with a new `initialDepth`.
 
-:::note Known visual limitation
+:::note Known visual limitation (Curved style only)
 For managers with many direct reports (≥ 8–10), the Bézier curves cross visually — the
 S-curve uses the parent's x-coordinate as its first control point, so curves intersect
-when children span a wide horizontal range. Use **Subtree Focus** to narrow the canvas.
+when children span a wide horizontal range. Switch the line style to **Elbow** (bus
+routing, no sibling crossings) or use **Subtree Focus** to narrow the canvas.
 :::
 
 ### Reporting chain highlight

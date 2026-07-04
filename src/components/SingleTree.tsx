@@ -3,7 +3,8 @@
  * Renders ONE root (TreeView hands it the joined forest) and translates
  * library concepts into ours:
  *   renderCustomNodeElement → NodeCard inside a <foreignObject>
- *   pathFunc                → custom Bézier from card-bottom to card-top
+ *   pathFunc                → custom Bézier or rounded elbow (linkStyle prop)
+ *                             from card-bottom to card-top
  *   pathClassFunc           → amber chain-highlight class on connector links
  *   __rd3t.collapsed        → explicit `collapsed` prop for NodeCard
  *
@@ -30,6 +31,8 @@ import NodeCard from './NodeCard.tsx'
 import { treeDepth, findParent } from '../lib/forestNav.ts'
 import { toPersonDetail, type PersonDetail } from '../lib/orgPresentation.ts'
 
+export type LinkStyle = 'curve' | 'elbow'
+
 export interface SingleTreeProps {
   root: OrgNode
   initialDepth?: number
@@ -40,10 +43,12 @@ export interface SingleTreeProps {
   chainIds: Set<string>
   onFocus: (id: string) => void
   panOffset?: { x: number; y: number }
+  linkStyle?: LinkStyle
 }
 
 export default function SingleTree({
   root, initialDepth, zoom, onSelect, selectedId, onSelectId, chainIds, onFocus, panOffset,
+  linkStyle = 'curve',
 }: SingleTreeProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [translate, setTranslate] = useState({ x: 0, y: 80 })
@@ -73,6 +78,38 @@ export default function SingleTree({
     },
     [],
   )
+
+  // Rounded orthogonal (elbow): drop → horizontal rail at midY → drop, with
+  // quadratic corner rounding. Every link from one parent shares the same
+  // trunk segment (same x, same midY), so per-link paths overlap
+  // pixel-perfectly and read as one bus with branches — sibling S-curves
+  // can't cross each other in this style. Same card-edge offsets as the
+  // curve, so no line ever touches a card.
+  const elbowToCardEdge = useCallback(
+    (link: { source: { x: number; y: number }; target: { x: number; y: number } }) => {
+      const { source: s, target: t } = link
+      const upper = s.y <= t.y ? s : t
+      const lower = s.y <= t.y ? t : s
+      const srcY = upper.y + CARD_HALF_H
+      const tgtY = lower.y - CARD_HALF_H
+      const midY = (srcY + tgtY) / 2
+      const dx = lower.x - upper.x
+      if (dx === 0) return `M${upper.x},${srcY} L${lower.x},${tgtY}`
+      const r = Math.min(10, Math.abs(dx) / 2, tgtY - midY)
+      const sign = dx > 0 ? 1 : -1
+      return [
+        `M${upper.x},${srcY}`,
+        `L${upper.x},${midY - r}`,
+        `Q${upper.x},${midY} ${upper.x + sign * r},${midY}`,
+        `L${lower.x - sign * r},${midY}`,
+        `Q${lower.x},${midY} ${lower.x},${midY + r}`,
+        `L${lower.x},${tgtY}`,
+      ].join(' ')
+    },
+    [],
+  )
+
+  const linkPath = linkStyle === 'elbow' ? elbowToCardEdge : curveToCardEdge
 
   const renderNode = useCallback(
     ({ nodeDatum, toggleNode }: CustomNodeElementProps) => {
@@ -112,7 +149,7 @@ export default function SingleTree({
       <Tree
         data={root}
         orientation="vertical"
-        pathFunc={curveToCardEdge as unknown as 'step'}
+        pathFunc={linkPath as unknown as 'step'}
         translate={{ x: translate.x + (panOffset?.x ?? 0), y: translate.y }}
         separation={{ siblings: 1.4, nonSiblings: 1.8 }}
         renderCustomNodeElement={renderNode}

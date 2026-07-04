@@ -24,7 +24,7 @@
  */
 import React, { useState, useMemo, useRef } from 'react'
 import type { OrgNode } from '../../shared/types.js'
-import SingleTree from './SingleTree.tsx'
+import SingleTree, { type LinkStyle } from './SingleTree.tsx'
 import ErrorBoundary from './ErrorBoundary.tsx'
 import { PlusIcon, MinusIcon, PersonIcon, zoomBtnStyle } from './icons.tsx'
 import { findSubtree, findChain, joinForest } from '../lib/forestNav.ts'
@@ -45,6 +45,7 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [focusedId, setFocusedId] = useState<string | null>(null)
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 })
+  const [linkStyle, setLinkStyle] = useState<LinkStyle>('curve')
   const scrollRef = useRef<HTMLDivElement>(null)
   const SCROLL_STEP = 240
 
@@ -184,9 +185,32 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
         </div>
       </div>
 
-      {/* Expand / Collapse all */}
+      {/* Line style A/B toggle + Expand / Collapse all */}
       {renderForest.some((r) => (r.children?.length ?? 0) > 0) && (
         <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', gap: 6 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center',
+            background: 'var(--surface)', border: '1px solid var(--border)',
+            borderRadius: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
+            overflow: 'hidden', marginRight: 6,
+          }}>
+            {(['curve', 'elbow'] as const).map((style) => (
+              <button
+                key={style}
+                onClick={() => setLinkStyle(style)}
+                title={style === 'curve' ? 'Curved connector lines' : 'Right-angle connector lines'}
+                style={{
+                  fontSize: 11, fontWeight: linkStyle === style ? 700 : 500,
+                  padding: '5px 12px', border: 'none',
+                  background: linkStyle === style ? 'var(--border-subtle)' : 'transparent',
+                  color: linkStyle === style ? 'var(--text)' : 'var(--text-muted)',
+                  cursor: 'pointer',
+                }}
+              >
+                {style === 'curve' ? 'Curved' : 'Elbow'}
+              </button>
+            ))}
+          </div>
           {(['all', 'collapsed'] as const).map((mode) => (
             <button
               key={mode}
@@ -219,6 +243,7 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
               chainIds={chainIds}
               onFocus={handleFocus}
               panOffset={panOffset}
+              linkStyle={linkStyle}
             />
           </ErrorBoundary>
         ))}
