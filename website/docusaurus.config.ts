@@ -10,7 +10,7 @@ const APP_URL = 'https://remote-org-chart-plugin.onrender.com';
 const config: Config = {
   title: 'Remote Org Chart',
   tagline: 'Interactive org hierarchies built on the Remote API',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/logo.svg',
 
   future: {
     v4: true,

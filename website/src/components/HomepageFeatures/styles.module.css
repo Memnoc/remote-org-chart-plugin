@@ -6,25 +6,45 @@
 }
 
 .featureCard {
-  display: block;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   padding: 1.5rem;
   border: 1px solid var(--ifm-color-emphasis-200);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--ifm-background-color);
   color: inherit;
   text-decoration: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .featureCard:hover {
   text-decoration: none;
   color: inherit;
   border-color: var(--ifm-color-primary);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 
-.featureEmoji {
-  font-size: 1.75rem;
-  line-height: 1;
+.featureCard h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
+}
+
+.featureCard p {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ifm-color-emphasis-700);
   margin-bottom: 0.75rem;
+}
+
+.featureIcon {
+  color: var(--ifm-color-primary);
+  margin-bottom: 0.75rem;
+}
+
+.featureLink {
+  margin-top: auto;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
 }

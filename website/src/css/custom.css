@@ -4,28 +4,29 @@
  * work well for content-centric websites.
  */
 
-/* Restrained green accent, Remote-style. Tune the base hex to the exact brand
-   green if you have it; the ramp below is derived from #1e9e6a. */
+/* Primary ramp derived from the app's selection blue (#3b82f6) so the docs
+   and the app read as one product family. */
 :root {
-  --ifm-color-primary: #1e9e6a;
-  --ifm-color-primary-dark: #1c8f60;
-  --ifm-color-primary-darker: #1a875b;
-  --ifm-color-primary-darkest: #156f4b;
-  --ifm-color-primary-light: #22ad74;
-  --ifm-color-primary-lighter: #26b579;
-  --ifm-color-primary-lightest: #3cc78d;
+  --ifm-color-primary: #2f6fe4;
+  --ifm-color-primary-dark: #2262d8;
+  --ifm-color-primary-darker: #1f5ccc;
+  --ifm-color-primary-darkest: #1a4ca8;
+  --ifm-color-primary-light: #4a80e8;
+  --ifm-color-primary-lighter: #5b8cea;
+  --ifm-color-primary-lightest: #82a9f0;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.08);
+  --ifm-heading-font-weight: 700;
 }
 
-/* Lighter green for dark-mode contrast. */
+/* Lighter blue for dark-mode contrast. */
 [data-theme='dark'] {
-  --ifm-color-primary: #4ecb8e;
-  --ifm-color-primary-dark: #35c47f;
-  --ifm-color-primary-darker: #2abf78;
-  --ifm-color-primary-darkest: #1f9d62;
-  --ifm-color-primary-light: #67d29e;
-  --ifm-color-primary-lighter: #75d6a7;
-  --ifm-color-primary-lightest: #98e0bd;
+  --ifm-color-primary: #7aa5f8;
+  --ifm-color-primary-dark: #5b90f6;
+  --ifm-color-primary-darker: #4c86f5;
+  --ifm-color-primary-darkest: #1d64f2;
+  --ifm-color-primary-light: #99bafa;
+  --ifm-color-primary-lighter: #a8c4fb;
+  --ifm-color-primary-lightest: #d5e3fd;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
