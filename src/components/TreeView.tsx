@@ -38,6 +38,42 @@ interface Props {
   hasActiveFilters?: boolean
 }
 
+/**
+ * Canvas-overlay segmented control. `active` may be a value outside
+ * `options` (e.g. expandMode 'default') — then no segment is highlighted.
+ */
+function SegmentedPill({ options, active, onChange }: {
+  options: { value: string; label: string; title: string }[]
+  active: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center',
+      background: 'var(--surface)', border: '1px solid var(--border)',
+      borderRadius: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
+      overflow: 'hidden',
+    }}>
+      {options.map((o) => (
+        <button
+          key={o.value}
+          onClick={() => onChange(o.value)}
+          title={o.title}
+          style={{
+            fontSize: 11, fontWeight: active === o.value ? 700 : 500,
+            padding: '5px 12px', border: 'none',
+            background: active === o.value ? 'var(--border-subtle)' : 'transparent',
+            color: active === o.value ? 'var(--text)' : 'var(--text-muted)',
+            cursor: 'pointer',
+          }}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilters = false }: Props) {
   const [expandMode, setExpandMode] = useState<'all' | 'collapsed' | 'default'>('default')
   const [treeKey, setTreeKey] = useState(0)
@@ -185,47 +221,25 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
         </div>
       </div>
 
-      {/* Line style A/B toggle + Expand / Collapse all */}
+      {/* Line style A/B toggle + Expand / Collapse all — matching segmented pills */}
       {renderForest.some((r) => (r.children?.length ?? 0) > 0) && (
-        <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', gap: 6 }}>
-          <div style={{
-            display: 'flex', alignItems: 'center',
-            background: 'var(--surface)', border: '1px solid var(--border)',
-            borderRadius: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
-            overflow: 'hidden', marginRight: 6,
-          }}>
-            {(['curve', 'elbow'] as const).map((style) => (
-              <button
-                key={style}
-                onClick={() => setLinkStyle(style)}
-                title={style === 'curve' ? 'Curved connector lines' : 'Right-angle connector lines'}
-                style={{
-                  fontSize: 11, fontWeight: linkStyle === style ? 700 : 500,
-                  padding: '5px 12px', border: 'none',
-                  background: linkStyle === style ? 'var(--border-subtle)' : 'transparent',
-                  color: linkStyle === style ? 'var(--text)' : 'var(--text-muted)',
-                  cursor: 'pointer',
-                }}
-              >
-                {style === 'curve' ? 'Curved' : 'Elbow'}
-              </button>
-            ))}
-          </div>
-          {(['all', 'collapsed'] as const).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => applyMode(mode)}
-              style={{
-                fontSize: 11, fontWeight: expandMode === mode ? 700 : 500,
-                padding: '5px 12px', borderRadius: 20,
-                border: '1px solid var(--border)', background: 'var(--surface)',
-                color: expandMode === mode ? 'var(--text)' : 'var(--text-muted)',
-                cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
-              }}
-            >
-              {mode === 'all' ? 'Expand all' : 'Collapse all'}
-            </button>
-          ))}
+        <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', gap: 8 }}>
+          <SegmentedPill
+            options={[
+              { value: 'curve', label: 'Curved', title: 'Curved connector lines' },
+              { value: 'elbow', label: 'Elbow', title: 'Right-angle connector lines' },
+            ]}
+            active={linkStyle}
+            onChange={(v) => setLinkStyle(v as LinkStyle)}
+          />
+          <SegmentedPill
+            options={[
+              { value: 'all', label: 'Expand all', title: 'Expand every team' },
+              { value: 'collapsed', label: 'Collapse all', title: 'Collapse to top level' },
+            ]}
+            active={expandMode}
+            onChange={(v) => applyMode(v as 'all' | 'collapsed')}
+          />
         </div>
       )}
 
