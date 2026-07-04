@@ -13,8 +13,13 @@
  * in DECISIONS.md).
  *
  * Geometry notes:
- * - CARD_HALF_H (100) = half the foreignObject height; connectors start/end
- *   at card edges instead of card centres, so no line crosses a card.
+ * - CARD_HALF_H (100) = half the foreignObject height. Links END at the
+ *   child's frame top (= card top, cards anchor to the frame top). Links
+ *   START at the parent's centre: cards are shorter than the frame and SVG
+ *   paints links before nodes, so the stub hides behind the opaque card and
+ *   the line emerges at the card's real bottom edge regardless of card
+ *   height (badge/pill rows vary it). Rail/curve maths still use the frame
+ *   edge (srcY), so the visible shape is unchanged.
  * - Canvas height comes from treeDepth × row height; width is centred once
  *   on mount from the container width.
  * - Known limitation: with many direct reports the S-curves visually cross —
@@ -74,7 +79,11 @@ export default function SingleTree({
       const srcY = upper.y + CARD_HALF_H
       const tgtY = lower.y - CARD_HALF_H
       const midY = (srcY + tgtY) / 2
-      return `M${upper.x},${srcY} C${upper.x},${midY} ${lower.x},${midY} ${lower.x},${tgtY}`
+      // Start at the node CENTRE, not the frame bottom: cards are shorter
+      // than the 200px foreignObject and links paint under nodes, so the
+      // vertical stub hides behind the card and the line emerges exactly at
+      // the card's real bottom edge — no floating gap for short cards.
+      return `M${upper.x},${upper.y} L${upper.x},${srcY} C${upper.x},${midY} ${lower.x},${midY} ${lower.x},${tgtY}`
     },
     [],
   )
@@ -94,11 +103,13 @@ export default function SingleTree({
       const tgtY = lower.y - CARD_HALF_H
       const midY = (srcY + tgtY) / 2
       const dx = lower.x - upper.x
-      if (dx === 0) return `M${upper.x},${srcY} L${lower.x},${tgtY}`
+      // Same centre-start trick as the curve: the stub down to the frame
+      // edge hides behind the parent card.
+      if (dx === 0) return `M${upper.x},${upper.y} L${lower.x},${tgtY}`
       const r = Math.min(10, Math.abs(dx) / 2, tgtY - midY)
       const sign = dx > 0 ? 1 : -1
       return [
-        `M${upper.x},${srcY}`,
+        `M${upper.x},${upper.y}`,
         `L${upper.x},${midY - r}`,
         `Q${upper.x},${midY} ${upper.x + sign * r},${midY}`,
         `L${lower.x - sign * r},${midY}`,
