@@ -38,7 +38,7 @@
 
 **Why:** Real org structures are not always a single hierarchy. The Remote API returns employees with no manager (orphans), employees whose manager is not on Remote (external managers), and employees caught in a reporting cycle (cycle-broken roots) — the sandbox org has 9 genuine roots among active employees. Forcing a single artificial root into the *data* would misrepresent it; hiding the unconnected people (Remote's own UI does this, with a "missing reporting lines" banner) trades completeness for cleanliness. The virtual root splits the difference: the API response and every consumer (list view, stats, CSV export, search) see the honest forest, while the canvas shows one Remote-style expandable tree with nobody hidden.
 
-**Trade-off:** The virtual root is a UI-only concept that must be special-cased: it renders as a compact chip (not a person card), can't be selected/focused/profiled, is excluded from reporting-chain highlights, and "collapse all" uses depth 1 instead of 0 so the org doesn't vanish behind a single chip. Single-root forests (e.g. a focused subtree, or a search that prunes to one tree) bypass the join entirely.
+**Trade-off:** The virtual root is a UI-only concept that must be special-cased: it renders as an "Organisation" company node (building icon + people/branch counts, not a person card), can't be selected/focused/profiled, is excluded from reporting-chain highlights, and "collapse all" uses depth 1 instead of 0 so the org doesn't vanish behind a single node. Single-root forests (e.g. a focused subtree, or a search that prunes to one tree) bypass the join entirely.
 
 ---
 

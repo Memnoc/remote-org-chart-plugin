@@ -75,7 +75,7 @@ Org data is rendered as an interactive hierarchy using `react-d3-tree`.
 - Vertical orientation, Bézier S-curve connectors (path goes from card bottom to card top, midpoint computed from vertical centre between nodes)
 - **Line style toggle** (top-right, "Curved" / "Elbow"): switches connectors between the default S-curves and rounded orthogonal elbows. Elbow links from one parent share the same trunk and horizontal rail, so they merge into a single bus with drops — sibling lines cannot cross in this style (see the known limitation below, which applies to Curved only)
 - Canvas background: dot-grid pattern (`radial-gradient`, CSS custom properties)
-- **Single expandable tree:** when the data has multiple roots (no-manager, external-manager, cycle-broken), they are joined under a synthetic **"Org" chip node** so the whole org renders as one tree — Remote's look, with nobody hidden. The chip collapses/expands the full org; it is not selectable and never appears in list view, stats, or CSV (render-layer only)
+- **Single expandable tree:** when the data has multiple roots (no-manager, external-manager, cycle-broken), they are joined under a synthetic **"Organisation" company node** (building icon, "N people · M branches" subtitle, explanatory tooltip) so the whole org renders as one tree — Remote's look, with nobody hidden. The node collapses/expands the full org; it is not selectable and never appears in list view, stats, or CSV (render-layer only)
 - Connector lines: light slate in light mode, deep purple in dark mode
 - **Known visual limitation (Curved style only):** for managers with many direct reports (≥ 8–10), the Bézier curves from the parent to widely-spread children cross each other visually. This is geometric — the S-curve uses the parent's x-coordinate as its first control point, which causes curves to intersect when children span a wide horizontal range. Workarounds: switch the line style to **Elbow** (bus routing, no sibling crossings) or use **Subtree Focus** ("View team →") to narrow the canvas to a single manager's tree.
 
@@ -93,7 +93,7 @@ Wired to react-d3-tree's reactive `zoom` prop — no remount needed.
 
 Buttons top-right of the canvas. Force all nodes to expand or collapse by remounting the tree with a new `initialDepth` (`undefined` = expanded; depth 1 under the virtual Org root = collapsed to top-level roots).
 
-**The app starts collapsed** — Org chip + top-level roots only, like Remote's own chart. The tree auto-expands while search/department filters are active (matches must be visible) and when focusing a team via "View team →"; the Expand/Collapse-all buttons override explicitly.
+**The app starts collapsed** — Organisation node + top-level roots only, like Remote's own chart. The tree auto-expands while search/department filters are active (matches must be visible) and when focusing a team via "View team →"; the Expand/Collapse-all buttons override explicitly.
 
 ### Reporting Chain Highlight
 

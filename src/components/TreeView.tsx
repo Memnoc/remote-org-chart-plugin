@@ -19,7 +19,7 @@
  *   virtual root never highlights as part of a reporting chain.
  *
  * Debugging: nodes re-expanding on unrelated interactions → something broke
- * renderForest's identity. Whole-org disappeared behind one chip → check
+ * renderForest's identity. Whole-org disappeared behind one node → check
  * initialDepth logic for the virtual root (must be 1, not 0, on collapse).
  */
 import React, { useState, useMemo, useRef } from 'react'
@@ -161,8 +161,8 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
   }
 
   const hasVirtualRoot = renderForest[0]?.attributes.isVirtual === true
-  // Depth 1 under a virtual root shows the Org chip + top-level roots;
-  // depth 0 would hide the whole org behind a single chip.
+  // Depth 1 under a virtual root shows the Organisation node + top-level
+  // roots; depth 0 would hide the whole org behind that single node.
   const collapsedDepth = hasVirtualRoot ? 1 : 0
   // Initial-depth policy:
   //   'all' / 'collapsed'  → explicit user override via the buttons

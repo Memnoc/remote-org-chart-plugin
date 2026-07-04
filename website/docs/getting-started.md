@@ -23,12 +23,12 @@ No login, no setup — the live URL is ready to test.
 
 ## Using the app — a 60-second tour
 
-1. **It opens collapsed**, like Remote's own chart: a compact **"Org" chip** with the
-   top-level people underneath. Click any card's **reports pill** (the count + chevron)
-   to expand that branch, or use **Expand all / Collapse all** (top-right).
+1. **It opens collapsed**, like Remote's own chart: an **"Organisation" company node**
+   with the top-level people underneath. Click any card's **reports pill** (the count +
+   chevron) to expand that branch, or use **Expand all / Collapse all** (top-right).
 2. **Click a person** — the card gets a blue ring, a **detail drawer** slides in
-   (name, title, department, employment type), and the full **reporting chain** from the
-   root down to that person lights up in amber.
+   (name, title, department, employment type, manager, direct reports), and the full
+   **reporting chain** from the root down to that person lights up in amber.
 3. **"View team →"** on any manager narrows the canvas to just their subtree; **"← Full
    org"** brings you back.
 4. **Search** (`/` from anywhere) matches names, titles, and departments at once; the

@@ -20,7 +20,7 @@ This page summarises the load-bearing ones.
   175 = 148 active + 23 archived + 4 pre-hire); the server keeps only `status === 'active'`.
   Offboarded and not-yet-started people don't belong on an org chart.
 - **Forest at the data layer, virtual root at the render layer** — the data keeps its 9
-  genuine roots (no fake CEO); the tree view joins them under a synthetic "Org" chip so the
+  genuine roots (no fake CEO); the tree view joins them under a synthetic "Organisation" node so the
   canvas shows one expandable tree, Remote-style, with nobody hidden. List view, stats, and
   CSV consume the honest forest.
 - **Cycle detection at build time, not render time** — cycles are broken once while the

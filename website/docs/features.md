@@ -32,10 +32,12 @@ Interactive hierarchy rendered with `react-d3-tree`.
   orthogonal elbows. Elbow links from one parent share a trunk and horizontal rail, so
   they merge into a single bus with drops — sibling lines cannot cross in this style.
 - Dot-grid canvas background via CSS custom properties.
-- **Single expandable tree** — multiple data roots are joined under a synthetic "Org"
-  chip node at render time, so the whole org expands from one tree without hiding anyone.
+- **Single expandable tree** — multiple data roots are joined under a synthetic
+  **"Organisation" company node** (building icon, "N people · M branches" subtitle,
+  explanatory tooltip) at render time, so the whole org expands from one tree without
+  hiding anyone.
 - **Zoom controls:** floating bar, ±10% steps clamped 25%–250%, live % readout, reset to 80%.
-- **Starts collapsed** — Org chip + top-level roots, like Remote's own chart. Auto-expands
+- **Starts collapsed** — Organisation node + top-level roots, like Remote's own chart. Auto-expands
   while searching/filtering or when a team is focused; Expand/Collapse-all overrides.
 - **Expand / collapse all:** remounts the tree with a new `initialDepth`.
 

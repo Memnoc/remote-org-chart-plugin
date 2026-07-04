@@ -12,7 +12,7 @@
  * Visual states: selected = blue border+glow; onChain = amber (reporting
  * chain); isExternal/missing dept tint the department label & avatar;
  * attributes.badge (external manager / cycle) renders an amber warning chip.
- * The virtual "Org" root renders the compact chip in the early return below.
+ * The virtual root renders as the "Organisation" company node (early return).
  */
 import React from 'react'
 import { deptColor, initials } from '../lib/orgPresentation.ts'
@@ -40,6 +40,23 @@ interface Props {
   onChain?: boolean
 }
 
+/** People in the subtrees under the virtual root — shown on the company node. */
+function countPeople(children?: unknown[]): number {
+  let n = 0
+  for (const c of (children ?? []) as { children?: unknown[] }[]) n += 1 + countPeople(c.children)
+  return n
+}
+
+function BuildingIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M6 5h1.5M8.5 5H10M6 7.5h1.5M8.5 7.5H10M6 10h1.5M8.5 10H10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M8 14v-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 function PeopleIcon() {
   return (
     <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
@@ -62,30 +79,36 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
   const hasChildren = Array.isArray(children) && children.length > 0
   const childCount = hasChildren ? (children as unknown[]).length : 0
 
-  // Synthetic org root — compact chip, not a person card
+  // Synthetic org root — a company node, not a person card. Vertically
+  // centred in the 200px foreignObject frame so the trunk line emerges at
+  // its bottom edge (same no-gap trick as person cards).
   if (attributes.isVirtual) {
+    const totalPeople = countPeople(children)
     return (
-      <div style={{ width: 224, display: 'flex', justifyContent: 'center' }}>
+      <div style={{ width: 224, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <button
           onClick={(e) => { e.stopPropagation(); onToggle?.() }}
-          title={collapsed ? 'Expand org' : 'Collapse org'}
+          title={`${childCount} ${childCount === 1 ? 'person has' : 'people have'} nobody above them on Remote — this node groups their trees so the whole company reads as one chart. Click to ${collapsed ? 'expand' : 'collapse'}.`}
           style={{
-            display: 'inline-flex', alignItems: 'center', gap: 7,
-            fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
             background: 'var(--surface)', border: '1.5px solid var(--border)',
-            borderRadius: 20, padding: '7px 16px', cursor: 'pointer',
+            borderRadius: 12, padding: '12px 20px', cursor: 'pointer',
             boxShadow: 'var(--shadow-card)', userSelect: 'none',
           }}
         >
-          <PeopleIcon />
-          <span>Org</span>
-          <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>· {childCount} {childCount === 1 ? 'branch' : 'branches'}</span>
-          <svg
-            width="9" height="9" viewBox="0 0 10 10"
-            style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
-          >
-            <path d="M1.5 3.5 L5 7 L8.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          </svg>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
+            <BuildingIcon />
+            Organisation
+            <svg
+              width="9" height="9" viewBox="0 0 10 10"
+              style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+            >
+              <path d="M1.5 3.5 L5 7 L8.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            </svg>
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)' }}>
+            {totalPeople} people · {childCount} {childCount === 1 ? 'branch' : 'branches'}
+          </span>
         </button>
       </div>
     )
