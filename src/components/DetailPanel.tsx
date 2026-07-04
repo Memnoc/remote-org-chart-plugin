@@ -95,6 +95,44 @@ function PersonDetailContent({ person, onClose }: { person: PersonDetail; onClos
             </div>
           </Row>
         )}
+        {person.reports && person.reports.length > 0 && (
+          <Row label={`Direct reports (${person.reports.length})`}>
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: 2 }}>
+              {person.reports.slice(0, 6).map((r, i) => {
+                const c = deptColor(r.department)
+                return (
+                  <div key={i} title={r.name} style={{
+                    width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                    // Tint layered over the solid surface so overlapped
+                    // avatars don't show through each other.
+                    background: `linear-gradient(${c}18, ${c}18), var(--surface)`,
+                    color: c,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 11, fontWeight: 700,
+                    boxShadow: '0 0 0 2px var(--surface)',
+                    border: `1.5px solid ${c}35`,
+                    marginLeft: i === 0 ? 0 : -8,
+                  }}>
+                    {r.name ? initials(r.name) : '?'}
+                  </div>
+                )
+              })}
+              {person.reports.length > 6 && (
+                <div title={person.reports.slice(6).map((r) => r.name || 'Unknown').join(', ')} style={{
+                  width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                  background: 'var(--border-subtle)', color: 'var(--text-secondary)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 11, fontWeight: 700,
+                  boxShadow: '0 0 0 2px var(--surface)',
+                  border: '1.5px solid var(--border)',
+                  marginLeft: -8,
+                }}>
+                  +{person.reports.length - 6}
+                </div>
+              )}
+            </div>
+          </Row>
+        )}
         {person.badge && (
           <Row label="Badge">
             <span style={{ fontSize: 13, color: 'var(--text)' }}>{person.badge}</span>

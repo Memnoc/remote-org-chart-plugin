@@ -94,10 +94,12 @@ deepest chain — plus a per-department headcount bar chart (Rosé Pine pastel a
 ## Person detail panel
 
 Clicking a card opens a right-hand drawer: avatar, full name, title, department, employment
-type, and a **Manager** row (the person's tree parent — avatar, name, title) so the
-reporting line stays readable even when connector lines cross on the canvas. The manager
-row is absent for roots; external managers surface through the badge row, which shows the
-full badge text. Closes via `×`, backdrop click, or `Esc`.
+type, a **Manager** row (the person's tree parent — avatar, name, title) so the
+reporting line stays readable even when connector lines cross on the canvas, and a
+**Direct reports (N)** row (overlapping avatar cluster of the tree children, up to 6 then
+a "+N" chip, names on hover). The manager row is absent for roots; external managers
+surface through the badge row, which shows the full badge text. No "full profile" view by
+design — see the PII-filter deferral in Decisions. Closes via `×`, backdrop click, or `Esc`.
 
 ## Theme
 

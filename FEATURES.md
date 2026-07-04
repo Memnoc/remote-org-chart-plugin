@@ -179,6 +179,7 @@ Clicking a node card opens a slide-in drawer from the right:
 
 - Avatar initials, full name, job title, department, employment type
 - **Manager** — the person's tree parent (avatar, name, title), so the reporting line is readable even when connector lines cross on the canvas. Absent for roots (no on-Remote manager); external managers appear via the badge row instead.
+- **Direct reports (N)** — overlapping avatar cluster of the person's tree children (up to 6, then a "+N" chip); hover an avatar for the name. Absent for non-managers.
 - Badge row (external manager / cycle) with the full badge text
 - Close via `×` button, backdrop click, or `Esc`
 

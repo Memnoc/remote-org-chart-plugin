@@ -279,3 +279,13 @@
 **Trade-off:** The during-render state adjustment in `ListView` (`prevInputs` comparison) is less familiar than an effect and triggers an immediate synchronous re-render — but that is one clean pass instead of a committed-then-corrected frame, and it is the React-documented pattern for this exact case.
 
 **Enforcement (added July 2026):** ESLint with `eslint-plugin-react-hooks` (`rules-of-hooks` + `exhaustive-deps` as errors) now guards this discipline mechanically — the "let the linter verify dependencies" rule from react.dev/learn/escape-hatches. Its first run caught three real issues: a render-phase ref write in `App` (replaced by making `selectedPerson` a real effect dependency), redundant synchronous `setState` at the top of `useOrg`'s fetch effect (dead churn — initial state was already `loading` and `refresh()` already set `refreshing`), and a ternary-as-statement. `DetailPanel`'s Esc-listener also stopped churning per keystroke by giving it a stable `onClose` (`useCallback` in `App`).
+
+---
+
+## Detail Drawer Shows Org Fields Only — No Full Profile
+
+**Decision:** The person detail drawer shows only org-relevant fields: name, title, department, employment type, manager, direct reports, and the edge-case badge. There is no "view full profile" expansion (location, start date, contact details, photo), even though Remote's detail endpoint returns those fields.
+
+**Why:** Remote's own drawer with location/start date sits behind their authenticated admin UI. This app is a public URL backed by an unauthenticated proxy — republishing personal data there would make the proxy a PII leak rather than a PII filter. The server-side mapper deliberately projects only the six fields the org chart needs; everything else is dropped before it ever reaches the client. Scope is the second reason: the assignment is an org chart, and who/role/department/manager/reports answers every org question the tree can raise.
+
+**Trade-off:** Less drawer parity with Remote's product. If richer profiles were ever needed, the right shape is a separate authenticated `/api/employee/:id` endpoint with its own caching and access-control story — not a fatter `/api/org` payload shipping unviewed personal data to every visitor.

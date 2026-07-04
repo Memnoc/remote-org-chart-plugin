@@ -61,6 +61,11 @@ Documented as ADRs so future reviews don't re-litigate them:
 - **No error telemetry** — `componentDidCatch` is the ready hook; it only needs an SDK call.
 - **No `process.on('unhandledRejection')` handler** — Render auto-restarts on crash; a
   one-line handler is the fix if the server grows.
+- **No full profile in the detail drawer** — the app is a public URL behind an
+  unauthenticated proxy, so the server-side mapper acts as a PII filter: only the six
+  org-relevant fields ever reach the client. Location, start date, and contact details
+  stay behind Remote's own authenticated UI; richer profiles would need a separate
+  authenticated endpoint.
 
 ## Types & data hygiene
 

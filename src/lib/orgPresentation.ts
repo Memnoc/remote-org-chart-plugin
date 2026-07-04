@@ -18,6 +18,8 @@ export type PersonDetail = {
   badge?: string
   /** The person's manager (tree parent), when they have one on Remote. */
   manager?: { name: string; title?: string; department?: string }
+  /** Direct reports (tree children) — drawer shows an avatar cluster. */
+  reports?: { name: string; department?: string }[]
 }
 
 export interface OrgStats {
@@ -92,10 +94,15 @@ export function initials(name: string): string {
   return name.split(' ').slice(0, 2).map((w) => w[0] ?? '').join('').toUpperCase()
 }
 
-export function toPersonDetail(
-  node: { name: string; attributes?: { title?: string | null; department?: string | null; isExternal?: boolean; badge?: string } },
-  parent?: { name: string; attributes?: { title?: string | null; department?: string | null } } | null,
-): PersonDetail {
+type DetailSource = {
+  name: string
+  attributes?: { title?: string | null; department?: string | null; isExternal?: boolean; badge?: string }
+  children?: unknown[]
+}
+
+export function toPersonDetail(node: DetailSource, parent?: DetailSource | null): PersonDetail {
+  const reports = (node.children as DetailSource[] | undefined)
+    ?.map((c) => ({ name: c.name, department: c.attributes?.department ?? undefined }))
   return {
     name: node.name,
     title: node.attributes?.title ?? undefined,
@@ -109,5 +116,6 @@ export function toPersonDetail(
         department: parent.attributes?.department ?? undefined,
       },
     } : {}),
+    ...(reports?.length ? { reports } : {}),
   }
 }
