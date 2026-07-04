@@ -39,8 +39,10 @@ interface Props {
 }
 
 /**
- * Canvas-overlay segmented control. `active` may be a value outside
- * `options` (e.g. expandMode 'default') — then no segment is highlighted.
+ * Canvas-overlay segmented control — same sliding-thumb style as the
+ * toolbar's Tree/List switch (grey track, white thumb with a soft shadow).
+ * `active` may be a value outside `options` (e.g. expandMode 'default') —
+ * then no thumb is shown.
  */
 function SegmentedPill({ options, active, onChange }: {
   options: { value: string; label: string; title: string }[]
@@ -49,10 +51,10 @@ function SegmentedPill({ options, active, onChange }: {
 }) {
   return (
     <div style={{
-      display: 'flex', alignItems: 'center',
-      background: 'var(--surface)', border: '1px solid var(--border)',
-      borderRadius: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
-      overflow: 'hidden',
+      display: 'flex', gap: 4,
+      background: 'var(--border-subtle)',
+      borderRadius: 20, padding: 3,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
     }}>
       {options.map((o) => (
         <button
@@ -60,11 +62,13 @@ function SegmentedPill({ options, active, onChange }: {
           onClick={() => onChange(o.value)}
           title={o.title}
           style={{
-            fontSize: 11, fontWeight: active === o.value ? 700 : 500,
-            padding: '5px 12px', border: 'none',
-            background: active === o.value ? 'var(--border-subtle)' : 'transparent',
+            padding: '5px 14px', borderRadius: 17, border: 'none',
+            background: active === o.value ? 'var(--surface)' : 'transparent',
             color: active === o.value ? 'var(--text)' : 'var(--text-muted)',
-            cursor: 'pointer',
+            fontWeight: active === o.value ? 600 : 500,
+            fontSize: 12, cursor: 'pointer',
+            boxShadow: active === o.value ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+            transition: 'all 0.15s',
           }}
         >
           {o.label}
@@ -198,8 +202,8 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
             onClick={handleBack}
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
-              background: 'var(--surface)', border: '1px solid var(--border)',
-              borderRadius: 20, padding: '5px 12px', fontSize: 11, fontWeight: 600,
+              background: 'var(--surface)', border: '1.5px solid var(--border)',
+              borderRadius: 20, padding: '6px 14px', fontSize: 12, fontWeight: 600,
               color: 'var(--text)', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
             }}
           >
@@ -210,8 +214,8 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
           </button>
         )}
         <div style={{
-          background: 'var(--surface)', border: '1px solid var(--border)',
-          borderRadius: 20, padding: '5px 12px', fontSize: 11, color: 'var(--text)',
+          background: 'var(--surface)', border: '1.5px solid var(--border)',
+          borderRadius: 20, padding: '6px 14px', fontSize: 12, color: 'var(--text)',
           boxShadow: '0 2px 8px rgba(0,0,0,0.07)', pointerEvents: 'none',
         }}>
           {focusedId
@@ -271,7 +275,7 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
       <div style={{
         position: 'absolute', bottom: 16, left: 16, zIndex: 10,
         display: 'flex', alignItems: 'center',
-        background: 'var(--surface)', border: '1px solid var(--border)',
+        background: 'var(--surface)', border: '1.5px solid var(--border)',
         borderRadius: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', overflow: 'hidden',
       }}>
         <button onClick={() => changeZoom(0.1)} style={zoomBtnStyle} title="Zoom in"><PlusIcon /></button>
