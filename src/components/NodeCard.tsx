@@ -10,7 +10,8 @@
  * Pill/team buttons stopPropagation so they don't also select the card.
  *
  * Visual states: selected = blue border+glow; onChain = amber (reporting
- * chain); isExternal/missing dept tint the department label & avatar.
+ * chain); isExternal/missing dept tint the department label & avatar;
+ * attributes.badge (external manager / cycle) renders an amber warning chip.
  * The virtual "Org" root renders the compact chip in the early return below.
  */
 import React from 'react'
@@ -52,7 +53,10 @@ function PeopleIcon() {
 
 export default function NodeCard({ nodeData, collapsed = false, onClick: onCardClick, onProfile, onToggle, onFocus, selected, onChain }: Props) {
   const { name, attributes = {}, children } = nodeData
-  const { title, department, isExternal } = attributes
+  const { title, department, isExternal, badge } = attributes
+  // Card shows a short label (the full external-manager string is too long for
+  // a chip); hover and the detail drawer carry the full badge text.
+  const badgeLabel = badge?.startsWith('reports to') ? 'External manager' : badge
   const isUnknown = !name
   const displayName = name || 'Unknown Employee'
   const hasChildren = Array.isArray(children) && children.length > 0
@@ -198,6 +202,32 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
           )}
         </div>
       </div>
+
+      {/* Edge-case badge (external manager / cycle) — amber warning chip */}
+      {badge && (
+        <div style={{ marginTop: 8 }}>
+          <span title={badge} style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            fontSize: 10,
+            fontWeight: 600,
+            color: '#b45309',
+            background: 'rgba(245,158,11,0.12)',
+            border: '1px solid rgba(245,158,11,0.35)',
+            borderRadius: 20,
+            padding: '3px 9px',
+            letterSpacing: '0.02em',
+          }}>
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+              <path d="M8 2 L14.5 13.5 H1.5 Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+              <path d="M8 6.5 V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <circle cx="8" cy="11.6" r="0.8" fill="currentColor" />
+            </svg>
+            {badgeLabel}
+          </span>
+        </div>
+      )}
 
       {/* Direct reports pill + View team */}
       {hasChildren && (

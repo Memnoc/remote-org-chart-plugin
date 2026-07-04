@@ -60,7 +60,10 @@ chain highlight all keep working inside the focused subtree.
 
 Each person renders as a card with a department label (small-caps, colour by deterministic
 hash), an initials avatar, name (falls back to "Unknown Employee"), a job title clamped
-to two lines (full text on hover), a
+to two lines (full text on hover), an **edge-case badge** (amber warning chip on flagged
+people: "External manager" — hover for the full `reports to X (external)` string — or
+"cycle detected"; live data has no flagged people, so this appears only with the snapshot
+dataset), a
 **direct-reports pill** (count + expand/collapse chevron, managers only), and the **"View
 team →"** button.
 

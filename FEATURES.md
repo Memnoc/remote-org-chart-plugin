@@ -53,6 +53,7 @@ Each person is rendered as a white card (`NodeCard`) with:
 - **Avatar** — circular initials badge, tinted to match department colour
 - **Name** — bold; shown as "Unknown Employee" when data is missing
 - **Job title** — secondary text, clamped to two lines; full text on hover
+- **Edge-case badge** — amber warning chip on people the tree builder flagged: "External manager" (short label; hover shows the full `reports to X (external)` string) or "cycle detected". The full badge text also appears in the detail panel. Live data currently has no flagged people, so this surfaces only with the snapshot dataset.
 - **Direct reports pill** — shows count + chevron; clicking it expands/collapses that subtree. Only appears on manager nodes.
 - **"View team →" button** — appears alongside the direct reports pill on manager nodes. Clicking it activates **Subtree Focus** mode (see below).
 
