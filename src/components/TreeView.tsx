@@ -36,13 +36,13 @@ interface Props {
   totalPeople?: number
   /** True while search/department filters are active — auto-expands the collapsed-by-default tree so matches are visible. */
   hasActiveFilters?: boolean
+  /** Connector style, owned by App (the toolbar control sets it). */
+  linkStyle?: LinkStyle
 }
 
 /**
  * Canvas-overlay segmented control — same sliding-thumb style as the
  * toolbar's Tree/List switch (grey track, white thumb with a soft shadow).
- * `active` may be a value outside `options` (e.g. expandMode 'default') —
- * then no thumb is shown.
  */
 function SegmentedPill({ options, active, onChange }: {
   options: { value: string; label: string; title: string }[]
@@ -78,14 +78,13 @@ function SegmentedPill({ options, active, onChange }: {
   )
 }
 
-export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilters = false }: Props) {
+export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilters = false, linkStyle = 'curve' }: Props) {
   const [expandMode, setExpandMode] = useState<'all' | 'collapsed' | 'default'>('default')
   const [treeKey, setTreeKey] = useState(0)
   const [zoom, setZoom] = useState(0.8)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [focusedId, setFocusedId] = useState<string | null>(null)
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 })
-  const [linkStyle, setLinkStyle] = useState<LinkStyle>('curve')
   const scrollRef = useRef<HTMLDivElement>(null)
   const SCROLL_STEP = 240
 
@@ -225,30 +224,20 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
         </div>
       </div>
 
-      {/* Line style A/B toggle (top-centre) + Expand / Collapse all (top-right) */}
+      {/* Expand / Collapse all. In 'default' mode the highlighted segment
+          mirrors what the tree actually shows (collapsed on start, expanded
+          while filtering/focused) rather than showing no selection. */}
       {renderForest.some((r) => (r.children?.length ?? 0) > 0) && (
-        <>
-          <div style={{ position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
-            <SegmentedPill
-              options={[
-                { value: 'curve', label: 'Curved', title: 'Curved connector lines' },
-                { value: 'elbow', label: 'Elbow', title: 'Right-angle connector lines' },
-              ]}
-              active={linkStyle}
-              onChange={(v) => setLinkStyle(v as LinkStyle)}
-            />
-          </div>
-          <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
-            <SegmentedPill
-              options={[
-                { value: 'all', label: 'Expand all', title: 'Expand every team' },
-                { value: 'collapsed', label: 'Collapse all', title: 'Collapse to top level' },
-              ]}
-              active={expandMode}
-              onChange={(v) => applyMode(v as 'all' | 'collapsed')}
-            />
-          </div>
-        </>
+        <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
+          <SegmentedPill
+            options={[
+              { value: 'all', label: 'Expand all', title: 'Expand every team' },
+              { value: 'collapsed', label: 'Collapse all', title: 'Collapse to top level' },
+            ]}
+            active={expandMode !== 'default' ? expandMode : (initialDepth === undefined ? 'all' : 'collapsed')}
+            onChange={(v) => applyMode(v as 'all' | 'collapsed')}
+          />
+        </div>
       )}
 
       {/* Scrollable tree area */}

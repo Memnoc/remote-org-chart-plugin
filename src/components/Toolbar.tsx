@@ -7,6 +7,7 @@
  */
 import React from 'react'
 import type { ViewMode } from '../lib/urlState.ts'
+import type { LinkStyle } from './SingleTree.tsx'
 import { FilterIcon } from './icons.tsx'
 import { deptColor } from '../lib/orgPresentation.ts'
 import { useDropdown } from '../hooks/useDropdown.ts'
@@ -21,6 +22,8 @@ interface Props {
   onResetDepts: () => void
   view: ViewMode
   onViewChange: (v: ViewMode) => void
+  linkStyle: LinkStyle
+  onLinkStyleChange: (s: LinkStyle) => void
   statsOpen: boolean
   onStatsToggle: () => void
   onExportCSV: () => void
@@ -31,6 +34,7 @@ export default function Toolbar({
   search, searchRef, onSearch,
   activeDepts, deptList, onToggleDept, onResetDepts,
   view, onViewChange,
+  linkStyle, onLinkStyleChange,
   statsOpen, onStatsToggle,
   onExportCSV, hasData,
 }: Props) {
@@ -162,6 +166,31 @@ export default function Toolbar({
       </div>
 
       <div style={{ flex: 1 }} />
+
+      {/* Connector line style — tree view only, lives here (not floating on
+          the canvas) so it can never overlap the root node. */}
+      {view === 'tree' && hasData && (
+        <div style={{ display: 'flex', gap: 4, background: 'var(--border-subtle)', borderRadius: 20, padding: '3px' }}>
+          {(['curve', 'elbow'] as LinkStyle[]).map((s) => (
+            <button
+              key={s}
+              onClick={() => onLinkStyleChange(s)}
+              title={s === 'curve' ? 'Curved connector lines' : 'Right-angle connector lines'}
+              style={{
+                padding: '5px 14px', borderRadius: 17, border: 'none',
+                background: linkStyle === s ? 'var(--surface)' : 'transparent',
+                color: linkStyle === s ? 'var(--text)' : 'var(--text-muted)',
+                fontWeight: linkStyle === s ? 600 : 500,
+                fontSize: 12, cursor: 'pointer',
+                boxShadow: linkStyle === s ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                transition: 'all 0.15s',
+              }}
+            >
+              {s === 'curve' ? 'Curved' : 'Elbow'}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: 4, background: 'var(--border-subtle)', borderRadius: 20, padding: '3px' }}>
         {(['tree', 'list'] as ViewMode[]).map((v) => (

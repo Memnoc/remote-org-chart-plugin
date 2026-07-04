@@ -24,6 +24,7 @@ import { useTheme } from './hooks/useTheme.ts'
 import Header from './components/Header.tsx'
 import Toolbar from './components/Toolbar.tsx'
 import TreeView from './components/TreeView.tsx'
+import type { LinkStyle } from './components/SingleTree.tsx'
 import ListView from './components/ListView.tsx'
 import DetailPanel from './components/DetailPanel.tsx'
 import StatsPanel from './components/StatsPanel.tsx'
@@ -44,6 +45,7 @@ export default function App() {
   const [activeDepts, setActiveDepts] = useState<Set<string>>(init.depts)
   const [selectedPerson, setSelectedPerson] = useState<PersonDetail | null>(null)
   const [statsOpen, setStatsOpen] = useState(false)
+  const [linkStyle, setLinkStyle] = useState<LinkStyle>('curve')
   // Stable identity: DetailPanel's Esc-listener effect depends on onClose —
   // an inline arrow would re-attach the window listener on every App render
   // (react.dev/learn/removing-effect-dependencies).
@@ -137,6 +139,8 @@ export default function App() {
           onResetDepts={() => setActiveDepts(new Set())}
           view={view}
           onViewChange={setView}
+          linkStyle={linkStyle}
+          onLinkStyleChange={setLinkStyle}
           statsOpen={statsOpen}
           onStatsToggle={() => setStatsOpen((o) => !o)}
           onExportCSV={() => {
@@ -165,6 +169,7 @@ export default function App() {
               onSelect={setSelectedPerson}
               totalPeople={allNodes.length}
               hasActiveFilters={search !== '' || activeDepts.size > 0}
+              linkStyle={linkStyle}
             />
           ) : (
             <ErrorBoundary>
