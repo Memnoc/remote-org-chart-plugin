@@ -16,6 +16,8 @@ export type PersonDetail = {
   department?: string
   isExternal?: boolean
   badge?: string
+  /** The person's manager (tree parent), when they have one on Remote. */
+  manager?: { name: string; title?: string; department?: string }
 }
 
 export interface OrgStats {
@@ -90,12 +92,22 @@ export function initials(name: string): string {
   return name.split(' ').slice(0, 2).map((w) => w[0] ?? '').join('').toUpperCase()
 }
 
-export function toPersonDetail(node: { name: string; attributes?: { title?: string | null; department?: string | null; isExternal?: boolean; badge?: string } }): PersonDetail {
+export function toPersonDetail(
+  node: { name: string; attributes?: { title?: string | null; department?: string | null; isExternal?: boolean; badge?: string } },
+  parent?: { name: string; attributes?: { title?: string | null; department?: string | null } } | null,
+): PersonDetail {
   return {
     name: node.name,
     title: node.attributes?.title ?? undefined,
     department: node.attributes?.department ?? undefined,
     isExternal: node.attributes?.isExternal,
     badge: node.attributes?.badge,
+    ...(parent ? {
+      manager: {
+        name: parent.name,
+        title: parent.attributes?.title ?? undefined,
+        department: parent.attributes?.department ?? undefined,
+      },
+    } : {}),
   }
 }

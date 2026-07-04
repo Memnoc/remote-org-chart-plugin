@@ -27,7 +27,7 @@ import Tree from 'react-d3-tree'
 import type { CustomNodeElementProps } from 'react-d3-tree'
 import type { OrgNode } from '../../shared/types.js'
 import NodeCard from './NodeCard.tsx'
-import { treeDepth } from '../lib/forestNav.ts'
+import { treeDepth, findParent } from '../lib/forestNav.ts'
 import { toPersonDetail, type PersonDetail } from '../lib/orgPresentation.ts'
 
 export interface SingleTreeProps {
@@ -96,13 +96,15 @@ export default function SingleTree({
             onClick={isVirtual ? undefined : () => onSelectId(id || null)}
             onProfile={onSelect && !isVirtual ? () => {
               onSelectId(id || null)
-              onSelect(toPersonDetail(nd))
+              // Parent = manager for the drawer's Manager row (null for roots
+              // and under the virtual Org root — findParent skips it).
+              onSelect(toPersonDetail(nd, id ? findParent([root], id) : null))
             } : undefined}
           />
         </foreignObject>
       )
     },
-    [onSelect, selectedId, onSelectId, chainIds, onFocus],
+    [onSelect, selectedId, onSelectId, chainIds, onFocus, root],
   )
 
   return (

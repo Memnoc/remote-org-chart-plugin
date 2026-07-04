@@ -42,6 +42,24 @@ export function walkForest(forest: OrgNode[]): { node: OrgNode; depth: number }[
   return result
 }
 
+/**
+ * The node whose children contain `id` — the person's manager. Returns null
+ * for roots and for the synthetic Org root's direct children (a virtual
+ * parent is not a manager). Powers the drawer's "Manager" row.
+ */
+export function findParent(forest: OrgNode[], id: string): OrgNode | null {
+  for (const node of forest) {
+    for (const child of node.children ?? []) {
+      if (child.attributes.id === id) {
+        return node.attributes.isVirtual ? null : node
+      }
+    }
+    const found = findParent(node.children ?? [], id)
+    if (found) return found
+  }
+  return null
+}
+
 /** Locate a node anywhere in the forest — powers Subtree Focus ("View team →"). */
 export function findSubtree(forest: OrgNode[], id: string): OrgNode | null {
   for (const node of forest) {

@@ -69,6 +69,32 @@ function PersonDetailContent({ person, onClose }: { person: PersonDetail; onClos
             {person.isExternal ? 'Contractor' : 'Full-time'}
           </span>
         </Row>
+        {person.manager && (
+          <Row label="Manager">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 2 }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                background: `${deptColor(person.manager.department)}18`,
+                color: deptColor(person.manager.department),
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 11, fontWeight: 700,
+                border: `1.5px solid ${deptColor(person.manager.department)}35`,
+              }}>
+                {initials(person.manager.name)}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', lineHeight: 1.25 }}>
+                  {person.manager.name}
+                </div>
+                {person.manager.title && (
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 1 }}>
+                    {person.manager.title}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Row>
+        )}
         {person.badge && (
           <Row label="Badge">
             <span style={{ fontSize: 13, color: 'var(--text)' }}>{person.badge}</span>

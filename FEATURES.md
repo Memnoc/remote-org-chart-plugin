@@ -178,6 +178,8 @@ Metric cards use Rosé Pine pastel accents — rose `#ebbcba`, foam `#9ccfd8`, g
 Clicking a node card opens a slide-in drawer from the right:
 
 - Avatar initials, full name, job title, department, employment type
+- **Manager** — the person's tree parent (avatar, name, title), so the reporting line is readable even when connector lines cross on the canvas. Absent for roots (no on-Remote manager); external managers appear via the badge row instead.
+- Badge row (external manager / cycle) with the full badge text
 - Close via `×` button, backdrop click, or `Esc`
 
 ---

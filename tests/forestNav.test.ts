@@ -1,11 +1,11 @@
 /**
- * joinForest tests — the virtual-root join used by TreeView. The
- * pass-through identity test matters most: TreeView memoizes on it, and
- * react-d3-tree wipes collapse state if data identity churns (that was the
- * zoom-reset bug).
+ * forestNav tests — the virtual-root join used by TreeView, and the parent
+ * lookup behind the drawer's Manager row. joinForest's pass-through identity
+ * test matters most: TreeView memoizes on it, and react-d3-tree wipes
+ * collapse state if data identity churns (that was the zoom-reset bug).
  */
 import { describe, it, expect } from 'vitest'
-import { joinForest, VIRTUAL_ROOT_ID } from '../src/lib/forestNav.ts'
+import { joinForest, findParent, VIRTUAL_ROOT_ID } from '../src/lib/forestNav.ts'
 import type { OrgNode } from '../shared/types.js'
 
 function node(id: string, children?: OrgNode[]): OrgNode {
@@ -38,5 +38,26 @@ describe('joinForest', () => {
     joinForest(forest)
     expect(forest).toHaveLength(2)
     expect(forest[0].attributes.id).toBe('a')
+  })
+})
+
+describe('findParent', () => {
+  it('finds the direct parent at any depth', () => {
+    const forest = [node('a', [node('b', [node('c')])])]
+    expect(findParent(forest, 'b')?.attributes.id).toBe('a')
+    expect(findParent(forest, 'c')?.attributes.id).toBe('b')
+  })
+
+  it('returns null for roots and unknown ids', () => {
+    const forest = [node('a', [node('b')])]
+    expect(findParent(forest, 'a')).toBeNull()
+    expect(findParent(forest, 'nope')).toBeNull()
+  })
+
+  it('treats the virtual Org root as no parent', () => {
+    const joined = joinForest([node('a', [node('b')]), node('c')])
+    expect(findParent(joined, 'a')).toBeNull()
+    expect(findParent(joined, 'c')).toBeNull()
+    expect(findParent(joined, 'b')?.attributes.id).toBe('a')
   })
 })
