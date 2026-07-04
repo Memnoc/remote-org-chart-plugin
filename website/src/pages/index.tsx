@@ -25,16 +25,19 @@ function ChartMock() {
         Live · 148 people
       </div>
       <svg className={styles.mockLines} viewBox="0 0 460 300" preserveAspectRatio="none">
+        {/* Same centre-to-centre trick as the app: paths run from source
+            centre to target centre and the opaque cards (higher z-index)
+            hide the stubs, so lines meet card edges exactly. */}
         {/* Organisation → three roots (elbow bus) */}
-        <path d="M230,44 L230,64 L80,64 L80,84" className={styles.mockLine} />
-        <path d="M230,44 L230,64 L380,64 L380,84" className={styles.mockLine} />
-        <path d="M230,44 L230,84" className={clsx(styles.mockLine, styles.mockLineChain)} />
+        <path d="M230,38 L230,72 L80,72 L80,126" className={styles.mockLine} />
+        <path d="M230,38 L230,72 L380,72 L380,126" className={styles.mockLine} />
+        <path d="M230,38 L230,126" className={clsx(styles.mockLine, styles.mockLineChain)} />
         {/* Middle root → two reports */}
-        <path d="M230,168 L230,188 L120,188 L120,208" className={clsx(styles.mockLine, styles.mockLineChain)} />
-        <path d="M230,168 L230,188 L340,188 L340,208" className={styles.mockLine} />
+        <path d="M230,126 L230,188 L120,188 L120,250" className={clsx(styles.mockLine, styles.mockLineChain)} />
+        <path d="M230,126 L230,188 L340,188 L340,250" className={styles.mockLine} />
       </svg>
 
-      <div className={styles.mockOrg} style={{left: 230, top: 22}}>
+      <div className={styles.mockOrg} style={{left: 230, top: 16}}>
         <span className={styles.mockOrgTitle}>Organisation</span>
         <span className={styles.mockOrgSub}>148 people · 9 branches</span>
       </div>
