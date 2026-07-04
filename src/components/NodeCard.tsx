@@ -103,7 +103,11 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
       style={{
         position: 'relative',
         opacity: dimmed ? 0.45 : 1,
-        background: onChain && !selected ? 'rgba(245,158,11,0.04)' : 'var(--surface)',
+        // Chain tint layered over the opaque surface — a bare rgba() here is
+        // ~transparent and lets the connector stub behind the card bleed through.
+        background: onChain && !selected
+          ? 'linear-gradient(rgba(245,158,11,0.04), rgba(245,158,11,0.04)), var(--surface)'
+          : 'var(--surface)',
         border: `1.5px solid ${selected ? '#3b82f6' : onChain ? '#f59e0b' : 'var(--border)'}`,
         borderRadius: 12,
         padding: '12px 14px',
