@@ -199,6 +199,7 @@ desktop rendering is unchanged:
 - **List view** rows wrap title/department under the name instead of overflowing
 - **Initial zoom is 45%** (80% on desktop) so the Organisation node and roots row fit the first screen; Reset View returns to the per-device starting zoom
 - **Centring is resize-aware** — a ResizeObserver re-centres the tree when the container width changes (mobile Safari settles its layout after mount: URL-bar collapse, font load)
+- **Collapse animation is disabled** — d3 transitions animate node transforms, and on a throttled phone an interrupted transition (e.g. a URL-bar resize mid-animation) strands cards at the canvas origin; phones get direct, instant transforms instead
 
 ---
 

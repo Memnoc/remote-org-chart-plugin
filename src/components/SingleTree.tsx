@@ -35,6 +35,7 @@ import type { OrgNode } from '../../shared/types.js'
 import NodeCard from './NodeCard.tsx'
 import { treeDepth, findParent } from '../lib/forestNav.ts'
 import { toPersonDetail, type PersonDetail } from '../lib/orgPresentation.ts'
+import { useIsNarrow } from '../hooks/useIsNarrow.ts'
 
 export type LinkStyle = 'curve' | 'elbow'
 
@@ -57,6 +58,7 @@ export default function SingleTree({
 }: SingleTreeProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [translate, setTranslate] = useState({ x: 0, y: 80 })
+  const narrow = useIsNarrow()
 
   // Centre the tree on the container's midline — and KEEP it centred via
   // ResizeObserver: mobile Safari settles its layout late (URL bar collapse,
@@ -175,7 +177,11 @@ export default function SingleTree({
         renderCustomNodeElement={renderNode}
         nodeSize={{ x: 280, y: 260 }}
         zoom={zoom}
-        enableLegacyTransitions
+        // d3 transitions animate node transforms; on throttled mobile Safari
+        // an interrupted transition (URL-bar resize mid-flight) strands cards
+        // at the origin while the untransitioned links land correctly. Phones
+        // get direct React-set transforms instead — nothing to interrupt.
+        enableLegacyTransitions={!narrow}
         collapsible
         initialDepth={initialDepth}
         pathClassFunc={({ source, target }) => {

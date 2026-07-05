@@ -116,7 +116,10 @@ build SHA and fetch timestamp, both drawers cap at 88vw, the D-pad navigator dis
 (the canvas pans by touch via react-d3-tree's built-in d3-zoom), and list rows wrap
 title/department under the name. Initial zoom drops to 45% so the roots row fits the
 first screen, and a ResizeObserver keeps the tree centred when mobile Safari settles its
-layout after mount (URL-bar collapse, font load).
+layout after mount (URL-bar collapse, font load). The collapse animation is also disabled
+on phones: d3 transitions animate node transforms, and an interrupted transition on a
+throttled device strands cards at the canvas origin — phones get instant transforms
+instead.
 
 ## Theme
 
