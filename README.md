@@ -55,7 +55,7 @@ Single process in production: Express serves the built SPA (`dist/`) and the `/a
 ### Key design decisions
 
 **Why live proxy + snapshot fallback?**
-Token never reaches the browser. Reviewers always see a working chart even if the API is unreachable or the token is rotated.
+Token never reaches the browser. Users always see a working chart even if the API is unreachable or the token is rotated.
 
 **Why N+1 detail fetch?**
 `GET /v1/employments` (list) returns `MinimalEmployment` with no manager fields. Manager relationships (`manager_employment_id`, `manager_email`) only appear on `GET /v1/employments/{id}` (detail). A single list endpoint would be cleaner but the data isn't there. Mitigated with bounded concurrency (pool 8) and a 5-minute in-memory cache.
@@ -107,7 +107,7 @@ npm start
 
 See [`render.yaml`](./render.yaml) for service config. Set `REMOTE_API_TOKEN` as an environment variable in the Render dashboard.
 
-**Cold-start note:** Render free tier sleeps after ~15 min idle (30–60s cold start on first hit). A keep-alive ping is configured at [cron-job.org](https://cron-job.org) hitting `/health` every 10 min during the review window. The snapshot fallback means even a cold/tokenless hit renders a full chart.
+**Cold-start note:** Render free tier sleeps after ~15 min idle (30–60s cold start on first hit). A keep-alive ping is configured at [cron-job.org](https://cron-job.org) hitting `/health` every 10 min to keep the service warm. The snapshot fallback means even a cold/tokenless hit renders a full chart.
 
 ---
 

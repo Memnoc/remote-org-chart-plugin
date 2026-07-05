@@ -96,7 +96,7 @@
 
 **Decision:** All component styles are written as inline React style objects. No Tailwind, no CSS Modules, no styled-components.
 
-**Why:** For a self-contained assignment project, inline styles eliminate build configuration, class name collisions, and external dependencies. They co-locate styles with components, making each component fully portable. CSS custom properties (`var(--primary)`, etc.) provide theming without a framework.
+**Why:** For a self-contained plugin of this size, inline styles eliminate build configuration, class name collisions, and external dependencies. They co-locate styles with components, making each component fully portable. CSS custom properties (`var(--primary)`, etc.) provide theming without a framework.
 
 **Trade-off:** Verbose — style objects are long. No hover/focus pseudo-classes in inline styles (those are handled via `onMouseEnter`/`onMouseLeave` where needed, or just omitted for simplicity). At larger scale a utility framework or CSS Modules would be more maintainable.
 
@@ -232,7 +232,7 @@
 
 **Decision:** Render errors caught by `ErrorBoundary` are displayed to the user but not reported to any external service. There is no `componentDidCatch` integration with Sentry, Datadog, or similar.
 
-**Why:** This is an assignment project with no telemetry infrastructure. Adding an SDK (Sentry, etc.) would require account setup, API keys, and environment configuration that are out of scope. `console.error` is used at every catch site so errors are visible in browser DevTools and server logs.
+**Why:** The current deployment has no telemetry infrastructure. Adding an SDK (Sentry, etc.) would require account setup, API keys, and environment configuration that are out of scope. `console.error` is used at every catch site so errors are visible in browser DevTools and server logs.
 
 **Trade-off:** Render errors in production are invisible unless a user reports them. For a production system, `componentDidCatch` should forward the error and `React.ErrorInfo` stack trace to an observability platform. The `ErrorBoundary` class already has the right lifecycle hook (`componentDidCatch`) — it just needs a call to the reporting SDK.
 
@@ -262,7 +262,7 @@
 
 **Decision:** The project documentation is a Docusaurus site in `website/`, hosted on **GitHub Pages** (`memnoc.github.io/remote-org-chart-plugin/`) via a GitHub Actions workflow — **not** bundled into the Render service.
 
-**Why:** An earlier iteration served the built docs from Express at `/docs`, sharing the app's single service. That coupled two concerns: (1) every app deploy paid the Docusaurus install + build (~1–3 min), and (2) the docs inherited the Render free-tier cold start — a reviewer hitting the docs while the app was asleep waited 30–60 s. GitHub Pages is a static CDN: always instant, independent of the app's sleep state, and free. Decoupling also pulls the docs build out of the app's `npm run build`, so app deploys return to baseline speed. The Actions workflow triggers only on pushes touching `website/**`, so app-only commits don't rebuild the docs.
+**Why:** An earlier iteration served the built docs from Express at `/docs`, sharing the app's single service. That coupled two concerns: (1) every app deploy paid the Docusaurus install + build (~1–3 min), and (2) the docs inherited the Render free-tier cold start — anyone hitting the docs while the app was asleep waited 30–60 s. GitHub Pages is a static CDN: always instant, independent of the app's sleep state, and free. Decoupling also pulls the docs build out of the app's `npm run build`, so app deploys return to baseline speed. The Actions workflow triggers only on pushes touching `website/**`, so app-only commits don't rebuild the docs.
 
 **Trade-off:** Docs live on a different origin (`memnoc.github.io`) than the app (`onrender.com`), so cross-links between them are absolute URLs, and the docs `baseUrl` is the Pages project sub-path (`/remote-org-chart-plugin/`). A one-time repo setting (Settings → Pages → Source → "GitHub Actions") is required, or the deploy step fails. Two deploy targets instead of one — acceptable because they are genuinely independent artifacts with different runtime characteristics (dynamic app vs static docs).
 
@@ -286,7 +286,7 @@
 
 **Decision:** The person detail drawer shows only org-relevant fields: name, title, department, employment type, manager, direct reports, and the edge-case badge. There is no "view full profile" expansion (location, start date, contact details, photo), even though Remote's detail endpoint returns those fields.
 
-**Why:** Remote's own drawer with location/start date sits behind their authenticated admin UI. This app is a public URL backed by an unauthenticated proxy — republishing personal data there would make the proxy a PII leak rather than a PII filter. The server-side mapper deliberately projects only the six fields the org chart needs; everything else is dropped before it ever reaches the client. Scope is the second reason: the assignment is an org chart, and who/role/department/manager/reports answers every org question the tree can raise.
+**Why:** Remote's own drawer with location/start date sits behind their authenticated admin UI. This app is a public URL backed by an unauthenticated proxy — republishing personal data there would make the proxy a PII leak rather than a PII filter. The server-side mapper deliberately projects only the six fields the org chart needs; everything else is dropped before it ever reaches the client. Scope is the second reason: the product is an org chart, and who/role/department/manager/reports answers every org question the tree can raise.
 
 **Trade-off:** Less drawer parity with Remote's product. If richer profiles were ever needed, the right shape is a separate authenticated `/api/employee/:id` endpoint with its own caching and access-control story — not a fatter `/api/org` payload shipping unviewed personal data to every visitor.
 

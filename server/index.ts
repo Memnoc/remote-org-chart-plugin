@@ -45,8 +45,8 @@ const CACHE_TTL_MS = 5 * 60 * 1000 // 5 min
 /**
  * Fallback data path. snapshot.json is a committed seed dataset that doubles
  * as the tree-builder test fixture — it contains every edge case (cycle,
- * dangling manager, external manager, missing fields). Guarantees a reviewer
- * always sees a working chart even with no token or a dead API.
+ * dangling manager, external manager, missing fields). Guarantees the chart
+ * always renders even with no token or a dead API.
  */
 function loadSnapshot(): OrgResponse {
   let raw: string

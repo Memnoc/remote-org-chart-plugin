@@ -40,7 +40,7 @@ services:
   responding.
 - **Cold start:** the free tier sleeps after ~15 min idle (30–60 s cold start on first
   hit). A keep-alive ping at [cron-job.org](https://cron-job.org) hits `/health` every
-  10 min during the review window. The snapshot fallback means even a cold or tokenless hit
+  10 min to keep the service warm. The snapshot fallback means even a cold or tokenless hit
   renders a full chart.
 
 ## Docs hosting

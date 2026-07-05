@@ -13,7 +13,7 @@ committed snapshot as a guaranteed fallback.
 - **Live app:** [remote-org-chart-plugin.onrender.com](https://remote-org-chart-plugin.onrender.com)
 - **Source:** [github.com/Memnoc/remote-org-chart-plugin](https://github.com/Memnoc/remote-org-chart-plugin)
 
-:::tip Reviewing this for the assignment?
+:::tip New here?
 Start with [Getting started](./getting-started.md) — a five-minute tour of what it is,
 how to use it, and why it works the way it does. Then [Features](./features.md) for the
 full product surface, [Architecture](./architecture.md) for how it is wired, and
@@ -30,8 +30,8 @@ full product surface, [Architecture](./architecture.md) for how it is wired, and
   **list view**.
 - Handles the messy real-world shapes: no manager, external managers, dangling references,
   reporting cycles, missing fields, and multiple roots — see [Edge cases](./edge-cases.md).
-- Falls back to a committed snapshot so a reviewer **always** sees a working chart, even
-  with no token or an unreachable API.
+- Falls back to a committed snapshot so the chart **always** renders, even with no token
+  or an unreachable API.
 
 ## Run it locally
 

@@ -25,7 +25,7 @@ This page summarises the load-bearing ones.
   CSV consume the honest forest.
 - **Cycle detection at build time, not render time** — cycles are broken once while the
   forest is built, so the renderer never has to reason about them.
-- **Snapshot fallback instead of an error state** — a reviewer always sees a working chart;
+- **Snapshot fallback instead of an error state** — the chart always renders;
   the failure mode is degraded data, not a blank screen.
 
 ## Frontend

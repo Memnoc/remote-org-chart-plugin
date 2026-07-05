@@ -70,7 +70,7 @@ The API token must never reach the browser. The proxy also gives one place for c
 filtering, and tree-building — the frontend receives ready-to-render data.
 
 **Why a snapshot fallback?**
-A reviewer must always see a working chart. If the token is rotated, the API is down, or
+The chart must always render. If the token is rotated, the API is down, or
 the env var is missing, the server falls back to a committed dataset that contains every
 edge case the live data does.
 

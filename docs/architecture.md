@@ -13,7 +13,7 @@ This document describes the high-level design of the Remote Org Chart applicatio
 
 ## Background
 
-The assignment requires fetching employee data from Remote's REST API and rendering an org chart publicly accessible at a URL. The key constraints are: the API token must not be exposed to browsers, the app must render gracefully without a token, and the solution should be explainable end-to-end without framework magic.
+The product requirement: fetch employee data from Remote's REST API and render an org chart publicly accessible at a URL. The key constraints are: the API token must not be exposed to browsers, the app must render gracefully without a token, and the solution should be explainable end-to-end without framework magic.
 
 ## Details
 
@@ -58,7 +58,7 @@ See [`docs/adr/`](./adr/) for formal records. Key choices:
 
 ## Limitations & Known Issues
 
-- Cache is in-process memory — cleared on server restart. Acceptable for a demo; production would use Redis or similar.
+- Cache is in-process memory — cleared on server restart. Acceptable at this scale; a multi-instance deployment would use Redis or similar.
 - N+1 fetch is O(n) on employees. At thousands of employees this would be slow. Mitigated by cache; a real system would need a webhook/sync approach.
 - Snapshot data is hand-authored and may drift from actual Acme Sandbox Corp structure once a live token is available.
 

@@ -50,7 +50,7 @@ npm start
 
 Render free tier spins down after ~15 min idle. First request after sleep takes 30–60s.
 
-**Fix for the review window:** configure a free cron job at [cron-job.org](https://cron-job.org) to `GET https://<your-app>.onrender.com/health` every 10 minutes. This keeps the service warm. The `/health` endpoint returns `{"status":"ok"}` with no side effects.
+**Fix:** configure a free cron job at [cron-job.org](https://cron-job.org) to `GET https://<your-app>.onrender.com/health` every 10 minutes. This keeps the service warm. The `/health` endpoint returns `{"status":"ok"}` with no side effects.
 
 **Even without the ping:** the snapshot fallback means the app always returns a full org chart, even on a cold start with no token — it just takes the cold-start delay.
 
@@ -63,8 +63,8 @@ Render free tier spins down after ~15 min idle. First request after sleep takes 
 
 ## Decisions & Trade-offs
 
-- **Single process vs. split (CDN + API):** single process simplifies deploy to one Render service. No CORS config. Acceptable for a demo.
-- **Render free tier vs. paid ($7/mo):** free tier has the cold-start issue; keep-alive ping neutralizes it for a bounded review window at zero cost.
+- **Single process vs. split (CDN + API):** single process simplifies deploy to one Render service. No CORS config. Acceptable at this scale.
+- **Render free tier vs. paid ($7/mo):** free tier has the cold-start issue; the keep-alive ping neutralizes it at zero cost.
 
 ## Limitations & Known Issues
 
