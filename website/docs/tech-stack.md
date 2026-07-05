@@ -68,5 +68,11 @@ discipline documented in [Design decisions](./decisions.md). `npm run lint`.
 
 ## Testing
 
-**Vitest 2.** `npm test` runs once; `npm run test:watch` watches. Tests live in `tests/`,
-covering the mapper and the tree-builder against the snapshot fixture.
+**Vitest 2.** `npm test` runs once; `npm run test:watch` watches. Tests live in `tests/`
+(node environment — everything under test is a pure function). Coverage follows the risk:
+six suites over the invariant-bearing pure core — tree builder (every documented edge
+case), mapper (external-manager rule), forest filter (context dimming), forest navigation
+(join identity, parent lookup, chain/subtree walkers), presentation (stats math, drawer
+view-model), and CSV escaping. The I/O edges (Remote client, Express routes, `window`,
+React components) are deliberately untested — failures there are loud, while a wrong tree
+or a wrong average span renders plausibly and only a test catches it.

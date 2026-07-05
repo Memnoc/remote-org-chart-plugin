@@ -152,7 +152,17 @@ npm test        # run once
 npm run test:watch  # watch mode
 ```
 
-Test files located in `tests/`. Configuration in `vitest.config.ts`.
+Test files located in `tests/`. Configuration in `vitest.config.ts` (`environment: 'node'` —
+no DOM; everything under test is a pure function).
+
+Coverage follows the risk: the invariant-bearing pure core is tested, the I/O edges are not.
+Six suites — `treeBuilder` (every edge case in the README table), `mapper` (external-manager
+rule, status filter), `forestFilter` (context dimming), `forestNav` (join identity, parent
+lookup, chain/subtree walkers, depth, DFS order), `orgPresentation` (stats math, drawer
+view-model), and `orgExport` (CSV escaping — the pure `buildCSV` half of the export).
+Untested by design: `remoteClient` and the Express routes (network I/O), `urlState`
+(window), and React components (no jsdom) — failures there are loud, while a wrong tree or
+a wrong average span renders plausibly and only a test catches it.
 
 ---
 

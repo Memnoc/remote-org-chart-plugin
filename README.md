@@ -112,7 +112,7 @@ See [`render.yaml`](./render.yaml) for service config. Set `REMOTE_API_TOKEN` as
 /server         Express proxy, Remote API client, tree-builder, snapshot.json
 /src            React SPA — App, TreeView, ListView, NodeCard, useOrg hook
 /shared         Shared TypeScript types (Person, OrgNode, RemoteEmployment, OrgResponse)
-/tests          Vitest unit tests — mapper and tree-builder
+/tests          Vitest unit tests — the pure core (tree-builder, mapper, filter, nav, stats, CSV)
 /docs           Architecture and integration documentation
 render.yaml     Render deploy config
 ```

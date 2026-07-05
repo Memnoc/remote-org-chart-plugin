@@ -20,9 +20,14 @@ function flattenForest(forest: OrgNode[], parentName = ''): string[][] {
   return rows
 }
 
-export function exportCSV(forest: OrgNode[]) {
+/** The full CSV string — pure, so the escaping rules are unit-testable. */
+export function buildCSV(forest: OrgNode[]): string {
   const header = ['Name', 'Title', 'Department', 'Manager', 'External']
-  const csv = [header, ...flattenForest(forest)].map((r) => r.join(',')).join('\n')
+  return [header, ...flattenForest(forest)].map((r) => r.join(',')).join('\n')
+}
+
+export function exportCSV(forest: OrgNode[]) {
+  const csv = buildCSV(forest)
   const blob = new Blob([csv], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

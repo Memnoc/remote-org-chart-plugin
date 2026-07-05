@@ -1,11 +1,14 @@
 /**
- * forestNav tests — the virtual-root join used by TreeView, and the parent
- * lookup behind the drawer's Manager row. joinForest's pass-through identity
- * test matters most: TreeView memoizes on it, and react-d3-tree wipes
- * collapse state if data identity churns (that was the zoom-reset bug).
+ * forestNav tests — every walker in the module. joinForest's pass-through
+ * identity test matters most: TreeView memoizes on it, and react-d3-tree
+ * wipes collapse state if data identity churns (that was the zoom-reset
+ * bug). findChain's unique-path guarantee is what the amber chain highlight
+ * (and the "no dotted-line reports" data model) leans on.
  */
 import { describe, it, expect } from 'vitest'
-import { joinForest, findParent, VIRTUAL_ROOT_ID } from '../src/lib/forestNav.ts'
+import {
+  joinForest, findParent, findSubtree, findChain, treeDepth, walkForest, VIRTUAL_ROOT_ID,
+} from '../src/lib/forestNav.ts'
 import type { OrgNode } from '../shared/types.js'
 
 function node(id: string, children?: OrgNode[]): OrgNode {
@@ -59,5 +62,72 @@ describe('findParent', () => {
     expect(findParent(joined, 'a')).toBeNull()
     expect(findParent(joined, 'c')).toBeNull()
     expect(findParent(joined, 'b')?.attributes.id).toBe('a')
+  })
+})
+
+describe('findSubtree', () => {
+  it('locates a node at any depth, across roots', () => {
+    const forest = [node('a', [node('b', [node('c')])]), node('d')]
+    expect(findSubtree(forest, 'a')?.attributes.id).toBe('a')
+    expect(findSubtree(forest, 'c')?.attributes.id).toBe('c')
+    expect(findSubtree(forest, 'd')?.attributes.id).toBe('d')
+  })
+
+  it('returns the node with its subtree intact, not a copy', () => {
+    const b = node('b', [node('c')])
+    const forest = [node('a', [b])]
+    expect(findSubtree(forest, 'b')).toBe(b)
+  })
+
+  it('returns null for an unknown id', () => {
+    expect(findSubtree([node('a')], 'nope')).toBeNull()
+  })
+})
+
+describe('findChain', () => {
+  it('returns the full root→target path, inclusive of both ends', () => {
+    const forest = [node('a', [node('b', [node('c')]), node('x')])]
+    expect(findChain(forest, 'c')).toEqual(new Set(['a', 'b', 'c']))
+  })
+
+  it('excludes siblings and other branches', () => {
+    const forest = [node('a', [node('b', [node('c')]), node('x', [node('y')])])]
+    const chain = findChain(forest, 'c')
+    expect(chain.has('x')).toBe(false)
+    expect(chain.has('y')).toBe(false)
+  })
+
+  it('chain to a root is just the root', () => {
+    expect(findChain([node('a', [node('b')])], 'a')).toEqual(new Set(['a']))
+  })
+
+  it('unknown target yields an empty set (nothing highlights)', () => {
+    expect(findChain([node('a')], 'nope')).toEqual(new Set())
+  })
+
+  it('includes the virtual root id when searching a joined forest', () => {
+    const joined = joinForest([node('a', [node('b')]), node('c')])
+    // Virtual root sits on the path — the connector from Organisation to the
+    // person's root is part of the highlighted chain.
+    expect(findChain(joined, 'b')).toEqual(new Set([VIRTUAL_ROOT_ID, 'a', 'b']))
+  })
+})
+
+describe('treeDepth', () => {
+  it('leaf is depth 1, chain of three is depth 3', () => {
+    expect(treeDepth(node('a'))).toBe(1)
+    expect(treeDepth(node('a', [node('b', [node('c')])]))).toBe(3)
+  })
+
+  it('takes the longest branch, not the first', () => {
+    expect(treeDepth(node('a', [node('b'), node('c', [node('d')])]))).toBe(3)
+  })
+})
+
+describe('walkForest', () => {
+  it('depth-first: a parent directly precedes its reports, with depths', () => {
+    const forest = [node('a', [node('b', [node('c')]), node('d')]), node('e')]
+    expect(walkForest(forest).map(({ node: n, depth }) => `${n.attributes.id}:${depth}`))
+      .toEqual(['a:0', 'b:1', 'c:2', 'd:1', 'e:0'])
   })
 })
