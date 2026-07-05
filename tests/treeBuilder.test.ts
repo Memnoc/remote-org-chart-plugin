@@ -16,7 +16,6 @@ function person(overrides: Partial<Person> & { id: string }): Person {
     managerId: null,
     externalManagerEmail: null,
     externalManagerName: null,
-    cycleFlag: false,
     ...overrides,
   }
 }

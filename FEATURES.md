@@ -57,7 +57,7 @@ Each person is rendered as a white card (`NodeCard`) with:
 - **Direct reports pill** — shows count + chevron; clicking it expands/collapses that subtree. Only appears on manager nodes.
 - **"View team →" button** — appears alongside the direct reports pill on manager nodes. Clicking it activates **Subtree Focus** mode (see below).
 
-Department colours: Engineering = green, Sales = emerald, Executive = amber, Ops = red, Finance = pink, HR = green, Marketing = blue, Design = cyan, Legal = violet, Product = orange, External/Unassigned = slate. Unknown departments get a stable hash-derived colour.
+Department colours: Engineering = green, Sales = emerald, Executive = amber, Ops = red, Finance = pink, HR = indigo, Marketing = blue, Design = cyan, Legal = violet, Product = orange, External/Unassigned = slate. Unknown departments get a stable hash-derived colour.
 
 ### Selection state
 

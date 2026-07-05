@@ -8,6 +8,7 @@
  * (see "orgUtils God Module Split" in DECISIONS.md).
  */
 import type { OrgNode } from '../../shared/types.js'
+import { treeDepth } from './forestNav.ts'
 
 /** What the DetailPanel drawer needs — a flat view-model, not a tree node. */
 export type PersonDetail = {
@@ -44,11 +45,7 @@ export function computeStats(allNodes: OrgNode[], forest: OrgNode[]): OrgStats {
   const avgSpan = managers.length > 0
     ? managers.reduce((s, m) => s + (m.children?.length ?? 0), 0) / managers.length
     : 0
-  function maxDepth(node: OrgNode): number {
-    if (!node.children?.length) return 1
-    return 1 + Math.max(...node.children.map(maxDepth))
-  }
-  const deepest = forest.length > 0 ? Math.max(...forest.map(maxDepth)) : 0
+  const deepest = forest.length > 0 ? Math.max(...forest.map(treeDepth)) : 0
   return {
     total: allNodes.length,
     managers: managers.length,
@@ -67,8 +64,8 @@ const DEPT_COLORS: Record<string, string> = {
   executive: '#f59e0b',
   ops: '#ef4444',
   finance: '#ec4899',
-  hr: '#22c55e',
-  'human resources': '#22c55e',
+  hr: '#6366f1',
+  'human resources': '#6366f1',
   marketing: '#3b82f6',
   design: '#06b6d4',
   legal: '#8b5cf6',

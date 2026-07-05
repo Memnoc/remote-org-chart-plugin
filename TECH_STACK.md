@@ -52,10 +52,10 @@
 - Cache bust: `POST /api/org/refresh` sets `cache = null` — client calls this before re-fetching
 
 ### Tree Construction (`server/lib/treeBuilder.ts`)
-1. Build `childrenMap: Map<employmentId, Person[]>` from flat list
-2. **Cycle detection:** walk each node's manager chain; if a node is visited twice, mark `cycleFlag = true` — cycle-flagged nodes become roots instead of children, breaking the cycle
-3. **Roots:** nodes with `managerId === null`, dangling manager references, cycle-flagged nodes, or external-manager nodes
-4. **External managers:** employees whose manager is not in the Remote system get `isExternal: true` and render as root nodes with a "Contractor" badge
+1. **Cycle detection:** walk each person's manager chain upward; a repeat visit means the chain loops — every member of the loop is collected into a `cycleIds` set
+2. Build `childrenMap: Map<employmentId, Person[]>` from the flat list, skipping cycle members so the loop is never re-created
+3. **Roots:** nodes with `managerId === null`, dangling manager references, cycle members (promoted, badge "cycle detected"), or external-manager nodes
+4. **External managers:** employees whose manager is not in the Remote system get `isExternal: true` and render as root nodes with a "reports to X (external)" badge
 
 ---
 

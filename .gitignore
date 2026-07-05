@@ -1,6 +1,8 @@
 node_modules/
 dist/
 dist-server/
+website/build/
+website/.docusaurus/
 .env
 *.local
 ASSIGNMENT.md

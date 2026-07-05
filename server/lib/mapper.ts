@@ -31,6 +31,5 @@ export function mapEmployment(raw: RemoteEmployment): Person {
       raw.manager_email && !raw.manager_employment_id ? raw.manager_email : null,
     externalManagerName:
       raw.manager && !raw.manager_employment_id ? raw.manager : null,
-    cycleFlag: false,
   }
 }

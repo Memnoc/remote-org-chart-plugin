@@ -1,8 +1,12 @@
 {
   "name": "remote-org-chart",
   "version": "1.0.0",
+  "description": "Org chart on Remote's API — interactive tree/list views with an Express proxy and snapshot fallback",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "prepare": "git config core.hooksPath .githooks || true",
     "dev": "concurrently \"vite\" \"tsx watch server/index.ts\"",

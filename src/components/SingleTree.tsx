@@ -171,16 +171,18 @@ export default function SingleTree({
       <Tree
         data={root}
         orientation="vertical"
+        // react-d3-tree types pathFunc as a closed union of preset names, but
+        // accepts a custom draw function at runtime — hence the double assertion.
         pathFunc={linkPath as unknown as 'step'}
         translate={{ x: translate.x + (panOffset?.x ?? 0), y: translate.y }}
         separation={{ siblings: 1.4, nonSiblings: 1.8 }}
         renderCustomNodeElement={renderNode}
         nodeSize={{ x: 280, y: 260 }}
         zoom={zoom}
-        // d3 transitions animate node transforms; on throttled mobile Safari
-        // an interrupted transition (URL-bar resize mid-flight) strands cards
-        // at the origin while the untransitioned links land correctly. Phones
-        // get direct React-set transforms instead — nothing to interrupt.
+        // Phones skip the d3 node animations: no visual benefit on a small
+        // screen, and fewer moving parts around the Safari foreignObject
+        // workaround (see lib/browser.ts). Not the mobile-bug fix itself —
+        // that was dropping the trigger CSS in NodeCard.
         enableLegacyTransitions={!narrow}
         collapsible
         initialDepth={initialDepth}

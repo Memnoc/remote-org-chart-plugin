@@ -57,5 +57,4 @@ export interface Person {
   /** Set only when the manager exists but is NOT on Remote (managerId null) — renders as an external-manager root. */
   externalManagerEmail: string | null
   externalManagerName: string | null
-  cycleFlag: boolean
 }
