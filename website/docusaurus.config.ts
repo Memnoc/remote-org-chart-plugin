@@ -107,7 +107,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Remote Org Chart — built for the Sr. Solution Architect assignment. © ${new Date().getFullYear()}.`,
+      copyright: `© ${new Date().getFullYear()} Matteo Stara — Remote Org Chart, built on Remote's API.`,
     },
     prism: {
       theme: prismThemes.github,
