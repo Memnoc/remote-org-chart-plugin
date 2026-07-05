@@ -12,6 +12,7 @@
 import React from 'react'
 import type { ThemeMode } from '../hooks/useTheme.ts'
 import { useDropdown } from '../hooks/useDropdown.ts'
+import { useIsNarrow } from '../hooks/useIsNarrow.ts'
 import { RefreshIcon, SunIcon, MoonIcon, SystemIcon, GitCommitIcon, iconBtnStyle } from './icons.tsx'
 
 const THEME_LABELS: Record<ThemeMode, string> = { light: 'Light', dark: 'Dark', system: 'System' }
@@ -29,6 +30,7 @@ interface Props {
 
 export default function Header({ theme, setTheme, status, source, fetchedAt, skippedCount, onRefresh, refreshing }: Props) {
   const { open, setOpen, triggerRef: btnRef, panelRef } = useDropdown()
+  const narrow = useIsNarrow()
 
   const isLive = status === 'ok' && source === 'live'
 
@@ -39,8 +41,8 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, ski
       borderBottom: '1px solid var(--border)',
       display: 'flex',
       alignItems: 'center',
-      padding: '0 20px',
-      gap: 12,
+      padding: narrow ? '0 12px' : '0 20px',
+      gap: narrow ? 8 : 12,
       flexShrink: 0,
       boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
       zIndex: 30,
@@ -62,17 +64,20 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, ski
             <line x1="8" y1="5" x2="13" y2="10" stroke="white" strokeWidth="1.2" />
           </svg>
         </div>
-        <span style={{ fontWeight: 800, fontSize: 17, color: 'var(--text)', letterSpacing: '-0.02em' }}>
+        <span style={{ fontWeight: 800, fontSize: narrow ? 15 : 17, color: 'var(--text)', letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
           Org Chart Plugin
         </span>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#d97706', userSelect: 'all' }} title="Build SHA">
-        <GitCommitIcon />
-        <span style={{ fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.04em', opacity: 0.75 }}>
-          {__GIT_SHA__}
-        </span>
-      </div>
+      {/* Build SHA is a dev/ops detail — not worth phone-width pixels */}
+      {!narrow && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#d97706', userSelect: 'all' }} title="Build SHA">
+          <GitCommitIcon />
+          <span style={{ fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.04em', opacity: 0.75 }}>
+            {__GIT_SHA__}
+          </span>
+        </div>
+      )}
 
       <div style={{ flex: 1 }} />
 
@@ -85,7 +90,7 @@ export default function Header({ theme, setTheme, status, source, fetchedAt, ski
           <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
             {isLive ? 'Live' : 'Snapshot'}
           </span>
-          {fetchedAt && (
+          {fetchedAt && !narrow && (
             <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
               · {new Date(fetchedAt).toLocaleTimeString()}
             </span>

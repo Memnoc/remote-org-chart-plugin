@@ -45,6 +45,9 @@ function NodeRow({ node, depth, search }: { node: OrgNode; depth: number; search
         display: 'flex',
         alignItems: 'baseline',
         gap: 8,
+        // No-op on desktop (one line fits); on phones title/department wrap
+        // under the name instead of overflowing horizontally.
+        flexWrap: 'wrap',
         // Filter-context ancestor (see forestFilter.ts) — dimmed, same as tree
         opacity: node.attributes.isContext ? 0.45 : 1,
       }}>

@@ -158,7 +158,8 @@ export default function DetailPanel({ person, onClose }: Props) {
       )}
       <div style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 201,
-        width: 320,
+        // Caps at 88vw on phones; identical 320px on anything wider.
+        width: 'min(320px, 88vw)',
         background: 'var(--surface)',
         borderLeft: '1px solid var(--border)',
         boxShadow: '-4px 0 24px rgba(0,0,0,0.12)',

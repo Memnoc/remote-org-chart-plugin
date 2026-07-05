@@ -107,6 +107,15 @@ a "+N" chip, names on hover). The manager row is absent for roots; external mana
 surface through the badge row, which shows the full badge text. No "full profile" view by
 design — see the PII-filter deferral in Decisions. Closes via `×`, backdrop click, or `Esc`.
 
+## Responsive layout (phones)
+
+Below 640px (`useIsNarrow` hook — a `matchMedia` subscription via `useSyncExternalStore`,
+same pattern as the theme's OS-preference tracking) the layout adapts without touching
+desktop rendering: the toolbar wraps with a full-width search row, the header drops the
+build SHA and fetch timestamp, both drawers cap at 88vw, the D-pad navigator disappears
+(the canvas pans by touch via react-d3-tree's built-in d3-zoom), and list rows wrap
+title/department under the name.
+
 ## Theme
 
 Three-way picker (Light / Dark / System). System tracks `prefers-color-scheme` reactively.

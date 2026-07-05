@@ -29,6 +29,7 @@ import ErrorBoundary from './ErrorBoundary.tsx'
 import { PlusIcon, MinusIcon, PersonIcon, zoomBtnStyle } from './icons.tsx'
 import { findSubtree, findChain, joinForest } from '../lib/forestNav.ts'
 import type { PersonDetail } from '../lib/orgPresentation.ts'
+import { useIsNarrow } from '../hooks/useIsNarrow.ts'
 
 interface Props {
   forest: OrgNode[]
@@ -86,6 +87,7 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
   const [focusedId, setFocusedId] = useState<string | null>(null)
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 })
   const scrollRef = useRef<HTMLDivElement>(null)
+  const narrow = useIsNarrow()
   const SCROLL_STEP = 240
 
   function pan(dx: number, dy: number) {
@@ -279,8 +281,9 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
         </button>
       </div>
 
-      {/* D-pad navigator */}
-      <div style={{
+      {/* D-pad navigator — pointer-precision aid; phones pan by touch, and it
+          would crowd the zoom bar at phone widths. */}
+      {!narrow && <div style={{
         position: 'absolute', bottom: 16, right: 32, zIndex: 10,
         background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
@@ -308,7 +311,7 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 3.5L6 7.5L10 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </button>
         <span />
-      </div>
+      </div>}
     </div>
   )
 }

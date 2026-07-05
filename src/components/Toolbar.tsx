@@ -11,6 +11,7 @@ import type { LinkStyle } from './SingleTree.tsx'
 import { FilterIcon } from './icons.tsx'
 import { deptColor } from '../lib/orgPresentation.ts'
 import { useDropdown } from '../hooks/useDropdown.ts'
+import { useIsNarrow } from '../hooks/useIsNarrow.ts'
 
 interface Props {
   search: string
@@ -39,20 +40,23 @@ export default function Toolbar({
   onExportCSV, hasData,
 }: Props) {
   const { open: filterOpen, setOpen: setFilterOpen, triggerRef: filterBtnRef, panelRef: filterPanelRef } = useDropdown()
+  const narrow = useIsNarrow()
 
   return (
     <div style={{
       background: 'var(--surface)',
       borderBottom: '1px solid var(--border)',
-      padding: '10px 20px',
+      padding: narrow ? '10px 12px' : '10px 20px',
       display: 'flex',
       alignItems: 'center',
       gap: 8,
       flexShrink: 0,
       position: 'relative',
       zIndex: 20,
+      // Phones: search takes the first row, controls wrap below it.
+      flexWrap: narrow ? 'wrap' : 'nowrap',
     }}>
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', flex: narrow ? '1 1 100%' : undefined }}>
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
           style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
           <circle cx="6" cy="6" r="4.5" stroke="var(--text-subtle)" strokeWidth="1.4" />
@@ -69,7 +73,7 @@ export default function Toolbar({
             borderRadius: 20,
             border: '1.5px solid var(--border)',
             fontSize: 13,
-            width: 240,
+            width: narrow ? '100%' : 240,
             outline: 'none',
             background: 'var(--surface)',
             color: 'var(--text)',

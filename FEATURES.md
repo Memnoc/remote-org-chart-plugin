@@ -186,6 +186,20 @@ Clicking a node card opens a slide-in drawer from the right:
 
 ---
 
+## Responsive Layout (phones)
+
+Below 640px (a `matchMedia` subscription via the `useIsNarrow` hook — same
+`useSyncExternalStore` pattern as the theme's OS-preference subscription) the layout adapts;
+desktop rendering is unchanged:
+
+- **Toolbar** wraps: search takes the full first row, the control pills flow below it
+- **Header** drops the build SHA and fetch timestamp (dev/ops details), tightens spacing
+- **Drawers** cap at 88vw (`min(320px, 88vw)` detail, `min(300px, 88vw)` stats) instead of a fixed width
+- **D-pad navigator** is hidden — the canvas pans by touch (react-d3-tree's built-in d3-zoom handles touch drag) and the page scrolls natively
+- **List view** rows wrap title/department under the name instead of overflowing
+
+---
+
 ## Theme
 
 Three-way picker (icon button in header → dropdown):
