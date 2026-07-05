@@ -85,7 +85,7 @@ Floating bar bottom-left of the canvas:
 
 - **+** / **−** buttons: ±10% zoom, clamped to 25%–250%
 - **% display**: shows current zoom level
-- **Reset View**: returns zoom to 80%
+- **Reset View**: returns zoom to the starting level (80% desktop, 45% on phones)
 
 Wired to react-d3-tree's reactive `zoom` prop — no remount needed.
 
@@ -197,6 +197,8 @@ desktop rendering is unchanged:
 - **Drawers** cap at 88vw (`min(320px, 88vw)` detail, `min(300px, 88vw)` stats) instead of a fixed width
 - **D-pad navigator** is hidden — the canvas pans by touch (react-d3-tree's built-in d3-zoom handles touch drag) and the page scrolls natively
 - **List view** rows wrap title/department under the name instead of overflowing
+- **Initial zoom is 45%** (80% on desktop) so the Organisation node and roots row fit the first screen; Reset View returns to the per-device starting zoom
+- **Centring is resize-aware** — a ResizeObserver re-centres the tree when the container width changes (mobile Safari settles its layout after mount: URL-bar collapse, font load)
 
 ---
 

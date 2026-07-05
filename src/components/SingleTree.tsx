@@ -58,11 +58,20 @@ export default function SingleTree({
   const containerRef = useRef<HTMLDivElement>(null)
   const [translate, setTranslate] = useState({ x: 0, y: 80 })
 
+  // Centre the tree on the container's midline — and KEEP it centred via
+  // ResizeObserver: mobile Safari settles its layout late (URL bar collapse,
+  // font load), so a mount-only measurement can centre on a stale width.
   useEffect(() => {
-    if (containerRef.current) {
-      const { width } = containerRef.current.getBoundingClientRect()
-      setTranslate({ x: width / 2, y: 80 })
+    const el = containerRef.current
+    if (!el) return
+    const measure = () => {
+      const { width } = el.getBoundingClientRect()
+      setTranslate((prev) => (prev.x === width / 2 ? prev : { x: width / 2, y: 80 }))
     }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [])
 
   const depth = treeDepth(root)

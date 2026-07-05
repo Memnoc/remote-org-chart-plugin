@@ -114,7 +114,9 @@ same pattern as the theme's OS-preference tracking) the layout adapts without to
 desktop rendering: the toolbar wraps with a full-width search row, the header drops the
 build SHA and fetch timestamp, both drawers cap at 88vw, the D-pad navigator disappears
 (the canvas pans by touch via react-d3-tree's built-in d3-zoom), and list rows wrap
-title/department under the name.
+title/department under the name. Initial zoom drops to 45% so the roots row fits the
+first screen, and a ResizeObserver keeps the tree centred when mobile Safari settles its
+layout after mount (URL-bar collapse, font load).
 
 ## Theme
 

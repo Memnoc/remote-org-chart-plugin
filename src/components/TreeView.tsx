@@ -82,12 +82,15 @@ function SegmentedPill({ options, active, onChange }: {
 export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilters = false, linkStyle = 'curve' }: Props) {
   const [expandMode, setExpandMode] = useState<'all' | 'collapsed' | 'default'>('default')
   const [treeKey, setTreeKey] = useState(0)
-  const [zoom, setZoom] = useState(0.8)
+  // Phones start zoomed out: at 0.8 a 224px card nearly fills a 390pt
+  // screen and the whole roots row lives off-canvas.
+  const narrow = useIsNarrow()
+  const initialZoom = narrow ? 0.45 : 0.8
+  const [zoom, setZoom] = useState(initialZoom)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [focusedId, setFocusedId] = useState<string | null>(null)
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 })
   const scrollRef = useRef<HTMLDivElement>(null)
-  const narrow = useIsNarrow()
   const SCROLL_STEP = 240
 
   function pan(dx: number, dy: number) {
@@ -275,7 +278,7 @@ export default function TreeView({ forest, onSelect, totalPeople, hasActiveFilte
         </span>
         <button onClick={() => changeZoom(-0.1)} style={zoomBtnStyle} title="Zoom out"><MinusIcon /></button>
         <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 2px' }} />
-        <button onClick={() => { setZoom(0.8); setPanOffset({ x: 0, y: 0 }) }} style={{ ...zoomBtnStyle, gap: 6, padding: '8px 12px' }} title="Reset zoom">
+        <button onClick={() => { setZoom(initialZoom); setPanOffset({ x: 0, y: 0 }) }} style={{ ...zoomBtnStyle, gap: 6, padding: '8px 12px' }} title="Reset zoom">
           <PersonIcon />
           <span style={{ fontSize: 12, fontWeight: 500 }}>Reset View</span>
         </button>
