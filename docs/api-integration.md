@@ -27,7 +27,7 @@ Authorization: Bearer <REMOTE_API_TOKEN>
 
 Token is stored as an environment variable on the server. Never sent to the browser.
 
-Sandbox base URL: `https://gateway.remote.com/v1`
+Sandbox base URL: `https://gateway.remote-sandbox.com/v1`
 
 ### Endpoints used
 
@@ -55,7 +55,7 @@ Sandbox base URL: `https://gateway.remote.com/v1`
 | External manager | `manager_employment_id: null`, `manager_email` set | Root with "reports to X (external)" badge |
 | Dangling reference | `manager_employment_id` set, no matching person in dataset | Treat as root (orphan) |
 | Reporting cycle | A.managerId = B, B.managerId = A | Detect via path traversal; cycle nodes become roots with "cycle detected" badge |
-| Missing data | `full_name`, `job_title`, or `department` is null | Display as `—`; never blank |
+| Missing data | `full_name`, `job_title`, or `department` is null | Name falls back to "Unknown Employee"; missing title/department are omitted — never a blank or sentinel string |
 
 ### Concurrency & caching
 

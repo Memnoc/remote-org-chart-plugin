@@ -44,6 +44,19 @@ npm run dev                   # SPA on :5173, Express proxy on :3001
 ```
 
 Open `http://localhost:5173`. Without `REMOTE_API_TOKEN` the app serves snapshot data.
+`npm test` runs the unit suite; `npm run lint` runs ESLint.
+
+## Assumptions & limitations
+
+- Built against the **Remote sandbox** API; production use would change only the base URL and token.
+- No login of its own — org data is treated as non-sensitive and the API token (the only
+  secret) never leaves the server. An internal deployment would sit behind SSO.
+- **In-memory cache, single instance** (5-minute TTL); Redis would replace it if scaled out.
+- The committed **snapshot can drift** from live sandbox data — the `source` badge in the
+  UI makes it visible.
+- **Unit tests only** — the pure core is covered; the UI is verified manually. Next step:
+  a Playwright smoke test over the deployed URL. Trade-offs behind these are in
+  [Decisions](./decisions.md).
 
 ## At a glance
 

@@ -27,6 +27,12 @@ Open `http://localhost:5173`.
 
 Without `REMOTE_API_TOKEN`, the app serves snapshot data (fallback mode).
 
+```bash
+npm test        # unit tests (Vitest, 55 tests over the pure core)
+npm run lint    # ESLint (typescript-eslint + react-hooks)
+npm run docs:dev # Docusaurus docs site on :3000
+```
+
 `npm install` also runs a `prepare` step that points git at `.githooks/` — enabling a
 non-blocking `pre-commit` reminder to update docs when a commit changes code. No manual
 setup needed.
@@ -70,9 +76,20 @@ Remote MCP is designed for LLM agents — structured tool definitions for AI mod
 | External manager (`manager_email` set, no id) | Rendered as root with "reports to X (external)" badge |
 | Dangling manager reference (id not in dataset) | Treated as root (orphan) |
 | Reporting cycle (A → B → A) | Cycle detected; cycle nodes rendered as roots with "cycle detected" badge |
-| Missing name / title / department | Displayed as `—`, never blank |
+| Missing name / title / department | Name falls back to "Unknown Employee"; missing title/department are omitted — never a blank or sentinel string |
 | Multiple root nodes | Joined under a virtual "Org" root — one expandable tree, no one hidden |
 | Non-active employments (archived / pre-hire) | Filtered out server-side; org chart shows current staff only |
+
+---
+
+## Assumptions & Limitations
+
+- **Sandbox data only** — built against the Remote sandbox API; production use would change only the base URL and token.
+- **Org data treated as non-sensitive** — the app has no login of its own; the API token is the only secret and never leaves the server. An internal deployment would sit behind the company's SSO.
+- **In-memory cache, single instance** — 5-minute TTL in process memory; a restart or a second instance re-fetches. Fine at this scale; Redis would replace it if scaled out.
+- **Snapshot can drift** — the committed fallback reflects the sandbox at capture time; the `source` badge in the UI makes it visible when you're looking at snapshot rather than live data.
+- **N+1 detail fetch** — manager fields only exist on the per-employment detail endpoint (API constraint), so a cold live fetch takes a few seconds; mitigated with a concurrency pool of 8 and the cache.
+- **Unit tests only** — the pure core (tree-builder, mapper, filter, nav, stats, CSV) is covered; the UI is verified manually. Next step would be a Playwright smoke test over the deployed URL.
 
 ---
 
@@ -111,7 +128,7 @@ See [`render.yaml`](./render.yaml) for service config. Set `REMOTE_API_TOKEN` as
 ```
 /server         Express proxy, Remote API client, tree-builder, snapshot.json
 /src            React SPA — App, TreeView, ListView, NodeCard, useOrg hook
-/shared         Shared TypeScript types (Person, OrgNode, RemoteEmployment, OrgResponse)
+/shared         Shared TypeScript types — the HTTP contract only (OrgNode, OrgResponse)
 /tests          Vitest unit tests — the pure core (tree-builder, mapper, filter, nav, stats, CSV)
 /docs           Architecture and integration documentation
 render.yaml     Render deploy config

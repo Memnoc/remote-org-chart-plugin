@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 title: Architecture
 ---
 
@@ -74,8 +74,8 @@ These docs are hosted separately on GitHub Pages — see [Deployment](./deployme
 ```
 /server         Express proxy, Remote API client, tree-builder, snapshot.json
 /src            React SPA — App, TreeView, ListView, NodeCard, useOrg hook
-/shared         Shared TypeScript types (Person, OrgNode, RemoteEmployment, OrgResponse)
+/shared         Shared TypeScript types — the HTTP contract only (OrgNode, OrgResponse)
 /website        This Docusaurus docs site
-/tests          Vitest unit tests — mapper and tree-builder
+/tests          Vitest unit tests — the pure core (tree-builder, mapper, filter, nav, stats, CSV)
 render.yaml     Render deploy config
 ```

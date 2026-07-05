@@ -15,7 +15,7 @@ The Express server serves both the compiled SPA (`/dist`) and the `/api/org` end
 2. Server checks in-memory cache (5-minute TTL)
 3. If `REMOTE_API_TOKEN` is present → fetches live data from Remote API (`/v1/employments`), paginates all pages with bounded concurrency (pool size 8), filters to `status === 'active'` (archived/pre-hire employments are excluded), maps to internal `OrgNode` shape, builds reporting tree
 4. If token absent or live fetch fails → falls back to `server/snapshot.json`
-5. Response envelope: `{ forest: OrgNode[], source: 'live' | 'snapshot', fetchedAt: string }`
+5. Response envelope: `{ forest: OrgNode[], source: 'live' | 'snapshot', fetchedAt: string, skippedCount?: number }`
 
 **Tree building:** `buildForest()` constructs a forest (array of trees) from the flat employee list using `manager_employment_id`. Cycles are detected and broken. Employees with no on-Remote manager become roots. External managers (off-Remote) are stub nodes with `isExternal: true`.
 

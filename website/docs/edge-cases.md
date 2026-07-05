@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 6
 title: Edge cases
 ---
 
@@ -14,7 +14,7 @@ assuming a single clean CEO-rooted tree.
 | External manager (`manager_email` set, no id) | Root with a "reports to X (external)" badge |
 | Dangling manager reference (id not in dataset) | Treated as a root (orphan) |
 | Reporting cycle (A → B → A) | Cycle detected; cycle nodes rendered as roots with a "cycle detected" badge |
-| Missing name / title / department | Displayed as `—`, never blank |
+| Missing name / title / department | Name falls back to "Unknown Employee"; missing title/department are omitted — never a blank or sentinel string |
 | Multiple root nodes | Joined under a virtual "Org" root — one expandable tree, no one hidden |
 | Non-active employments (archived / pre-hire) | Filtered out server-side (`status === 'active'`) |
 

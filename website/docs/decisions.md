@@ -1,5 +1,5 @@
 ---
-sidebar_position: 8
+sidebar_position: 9
 title: Design decisions
 ---
 
@@ -77,7 +77,8 @@ Documented as ADRs so future reviews don't re-litigate them:
 
 - **Shared types are the HTTP contract only** — `shared/types.ts` describes what crosses the
   wire, nothing internal.
-- **Null/undefined over sentinel strings** — missing data is `null`, formatted to `—` at
-  render, never a magic `"N/A"`.
+- **Null/undefined over sentinel strings** — missing data stays `null`/`undefined` end to
+  end (a missing name falls back to "Unknown Employee" at tree-build; missing title or
+  department is simply omitted at render), never a magic `"N/A"` or `—`.
 - **`orgUtils` split** — the former god module was broken into focused modules
   (presentation, export, nav, filter) so each has one reason to change.

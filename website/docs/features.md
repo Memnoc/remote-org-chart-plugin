@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 title: Features
 ---
 
@@ -36,7 +36,7 @@ Interactive hierarchy rendered with `react-d3-tree`.
   **"Organisation" company node** (building icon, "N people · M branches" subtitle,
   explanatory tooltip) at render time, so the whole org expands from one tree without
   hiding anyone.
-- **Zoom controls:** floating bar, ±10% steps clamped 25%–250%, live % readout, reset to 80%.
+- **Zoom controls:** floating bar, ±10% steps clamped 25%–250%, live % readout, reset to 80% (45% on phones).
 - **Starts collapsed** — Organisation node + top-level roots, like Remote's own chart. Auto-expands
   while searching/filtering or when a team is focused; Expand/Collapse-all overrides.
 - **Expand / collapse all:** remounts the tree with a new `initialDepth`.

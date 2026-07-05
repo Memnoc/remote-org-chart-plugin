@@ -202,7 +202,7 @@
 
 **Why:** A module with 5 unrelated concerns fails the deletion test — deleting it would scatter complexity to 9 import sites. Each split module earns its existence: callers import only what they need, the interface of each module is narrow relative to its implementation, and locality is preserved (filtering bugs live in `forestFilter.ts`, colour bugs live in `orgPresentation.ts`).
 
-**Trade-off:** 9 import sites updated. The original file is blanked (not deleted) because the pre-commit hook blocks `rm`. Future cleanup can remove it once all consumers are verified.
+**Trade-off:** 9 import sites updated. The original file was blanked first (an environment guardrail blocked `rm` at the time), then deleted once all consumers were verified against the new modules.
 
 ---
 
