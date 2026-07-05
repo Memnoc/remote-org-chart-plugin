@@ -39,6 +39,12 @@ This page summarises the load-bearing ones.
 - **URL state via `history.replaceState`, no router** — one screen; a router would be
   ceremony. Search, filters, and view mode live in query params.
 - **Client-side CSV export** — walks the forest in the browser; no server round-trip.
+- **Safari foreignObject workaround** — WebKit paints foreignObject HTML at the SVG origin
+  when it uses `position`/`transform`/`transition` (WebKit bug 23113; react-d3-tree
+  issue #284) — on a real iPhone every card stacked at the top-left while the pure-SVG
+  links drew correctly, invisible in desktop DevTools emulation (Blink). Node cards drop
+  those properties on Safari (`IS_SAFARI` gate — static chevron, no hover transitions)
+  instead of reimplementing the node layer as an HTML overlay.
 
 ## Resilience
 

@@ -16,6 +16,7 @@
  */
 import React from 'react'
 import { deptColor, initials } from '../lib/orgPresentation.ts'
+import { IS_SAFARI } from '../lib/browser.ts'
 
 interface Props {
   nodeData: {
@@ -53,6 +54,24 @@ function BuildingIcon() {
       <rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" strokeWidth="1.5" />
       <path d="M6 5h1.5M8.5 5H10M6 7.5h1.5M8.5 7.5H10M6 10h1.5M8.5 10H10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
       <path d="M8 14v-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+/**
+ * Expand/collapse chevron. Safari can't have the rotate transform inside a
+ * foreignObject (mispositions the whole card — see lib/browser.ts), so it
+ * gets a pre-rotated path instead of the animated rotation.
+ */
+function Chevron({ collapsed }: { collapsed: boolean }) {
+  const down = 'M1.5 3.5 L5 7 L8.5 3.5'
+  const right = 'M3.5 1.5 L7 5 L3.5 8.5'
+  return (
+    <svg
+      width="9" height="9" viewBox="0 0 10 10"
+      style={IS_SAFARI ? undefined : { transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+    >
+      <path d={IS_SAFARI && collapsed ? right : down} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </svg>
   )
 }
@@ -99,12 +118,7 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
             <BuildingIcon />
             Organisation
-            <svg
-              width="9" height="9" viewBox="0 0 10 10"
-              style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
-            >
-              <path d="M1.5 3.5 L5 7 L8.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-            </svg>
+            <Chevron collapsed={collapsed} />
           </span>
           <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)' }}>
             {totalPeople} people · {childCount} {childCount === 1 ? 'branch' : 'branches'}
@@ -124,7 +138,9 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
     <div
       onClick={onCardClick}
       style={{
-        position: 'relative',
+        // No `position` here on purpose: nothing in the card is absolutely
+        // positioned, and `position` inside a foreignObject makes Safari
+        // paint the card at the SVG origin (see lib/browser.ts).
         opacity: dimmed ? 0.45 : 1,
         // Chain tint layered over the opaque surface — a bare rgba() here is
         // ~transparent and lets the connector stub behind the card bleed through.
@@ -140,7 +156,7 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
           : onChain ? '0 0 0 2px rgba(245,158,11,0.2), 0 4px 12px rgba(0,0,0,0.07)'
           : 'var(--shadow-card)',
         cursor: onCardClick ? 'pointer' : 'default',
-        transition: 'box-shadow 0.15s, border-color 0.15s, opacity 0.15s',
+        transition: IS_SAFARI ? undefined : 'box-shadow 0.15s, border-color 0.15s, opacity 0.15s',
         userSelect: 'none',
       }}
     >
@@ -273,17 +289,12 @@ export default function NodeCard({ nodeData, collapsed = false, onClick: onCardC
               borderRadius: 20,
               padding: '4px 10px',
               cursor: 'pointer',
-              transition: 'background 0.1s',
+              transition: IS_SAFARI ? undefined : 'background 0.1s',
             }}
           >
             <PeopleIcon />
             <span>{childCount}</span>
-            <svg
-              width="9" height="9" viewBox="0 0 10 10"
-              style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
-            >
-              <path d="M1.5 3.5 L5 7 L8.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-            </svg>
+            <Chevron collapsed={collapsed} />
           </button>
           {onFocus && (
             <button

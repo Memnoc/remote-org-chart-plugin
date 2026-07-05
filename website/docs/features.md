@@ -117,9 +117,11 @@ build SHA and fetch timestamp, both drawers cap at 88vw, the D-pad navigator dis
 title/department under the name. Initial zoom drops to 45% so the roots row fits the
 first screen, and a ResizeObserver keeps the tree centred when mobile Safari settles its
 layout after mount (URL-bar collapse, font load). The collapse animation is also disabled
-on phones: d3 transitions animate node transforms, and an interrupted transition on a
-throttled device strands cards at the canvas origin — phones get instant transforms
-instead.
+on phones (instant node transforms instead of d3-animated ones), and Safari — Mac and
+iOS, where every browser is WebKit — drops the cards' micro-transitions: WebKit paints
+foreignObject HTML at the SVG origin when it uses `position`/`transform`/`transition`
+(WebKit bug 23113). See "Safari foreignObject Workaround" in
+[Decisions](./decisions.md).
 
 ## Theme
 

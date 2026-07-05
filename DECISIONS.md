@@ -289,3 +289,28 @@
 **Why:** Remote's own drawer with location/start date sits behind their authenticated admin UI. This app is a public URL backed by an unauthenticated proxy — republishing personal data there would make the proxy a PII leak rather than a PII filter. The server-side mapper deliberately projects only the six fields the org chart needs; everything else is dropped before it ever reaches the client. Scope is the second reason: the assignment is an org chart, and who/role/department/manager/reports answers every org question the tree can raise.
 
 **Trade-off:** Less drawer parity with Remote's product. If richer profiles were ever needed, the right shape is a separate authenticated `/api/employee/:id` endpoint with its own caching and access-control story — not a fatter `/api/org` payload shipping unviewed personal data to every visitor.
+
+---
+
+## Safari foreignObject Workaround — Drop the Trigger CSS, Not the Feature
+
+**Decision:** HTML rendered inside the tree's SVG `<foreignObject>` (the node cards) never
+uses `position`, `transform`, or `transition`. Where those added polish — card hover
+micro-transitions, the animated chevron rotation — they are gated behind an `IS_SAFARI`
+check (`src/lib/browser.ts`) and replaced with static equivalents on WebKit (a pre-rotated
+chevron path instead of a CSS rotation). `position: relative` on the card root was dead
+style and is removed for all browsers.
+
+**Why:** WebKit (Mac Safari and every iOS browser, since iOS mandates WebKit) paints
+foreignObject content at the top SVG's origin — ignoring ancestor `<g>` transforms — when
+that content uses any of those CSS properties (WebKit bug 23113, open since 2009;
+documented for this exact library in react-d3-tree issue #284). On a real iPhone every
+person card rendered stacked at the canvas top-left while the pure-SVG connector links
+drew correctly. The Organisation card was the diagnostic tell: it renders fine because its
+root carries none of the trigger properties. Desktop DevTools mobile emulation runs Blink,
+so the bug is invisible in any desktop-based preview — it only reproduces on real WebKit.
+
+**Trade-off:** Safari users lose ~150ms hover transitions and a 200ms chevron rotation —
+imperceptible against broken rendering. The alternative (replacing foreignObject with an
+HTML overlay positioned in sync with the SVG) would dodge the bug entirely but means
+reimplementing react-d3-tree's node layer; not worth it while the CSS diet fully fixes it.
